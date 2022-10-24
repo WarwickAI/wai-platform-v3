@@ -1,19 +1,26 @@
-import { Group } from "@prisma/client";
+import { Group, User } from "@prisma/client";
 import { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
-import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/solid";
 
 const Groups: NextPage = () => {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  const group = trpc.group.get.useQuery(selectedGroup?.id || "");
   const groups = trpc.group.getAll.useQuery();
+  const users = trpc.user.getAll.useQuery();
 
   const utils = trpc.useContext();
   const deleteGroup = trpc.group.delete.useMutation();
+  const addUser = trpc.group.addUser.useMutation();
+  const removeUser = trpc.group.removeUser.useMutation();
 
   const handleDeleteGroup = () => {
     if (!selectedGroup) return;
@@ -31,10 +38,43 @@ const Groups: NextPage = () => {
     );
   };
 
+  const handleAddUser = () => {
+    if (!selectedGroup || !selectedUser) return;
+
+    addUser.mutate(
+      {
+        groupId: selectedGroup.id,
+        userId: selectedUser.id,
+      },
+      {
+        onSuccess: () => {
+          utils.group.get.invalidate(selectedGroup.id);
+          setSelectedUser(null);
+        },
+      }
+    );
+  };
+
+  const handleRemoveUser = (userId: string) => {
+    if (!selectedGroup) return;
+
+    removeUser.mutate(
+      {
+        groupId: selectedGroup.id,
+        userId,
+      },
+      {
+        onSuccess: () => {
+          utils.group.get.invalidate(selectedGroup.id);
+        },
+      }
+    );
+  };
+
   return (
-    <div className="p-8">
-      <h1 className="mb-8 text-4xl font-bold">Groups Admin</h1>
-      <div className="flex flex-row flex-wrap items-center space-x-2">
+    <div className="container mx-auto flex min-h-screen flex-col items-center justify-center p-8">
+      <h1 className="text-4xl font-bold">Groups Admin</h1>
+      <div className="mt-8 flex flex-row flex-wrap items-center space-x-2">
         {groups.data ? (
           <select
             className="select-bordered select"
@@ -59,7 +99,7 @@ const Groups: NextPage = () => {
         )}
         <div className="btn-group">
           <GroupCreateModal />
-          <button className="btn btn-sm" onClick={handleDeleteGroup}>
+          <button className="btn-sm btn" onClick={handleDeleteGroup}>
             <TrashIcon className="h-4 w-4 font-bold text-white" />
           </button>
           {selectedGroup && (
@@ -71,6 +111,42 @@ const Groups: NextPage = () => {
           )}
         </div>
       </div>
+      <div className="mt-4 flex flex-row flex-wrap">
+        {selectedGroup &&
+          group.data &&
+          group.data.users.map((user) => (
+            <UserBadge
+              key={user.id}
+              user={user}
+              removeUser={handleRemoveUser}
+            />
+          ))}
+      </div>
+      {selectedGroup && users.data && (
+        <div className="flex flex-row flex-wrap items-center space-x-2">
+          <select
+            className="select-bordered select mt-4"
+            value={selectedUser?.id || 0}
+            onChange={(e) =>
+              setSelectedUser(
+                users.data.find((user) => user.id === e.target.value) || null
+              )
+            }
+          >
+            <option value={0} disabled>
+              Add User
+            </option>
+            {users.data.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.email}
+              </option>
+            ))}
+          </select>
+          <button className="btn-sm btn" onClick={handleAddUser}>
+            <PlusIcon className="h-4 w-4 font-bold text-white" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -103,7 +179,7 @@ const GroupCreateModal = () => {
 
   return (
     <>
-      <label htmlFor="create-group-modal" className="btn btn-sm">
+      <label htmlFor="create-group-modal" className="btn-sm btn">
         <PlusIcon className="h-4 w-4 font-bold text-white" />
       </label>
       <input
@@ -146,15 +222,15 @@ const GroupCreateModal = () => {
           </div>
 
           <div className="modal-action">
-            <label htmlFor="create-group-modal" className="btn btn-error">
+            <label htmlFor="create-group-modal" className="btn-error btn">
               Cancel
             </label>
             <label
               htmlFor="create-group-modal"
-              className="btn btn-success"
+              className="btn-success btn"
               onClick={() => handleCreateGroup()}
             >
-              Edit!
+              Create!
             </label>
           </div>
         </div>
@@ -177,34 +253,28 @@ const GroupEditModal = ({ id, name, description }: GroupEditModalProps) => {
 
   const utils = trpc.useContext();
 
-  const createGroup = trpc.group.create.useMutation();
+  const editGroup = trpc.group.edit.useMutation();
 
   useEffect(() => {
     setNewName(name || "");
     setNewDescription(description || "");
   }, [name, description]);
 
-  const handleCreateGroup = () => {
-    createGroup.mutate(
+  const handleEditGroup = () => {
+    editGroup.mutate(
       {
+        id,
         name: newName,
         description: newDescription,
       },
       {
-        onSuccess: () => {
-          utils.group.getAll.invalidate();
-          setNewName("");
-          setNewDescription("");
-        },
+        onSuccess: () => utils.group.getAll.invalidate(),
       }
     );
   };
 
   return (
     <>
-      <label htmlFor="edit-group-modal" className="btn btn-sm">
-        <PencilIcon className="h-4 w-4 font-bold text-white" />
-      </label>
       <input
         type="checkbox"
         id={"edit-group-modal"}
@@ -245,19 +315,38 @@ const GroupEditModal = ({ id, name, description }: GroupEditModalProps) => {
           </div>
 
           <div className="modal-action">
-            <label htmlFor="edit-group-modal" className="btn btn-error">
+            <label htmlFor="edit-group-modal" className="btn-error btn">
               Cancel
             </label>
             <label
               htmlFor="edit-group-modal"
-              className="btn btn-success"
-              onClick={() => handleCreateGroup()}
+              className="btn-success btn"
+              onClick={() => handleEditGroup()}
             >
               Edit!
             </label>
           </div>
         </div>
       </div>
+      <label htmlFor="edit-group-modal" className="btn-sm btn">
+        <PencilIcon className="h-4 w-4 font-bold text-white" />
+      </label>
     </>
+  );
+};
+
+type UserBadgeProps = {
+  user: User;
+  removeUser: (id: string) => void;
+};
+
+const UserBadge = ({ user, removeUser }: UserBadgeProps) => {
+  return (
+    <div className="badge-secondary badge badge-lg">
+      <button onClick={() => removeUser(user.id)}>
+        <XMarkIcon className="h-4 w-4 text-white" />
+      </button>
+      <span className="ml-2">{user.email}</span>
+    </div>
   );
 };

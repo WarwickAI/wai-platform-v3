@@ -1,4 +1,9 @@
-import { router, publicProcedure, authedProcedure } from "../trpc";
+import {
+  router,
+  publicProcedure,
+  authedProcedure,
+  execProcedure,
+} from "../trpc";
 import { z } from "zod";
 
 export const groupRouter = router({
@@ -42,5 +47,31 @@ export const groupRouter = router({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.group.delete({ where: { id: input.id } });
+    }),
+
+  addUser: execProcedure
+    .input(z.object({ groupId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.group.update({
+        where: { id: input.groupId },
+        data: {
+          users: {
+            connect: { id: input.userId },
+          },
+        },
+      });
+    }),
+
+  removeUser: execProcedure
+    .input(z.object({ groupId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.group.update({
+        where: { id: input.groupId },
+        data: {
+          users: {
+            disconnect: { id: input.userId },
+          },
+        },
+      });
     }),
 });

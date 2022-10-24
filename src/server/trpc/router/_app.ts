@@ -4,12 +4,14 @@ import { exampleRouter } from "./example";
 import { authRouter } from "./auth";
 import { elementRouter } from "./element";
 import { groupRouter } from "./group";
+import { userRouter } from "./user";
 
 export const appRouter = router({
   example: exampleRouter,
   element: elementRouter,
   group: groupRouter,
   auth: authRouter,
+  user: userRouter,
 });
 
 // export type definition of API

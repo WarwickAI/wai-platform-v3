@@ -2,9 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
-import { MutateFunction } from "@tanstack/react-query";
 import { User } from "@prisma/client";
-import { userAgent } from "next/server";
 
 const Home: NextPage = () => {
   const hello = trpc.example.hello.useQuery({ text: "from tRPC" });

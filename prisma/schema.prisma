@@ -60,12 +60,16 @@ model User {
 }
 
 model Group {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       User[]
+  id               String    @id @default(cuid())
+  name             String    @unique
+  description      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  users            User[]
+  masterElements   Element[] @relation("MasterElements_To_Groups")
+  editElements     Element[] @relation("EditElements_To_Groups")
+  interactElements Element[] @relation("InteractElements_To_Groups")
+  viewElements     Element[] @relation("ViewElements_To_Groups")
 }
 
 model VerificationToken {
@@ -78,14 +82,43 @@ model VerificationToken {
 
 enum ElementType {
   Text
+  Page
+}
+
+enum AttributeType {
+  Text
+  Number
+  Boolean
+  Markdown
 }
 
 model Element {
-  id        String      @id @default(cuid())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  type      ElementType
-  value     String
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
+  id             String      @id @default(cuid())
+  index          Int         @default(0)
+  route          String?     @unique
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  type           ElementType
+  atts           Attribute[]
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  masterGroups   Group[]     @relation("MasterElements_To_Groups")
+  editGroups     Group[]     @relation("EditElements_To_Groups")
+  interactGroups Group[]     @relation("InteractElements_To_Groups")
+  viewGroups     Group[]     @relation("ViewElements_To_Groups")
+  parentId       String?
+  parent         Element?    @relation("Element_To_Parent", fields: [parentId], references: [id])
+  children       Element[]   @relation("Element_To_Parent")
+}
+
+model Attribute {
+  id        String        @id @default(cuid())
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  name      String
+  type      AttributeType
+  value     Json
+  required  Boolean
+  elementId String
+  element   Element       @relation(fields: [elementId], references: [id], onDelete: Cascade)
 }

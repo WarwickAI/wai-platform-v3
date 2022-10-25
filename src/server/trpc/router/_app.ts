@@ -5,10 +5,12 @@ import { authRouter } from "./auth";
 import { elementRouter } from "./element";
 import { groupRouter } from "./group";
 import { userRouter } from "./user";
+import { attributeRouter } from "./attribute";
 
 export const appRouter = router({
   example: exampleRouter,
   element: elementRouter,
+  attribute: attributeRouter,
   group: groupRouter,
   auth: authRouter,
   user: userRouter,

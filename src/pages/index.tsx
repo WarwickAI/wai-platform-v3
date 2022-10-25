@@ -2,15 +2,73 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
-import { User } from "@prisma/client";
+import { useEffect, useState } from "react";
+import Item from "../components/item";
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { Attribute, Element, User } from "@prisma/client";
 
 const Home: NextPage = () => {
-  const hello = trpc.example.hello.useQuery({ text: "from tRPC" });
-
-  const utils = trpc.useContext();
+  const [items, setItems] = useState<
+    (Element & {
+      user: User;
+      atts: Attribute[];
+    })[]
+  >([]);
 
   const elements = trpc.element.getAll.useQuery();
+
   const createElement = trpc.element.create.useMutation();
+
+  useEffect(() => {
+    if (!elements.data) return;
+
+    setItems(elements.data.sort((a, b) => a.index - b.index));
+  }, [elements.data]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const addPage = () => {
+    createElement.mutate(
+      {
+        type: "Page",
+        index: 0,
+        atts: [
+          {
+            name: "Title",
+            type: "Text",
+            value: "Untitled",
+            required: true,
+          },
+        ],
+      },
+      {
+        onSuccess: () => elements.refetch(),
+      }
+    );
+  };
 
   return (
     <>
@@ -23,76 +81,53 @@ const Home: NextPage = () => {
         <h1 className="text-5xl font-extrabold leading-normal text-gray-700 md:text-[5rem]">
           Create <span className="text-purple-300">T3</span> App
         </h1>
-        <p className="text-2xl text-gray-700">This stack uses:</p>
-        <div className="mt-3 grid gap-3 pt-3 text-center md:grid-cols-3 lg:w-2/3">
-          <TechnologyCard
-            name="NextJS"
-            description="The React framework for production"
-            documentation="https://nextjs.org/"
-          />
-          <TechnologyCard
-            name="TypeScript"
-            description="Strongly typed programming language that builds on JavaScript, giving you better tooling at any scale"
-            documentation="https://www.typescriptlang.org/"
-          />
-          <TechnologyCard
-            name="TailwindCSS"
-            description="Rapidly build modern websites without ever leaving your HTML"
-            documentation="https://tailwindcss.com/"
-          />
-          <TechnologyCard
-            name="tRPC"
-            description="End-to-end typesafe APIs made easy"
-            documentation="https://trpc.io/"
-          />
-          <TechnologyCard
-            name="Next-Auth"
-            description="Authentication for Next.js"
-            documentation="https://next-auth.js.org/"
-          />
-          <TechnologyCard
-            name="Prisma"
-            description="Build data-driven JavaScript & TypeScript apps in less time"
-            documentation="https://www.prisma.io/docs/"
-          />
-        </div>
-        <div className="flex w-full items-center justify-center pt-6 text-2xl text-blue-500">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
-        </div>
-        <div className="flex w-full items-center justify-center pt-6 text-2xl text-blue-500">
-          {elements.data ? (
-            elements.data.map((element) => (
-              <TextElement
-                key={element.id}
-                id={element.id}
-                text={element.value}
-                user={element.user}
-              />
-            ))
-          ) : (
-            <p>Loading...</p>
-          )}
-          {/* Create Element */}
-          <div
-            onClick={() =>
-              createElement.mutate(
-                {
-                  type: "Text",
-                  value: "Some Text",
-                },
-                {
-                  onSuccess: () => utils.element.getAll.invalidate(),
-                }
-              )
-            }
+        <div className="flex w-full flex-col items-center justify-center space-y-2 pt-6 text-2xl text-blue-500">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            Create
-          </div>
+            <SortableContext
+              items={items}
+              strategy={verticalListSortingStrategy}
+            >
+              {items.length > 0 ? (
+                items.map((element) => (
+                  <Item key={element.id} element={element} />
+                ))
+              ) : (
+                <Item />
+              )}
+            </SortableContext>
+          </DndContext>
         </div>
+        <button onClick={addPage}>add</button>
         <AuthShowcase />
       </main>
     </>
   );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setItems((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+
+      console.log("Moving from", oldIndex, "to", newIndex);
+
+      console.log(
+        "Before",
+        items,
+        "after",
+        arrayMove(items, oldIndex, newIndex)
+      );
+
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  }
 };
 
 export default Home;
@@ -118,63 +153,6 @@ const AuthShowcase: React.FC = () => {
       >
         {sessionData ? "Sign out" : "Sign in"}
       </button>
-    </div>
-  );
-};
-
-type TechnologyCardProps = {
-  name: string;
-  description: string;
-  documentation: string;
-};
-
-const TechnologyCard = ({
-  name,
-  description,
-  documentation,
-}: TechnologyCardProps) => {
-  return (
-    <section className="flex flex-col justify-center rounded border-2 border-gray-500 p-6 shadow-xl duration-500 motion-safe:hover:scale-105">
-      <h2 className="text-lg text-gray-700">{name}</h2>
-      <p className="text-sm text-gray-600">{description}</p>
-      <a
-        className="m-auto mt-3 w-fit text-sm text-violet-500 underline decoration-dotted underline-offset-2"
-        href={documentation}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Documentation
-      </a>
-    </section>
-  );
-};
-
-type TextElementProps = {
-  id: string;
-  text: string;
-  user: User;
-};
-
-const TextElement = ({ id, text, user }: TextElementProps) => {
-  const utils = trpc.useContext();
-
-  const deleteElement = trpc.element.delete.useMutation();
-
-  return (
-    <div className="radius flex flex-row items-center rounded-md border-2 border-emerald-400 bg-emerald-100 p-2 text-gray-700">
-      <p className="mr-2 ">{text}</p>
-      <button
-        className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-500 text-white"
-        onClick={() =>
-          deleteElement.mutate(
-            { id },
-            { onSuccess: () => utils.element.getAll.invalidate() }
-          )
-        }
-      >
-        <p>x</p>
-      </button>
-      <p>{user.email}</p>
     </div>
   );
 };

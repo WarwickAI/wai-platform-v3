@@ -25,4 +25,7 @@ export default defineNextConfig({
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: ["www.gravatar.com"],
+  },
 });

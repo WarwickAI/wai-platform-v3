@@ -48,4 +48,22 @@ export const elementRouter = router({
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.element.delete({ where: { id: input.id } });
     }),
+
+  order: authedProcedure
+    .input(
+      z
+        .object({
+          id: z.string(),
+          index: z.number(),
+        })
+        .array()
+    )
+    .mutation(async ({ ctx, input }) => {
+      for (const { id, index } of input) {
+        await ctx.prisma.element.update({
+          where: { id },
+          data: { index },
+        });
+      }
+    }),
 });

@@ -65,14 +65,12 @@ const MarkdownAttribute = ({ attribute }: { attribute: Attribute }) => {
     >
       {hovered ? (
         <SimpleMDEReact
-          className="w-full max-w-lg"
-          value={attribute.value as string}
+          value={value as string}
           onChange={(v) => {
             debounced(v);
             setValue(v);
           }}
           options={mdeOptions}
-          
         />
       ) : (
         <article className="prose">

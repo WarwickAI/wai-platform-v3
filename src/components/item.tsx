@@ -3,7 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Bars4Icon, PlusIcon } from "@heroicons/react/24/solid";
 import { Attribute, AttributeType, Element, User } from "@prisma/client";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { trpc } from "../utils/trpc";
 import TextElement from "./elements/Text";
 import { MD5 } from "crypto-js";
@@ -65,7 +65,12 @@ const Item = ({ element, parent }: ItemProps) => {
     deleteElement.mutate(
       { id: element.id },
       {
-        onSuccess: () => utils.element.getAll.invalidate(),
+        onSuccess: () => {
+          utils.element.getAll.invalidate();
+          utils.element.getPage.invalidate({
+            route: parent?.route || parent?.id || "",
+          });
+        },
       }
     );
   };

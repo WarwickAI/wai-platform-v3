@@ -1,11 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bars4Icon, PlusIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { Bars4Icon, PlusIcon } from "@heroicons/react/24/solid";
 import {
   Attribute,
   AttributeType,
   Element,
   ElementType,
+  Group,
   User,
 } from "@prisma/client";
 import Image from "next/image";
@@ -14,22 +15,27 @@ import { trpc } from "../utils/trpc";
 import TextElement, { TextRequiredAttributes } from "./elements/Text";
 import { MD5 } from "crypto-js";
 import PageElement, { PageRequiredAttributes } from "./elements/Page";
+import Permissions from "./permissions";
 
 type ItemProps = {
   element?: Element & {
     user: User;
     atts: Attribute[];
+    masterGroups: Group[];
+    editGroups: Group[];
+    interactGroups: Group[];
+    viewGroups: Group[];
   };
   parent?: Element;
+  blur?: boolean;
 };
 
-const Item = ({ element, parent }: ItemProps) => {
+const Item = ({ element, parent, blur }: ItemProps) => {
   const utils = trpc.useContext();
   const createElement = trpc.element.create.useMutation();
   const deleteElement = trpc.element.delete.useMutation();
 
   const [hovered, setHovered] = useState<boolean>(false);
-  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -91,14 +97,14 @@ const Item = ({ element, parent }: ItemProps) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative w-full max-w-md rounded-lg border-2 p-2 transition-colors ${
+      className={`relative w-full max-w-md rounded-lg border-2 bg-white p-2 transition-colors ${
         hovered ? "border-slate-300" : "border-white"
-      }`}
+      } ${blur ? "opacity-20" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
-        className={`xs:-left-8 xs:flex-col absolute -left-32 flex flex-row space-x-1 pr-5 text-neutral transition-opacity ${
+        className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row space-x-1 pr-5 text-neutral transition-opacity ${
           hovered ? "opacity-100" : "opacity-0"
         }`}
         {...listeners}
@@ -133,22 +139,26 @@ const Item = ({ element, parent }: ItemProps) => {
         <button onClick={handleDelete}>
           <Bars4Icon className="h-6 w-6" />
         </button>
-        <button onClick={() => setIsEdit(!isEdit)}>
-          <PencilIcon
-            className={`h-6 w-6 ${isEdit ? "rounded-md bg-slate-300" : ""}`}
-          />
-        </button>
       </div>
       {element ? (
         element.type === "Text" ? (
-          <TextElement element={element} edit={isEdit} />
+          <TextElement element={element} edit={true} />
         ) : element.type === "Page" ? (
-          <PageElement element={{ ...element, children: [] }} edit={isEdit} />
+          <PageElement element={{ ...element, children: [] }} edit={true} />
         ) : (
           <p>No element found...</p>
         )
       ) : (
         <></>
+      )}
+      {element && (
+        <div
+          className={`absolute top-0 right-0 z-10 transition-opacity ${
+            hovered ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Permissions element={element} />
+        </div>
       )}
     </div>
   );

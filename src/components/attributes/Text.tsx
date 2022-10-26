@@ -33,26 +33,16 @@ const TextAttribute = ({ attribute, isTitle, edit }: TextAttributeProps) => {
 
   return (
     <div>
-      {edit ? (
-        <input
-          className={`input w-full ${
-            isTitle ? "input-lg text-4xl font-extrabold" : ""
-          }`}
-          value={value as string}
-          onChange={(e) => {
-            debounced(e.target.value);
-            setValue(e.target.value);
-          }}
-        />
-      ) : (
-        <p
-          className={`input w-full ${
-            isTitle ? "input-lg p-4 text-4xl font-extrabold" : ""
-          }`}
-        >
-          {value}
-        </p>
-      )}
+      <input
+        className={`input-ghost input w-full border-0 ${
+          isTitle ? "input-lg text-4xl font-extrabold" : ""
+        } ${!edit ? "pointer-events-none" : ""}`}
+        value={value as string}
+        onChange={(e) => {
+          setValue(e.target.value);
+          debounced(e.target.value);
+        }}
+      />
     </div>
   );
 };

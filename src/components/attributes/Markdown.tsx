@@ -11,7 +11,7 @@ import { Options } from "easymde";
 import ReactMarkdown from "react-markdown";
 import ReactDOMServer from "react-dom/server";
 import remarkGfm from "remark-gfm";
-import remarkGitHub from "remark-github";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 type MarkdownAttributeProps = {
   attribute: Attribute;
@@ -20,6 +20,7 @@ type MarkdownAttributeProps = {
 
 const MarkdownAttribute = ({ attribute, edit }: MarkdownAttributeProps) => {
   const [value, setValue] = useState<string>("");
+  const [editMode, setEditMode] = useState<boolean>(false);
 
   useEffect(() => {
     setValue(attribute.value as string);
@@ -48,7 +49,7 @@ const MarkdownAttribute = ({ attribute, edit }: MarkdownAttributeProps) => {
         return ReactDOMServer.renderToString(
           <article className="prose">
             <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkGitHub]}
+              remarkPlugins={[remarkGfm]}
               // renderers={{
               //   CodeBlock: CodeRenderer,
               //   Code: CodeRenderer,
@@ -64,26 +65,25 @@ const MarkdownAttribute = ({ attribute, edit }: MarkdownAttributeProps) => {
 
   return (
     <div>
-      {edit ? (
-        <SimpleMDEReact
-          value={value as string}
-          onChange={(v) => {
-            debounced(v);
-            setValue(v);
-          }}
-          options={mdeOptions}
-        />
+      {edit && editMode ? (
+        <div>
+          <SimpleMDEReact
+            value={value as string}
+            onChange={(v) => {
+              debounced(v);
+              setValue(v);
+            }}
+            options={mdeOptions}
+          />
+          <div className="absolute right-0 top-0 z-10 m-4">
+            <button onClick={() => setEditMode(false)}>
+              <XMarkIcon className="h-8 w-8 text-neutral" />
+            </button>
+          </div>
+        </div>
       ) : (
-        <article className="prose">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            // renderers={{
-            //   CodeBlock: CodeRenderer,
-            //   Code: CodeRenderer,
-            // }}
-          >
-            {value}
-          </ReactMarkdown>
+        <article className="prose" onClick={() => setEditMode(true)}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
         </article>
       )}
     </div>

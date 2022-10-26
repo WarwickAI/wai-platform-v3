@@ -31,7 +31,6 @@
     "react-markdown": "^8.0.3",
     "react-simplemde-editor": "^5.2.0",
     "remark-gfm": "^3.0.1",
-    "remark-github": "^11.2.4",
     "superjson": "1.9.1",
     "use-debounce": "^8.0.4",
     "zod": "^3.18.0"

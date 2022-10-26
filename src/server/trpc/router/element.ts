@@ -14,7 +14,20 @@ export const elementRouter = router({
         include: {
           user: true,
           atts: true,
-          children: { include: { user: true, atts: true } },
+          children: {
+            include: {
+              user: true,
+              atts: true,
+              masterGroups: true,
+              editGroups: true,
+              interactGroups: true,
+              viewGroups: true,
+            },
+          },
+          masterGroups: true,
+          editGroups: true,
+          interactGroups: true,
+          viewGroups: true,
         },
       });
     }),
@@ -65,5 +78,55 @@ export const elementRouter = router({
           data: { index },
         });
       }
+    }),
+
+  addPerms: authedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        masterGroups: z.string().array().nullish(),
+        editGroups: z.string().array().nullish(),
+        interactGroups: z.string().array().nullish(),
+        viewGroups: z.string().array().nullish(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.element.update({
+        where: { id: input.id },
+        data: {
+          masterGroups: { connect: input.masterGroups?.map((id) => ({ id })) },
+          editGroups: { connect: input.editGroups?.map((id) => ({ id })) },
+          interactGroups: {
+            connect: input.interactGroups?.map((id) => ({ id })),
+          },
+          viewGroups: { connect: input.viewGroups?.map((id) => ({ id })) },
+        },
+      });
+    }),
+
+  removePerms: authedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        masterGroups: z.string().array().nullish(),
+        editGroups: z.string().array().nullish(),
+        interactGroups: z.string().array().nullish(),
+        viewGroups: z.string().array().nullish(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.element.update({
+        where: { id: input.id },
+        data: {
+          masterGroups: {
+            disconnect: input.masterGroups?.map((id) => ({ id })),
+          },
+          editGroups: { disconnect: input.editGroups?.map((id) => ({ id })) },
+          interactGroups: {
+            disconnect: input.interactGroups?.map((id) => ({ id })),
+          },
+          viewGroups: { disconnect: input.viewGroups?.map((id) => ({ id })) },
+        },
+      });
     }),
 });

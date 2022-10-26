@@ -5,6 +5,8 @@ import {
   closestCenter,
   DndContext,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -16,10 +18,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Attribute, AttributeType, Element, User } from "@prisma/client";
+import { Attribute, AttributeType, Element, Group, User } from "@prisma/client";
 import TextAttribute from "../attributes/Text";
 import { trpc } from "../../utils/trpc";
-import { PencilIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 
 export const PageRequiredAttributes: {
@@ -35,18 +36,30 @@ type PageElementProps = {
     children: (Element & {
       user: User;
       atts: Attribute[];
+      masterGroups: Group[];
+      editGroups: Group[];
+      interactGroups: Group[];
+      viewGroups: Group[];
     })[];
+    masterGroups: Group[];
+    editGroups: Group[];
+    interactGroups: Group[];
+    viewGroups: Group[];
   };
   edit: boolean;
   page?: boolean;
 };
 
-const PageElement = ({ element, page }: PageElementProps) => {
-  const [isEditTitle, setIsEditTitle] = useState<boolean>(false);
+const PageElement = ({ element, page, edit }: PageElementProps) => {
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [items, setItems] = useState<
     (Element & {
       user: User;
       atts: Attribute[];
+      masterGroups: Group[];
+      editGroups: Group[];
+      interactGroups: Group[];
+      viewGroups: Group[];
     })[]
   >([]);
   useEffect(() => {
@@ -85,24 +98,15 @@ const PageElement = ({ element, page }: PageElementProps) => {
         <main className="container mx-auto flex min-h-screen max-w-2xl flex-col p-8">
           <div className="flex flex-row space-x-2">
             {titleAttribute && (
-              <TextAttribute
-                attribute={titleAttribute}
-                isTitle
-                edit={isEditTitle}
-              />
+              <TextAttribute attribute={titleAttribute} isTitle edit={true} />
             )}
-            <button
-              className="text-neutral"
-              onClick={() => setIsEditTitle(!isEditTitle)}
-            >
-              <PencilIcon className="h-6 w-6" />
-            </button>
           </div>
 
           <div className="flex w-full flex-col space-y-2 pt-6 text-2xl">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
@@ -116,12 +120,27 @@ const PageElement = ({ element, page }: PageElementProps) => {
                 ) : (
                   <Item parent={element} />
                 )}
+                <DragOverlay>
+                  {activeId ? (
+                    <Item
+                      element={items.find((i) => i.id === activeId)}
+                      parent={element}
+                    />
+                  ) : null}
+                </DragOverlay>
               </SortableContext>
             </DndContext>
           </div>
         </main>
       </>
     );
+  }
+
+  function handleDragStart(event: DragStartEvent) {
+    const { active } = event;
+    const { id } = active;
+
+    setActiveId(id as string);
   }
 
   function handleDragEnd(event: DragEndEvent) {

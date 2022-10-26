@@ -11,11 +11,15 @@ import { Options } from "easymde";
 import ReactMarkdown from "react-markdown";
 import ReactDOMServer from "react-dom/server";
 import remarkGfm from "remark-gfm";
+import remarkGitHub from "remark-github";
 
-const MarkdownAttribute = ({ attribute }: { attribute: Attribute }) => {
+type MarkdownAttributeProps = {
+  attribute: Attribute;
+  edit: boolean;
+};
+
+const MarkdownAttribute = ({ attribute, edit }: MarkdownAttributeProps) => {
   const [value, setValue] = useState<string>("");
-
-  const [hovered, setHovered] = useState<boolean>(false);
 
   useEffect(() => {
     setValue(attribute.value as string);
@@ -27,10 +31,10 @@ const MarkdownAttribute = ({ attribute }: { attribute: Attribute }) => {
 
   const utils = trpc.useContext();
 
-  const edit = trpc.attribute.editValue.useMutation();
+  const editAttribute = trpc.attribute.editValue.useMutation();
 
   const handleEdit = (newValue: string) => {
-    edit.mutate(
+    editAttribute.mutate(
       { id: attribute.id, value: newValue },
       { onSuccess: () => utils.element.getAll.invalidate() }
     );
@@ -44,7 +48,7 @@ const MarkdownAttribute = ({ attribute }: { attribute: Attribute }) => {
         return ReactDOMServer.renderToString(
           <article className="prose">
             <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
+              remarkPlugins={[remarkGfm, remarkGitHub]}
               // renderers={{
               //   CodeBlock: CodeRenderer,
               //   Code: CodeRenderer,
@@ -59,11 +63,8 @@ const MarkdownAttribute = ({ attribute }: { attribute: Attribute }) => {
   }, []);
 
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {hovered ? (
+    <div>
+      {edit ? (
         <SimpleMDEReact
           value={value as string}
           onChange={(v) => {

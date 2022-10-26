@@ -6,12 +6,11 @@ import { trpc } from "../../utils/trpc";
 type TextAttributeProps = {
   attribute: Attribute;
   isTitle?: boolean;
+  edit: boolean;
 };
 
-const TextAttribute = ({ attribute, isTitle }: TextAttributeProps) => {
+const TextAttribute = ({ attribute, isTitle, edit }: TextAttributeProps) => {
   const [value, setValue] = useState<string>("");
-
-  const [hovered, setHovered] = useState<boolean>(false);
 
   useEffect(() => {
     setValue(attribute.value as string);
@@ -23,21 +22,18 @@ const TextAttribute = ({ attribute, isTitle }: TextAttributeProps) => {
 
   const utils = trpc.useContext();
 
-  const edit = trpc.attribute.editValue.useMutation();
+  const editAttribute = trpc.attribute.editValue.useMutation();
 
   const handleEdit = (newValue: string) => {
-    edit.mutate(
+    editAttribute.mutate(
       { id: attribute.id, value: newValue },
       { onSuccess: () => utils.element.getAll.invalidate() }
     );
   };
 
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {hovered ? (
+    <div>
+      {edit ? (
         <input
           className={`input w-full ${
             isTitle ? "input-lg text-4xl font-extrabold" : ""

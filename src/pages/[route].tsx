@@ -10,7 +10,7 @@ const Route: NextPage = () => {
   const page = trpc.element.getPage.useQuery({ route: route as string });
 
   return page.data ? (
-    <PageElement element={page.data} />
+    <PageElement element={page.data} edit={false} page />
   ) : (
     <p>loading page...</p>
   );

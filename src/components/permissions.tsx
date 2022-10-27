@@ -1,7 +1,8 @@
-import { LockClosedIcon } from "@heroicons/react/24/solid";
+import { LockClosedIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Element, Group } from "@prisma/client";
 import { useState } from "react";
 import { trpc } from "../utils/trpc";
+import { GroupBadge } from "./attributes/Group";
 
 type PermissionsProps = {
   element: Element & {
@@ -10,17 +11,21 @@ type PermissionsProps = {
     interactGroups: Group[];
     viewGroups: Group[];
   };
+  open: boolean;
+  setOpen: (open: boolean) => void;
 };
 
-const Permissions = ({ element }: PermissionsProps) => {
-  const [open, setOpen] = useState<boolean>(false);
-
+const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
   return (
     <div>
       <button className="btn-xs btn" onClick={() => setOpen(!open)}>
         <LockClosedIcon className="h-4 w-4 text-white" />
       </button>
-      <div className={`absolute ${open ? "visible" : "invisible"}`}>
+      <div
+        className={`absolute right-0 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 ${
+          open ? "visible" : "invisible"
+        }`}
+      >
         <PermissionSelect
           permissionName="master"
           groups={element.masterGroups}
@@ -94,11 +99,11 @@ const PermissionSelect = ({
 
   return (
     <>
-      <div className="flex flex-row items-center">
-        <label className="input-group">
-          <span>{permissionName}</span>
+      <div className="flex flex-row items-center justify-end">
+        <label className="input-group flex-grow">
+          <span className="w-20 text-sm capitalize">{permissionName}</span>
           <select
-            className="select-bordered select select-sm"
+            className="select-bordered select select-sm w-56"
             name={permissionName}
             id={permissionName}
             value={selected?.id || 0}
@@ -122,18 +127,22 @@ const PermissionSelect = ({
           onClick={() => {
             if (selected) {
               handlePermChange(selected);
+              setSelected(null);
             }
           }}
         >
           Add
         </button>
       </div>
-      <div className="flex flex-row flex-wrap">
+      <div className="flex flex-row flex-wrap space-x-4">
         {groups.map((g) => (
-          <div key={g.id} className="flex flex-row items-center">
-            <span>{g.name}</span>
-            <button className="btn-sm btn" onClick={() => handlePermRemove(g)}>
-              Remove
+          <div key={g.id} className="relative">
+            <GroupBadge group={g} />
+            <button
+              className="absolute top-0 -right-3 flex h-6 w-6 items-center justify-center rounded-full bg-red-700 z-10"
+              onClick={() => handlePermRemove(g)}
+            >
+              <TrashIcon className="h-4 w-4 text-white" />
             </button>
           </div>
         ))}

@@ -37,6 +37,7 @@ const Item = ({ element, parent, blur }: ItemProps) => {
 
   const [hovered, setHovered] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);
+  const [showPermissions, setShowPermissions] = useState<boolean>(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: element?.id || 0 });
@@ -93,19 +94,21 @@ const Item = ({ element, parent, blur }: ItemProps) => {
     );
   };
 
+  const active = hovered || showAdd || showPermissions;
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={`relative w-full max-w-md rounded-lg border-2 bg-white p-2 transition-colors ${
-        hovered ? "border-slate-300" : "border-white"
+        active ? "border-slate-300" : "border-white"
       } ${blur ? "opacity-20" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
         className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row space-x-1 pr-5 text-neutral transition-opacity ${
-          hovered ? "opacity-100" : "opacity-0"
+          active ? "opacity-100" : "opacity-0"
         }`}
         {...listeners}
         {...attributes}
@@ -154,10 +157,14 @@ const Item = ({ element, parent, blur }: ItemProps) => {
       {element && (
         <div
           className={`absolute top-0 right-0 z-10 transition-opacity ${
-            hovered ? "opacity-100" : "opacity-0"
+            active ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Permissions element={element} />
+          <Permissions
+            element={element}
+            open={showPermissions}
+            setOpen={setShowPermissions}
+          />
         </div>
       )}
     </div>

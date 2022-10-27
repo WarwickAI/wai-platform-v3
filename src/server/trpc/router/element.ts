@@ -4,7 +4,16 @@ import { AttributeType, ElementType } from "@prisma/client";
 
 export const elementRouter = router({
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.element.findMany({ include: { user: true, atts: true } });
+    return ctx.prisma.element.findMany({
+      include: {
+        user: true,
+        atts: true,
+        masterGroups: true,
+        editGroups: true,
+        interactGroups: true,
+        viewGroups: true,
+      },
+    });
   }),
   getPage: publicProcedure
     .input(z.object({ route: z.string() }))

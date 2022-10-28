@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Item from "../item";
 import {
   closestCenter,
@@ -46,11 +46,10 @@ type PageElementProps = {
     interactGroups: Group[];
     viewGroups: Group[];
   };
-  edit: boolean;
   page?: boolean;
 };
 
-const PageElement = ({ element, page, edit }: PageElementProps) => {
+const PageElement = ({ element, page }: PageElementProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [items, setItems] = useState<
     (Element & {
@@ -66,6 +65,8 @@ const PageElement = ({ element, page, edit }: PageElementProps) => {
     setItems(element.children.sort((a, b) => a.index - b.index));
   }, [element.children]);
 
+  const user = trpc.user.getMe.useQuery();
+
   const orderElements = trpc.element.order.useMutation();
 
   const sensors = useSensors(
@@ -80,6 +81,17 @@ const PageElement = ({ element, page, edit }: PageElementProps) => {
   );
 
   const titleAttribute = element.atts.find((a) => a.name === "Title");
+
+  const edit = useMemo(() => {
+    if (!element || !user.data) return false;
+
+    for (const elGroup of element.editGroups) {
+      for (const userGroup of user.data.groups) {
+        if (elGroup.id === userGroup.id) return true;
+      }
+    }
+    return false;
+  }, [element, user]);
 
   if (!page) {
     return (
@@ -98,7 +110,7 @@ const PageElement = ({ element, page, edit }: PageElementProps) => {
         <main className="container mx-auto flex min-h-screen max-w-2xl flex-col p-8">
           <div className="flex flex-row space-x-2">
             {titleAttribute && (
-              <TextAttribute attribute={titleAttribute} isTitle edit={true} />
+              <TextAttribute attribute={titleAttribute} isTitle edit={edit} />
             )}
           </div>
 
@@ -113,18 +125,22 @@ const PageElement = ({ element, page, edit }: PageElementProps) => {
                 items={items}
                 strategy={verticalListSortingStrategy}
               >
-                {items.length > 0 ? (
-                  items.map((child) => (
-                    <Item key={child.id} element={child} parent={element} />
-                  ))
-                ) : (
-                  <Item parent={element} />
-                )}
+                {items.length > 0
+                  ? items.map((child) => (
+                      <Item
+                        key={child.id}
+                        element={child}
+                        parent={element}
+                        editParent={edit}
+                      />
+                    ))
+                  : edit && <Item parent={element} editParent={edit} />}
                 <DragOverlay>
                   {activeId ? (
                     <Item
                       element={items.find((i) => i.id === activeId)}
                       parent={element}
+                      editParent={edit}
                     />
                   ) : null}
                 </DragOverlay>

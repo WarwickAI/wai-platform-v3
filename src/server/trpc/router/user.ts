@@ -1,4 +1,4 @@
-import { router, execProcedure } from "../trpc";
+import { router, execProcedure, authedProcedure } from "../trpc";
 import { z } from "zod";
 
 export const userRouter = router({
@@ -11,5 +11,12 @@ export const userRouter = router({
 
   getAll: execProcedure.query(({ ctx }) => {
     return ctx.prisma.user.findMany();
+  }),
+
+  getMe: execProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findUniqueOrThrow({
+      where: { id: ctx.session.user.id },
+      include: { groups: true },
+    });
   }),
 });

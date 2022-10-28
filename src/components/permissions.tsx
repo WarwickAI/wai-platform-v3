@@ -18,7 +18,7 @@ type PermissionsProps = {
 const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
   return (
     <div>
-      <button className="btn-xs btn" onClick={() => setOpen(!open)}>
+      <button className="bg-neutral p-1 rounded-full" onClick={() => setOpen(!open)}>
         <LockClosedIcon className="h-4 w-4 text-white" />
       </button>
       <div

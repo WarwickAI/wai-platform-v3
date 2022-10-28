@@ -10,7 +10,7 @@ import {
   User,
 } from "@prisma/client";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";
 import TextElement, { TextRequiredAttributes } from "./elements/Text";
 import { MD5 } from "crypto-js";
@@ -28,10 +28,14 @@ type ItemProps = {
   };
   parent?: Element;
   blur?: boolean;
+  editParent: boolean;
 };
 
-const Item = ({ element, parent, blur }: ItemProps) => {
+const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   const utils = trpc.useContext();
+
+  const user = trpc.user.getMe.useQuery();
+
   const createElement = trpc.element.create.useMutation();
   const deleteElement = trpc.element.delete.useMutation();
 
@@ -94,21 +98,33 @@ const Item = ({ element, parent, blur }: ItemProps) => {
     );
   };
 
-  const active = hovered || showAdd || showPermissions;
+  const edit = useMemo(() => {
+    if (!element || !user.data) return false;
+
+    for (const elGroup of element.editGroups) {
+      for (const userGroup of user.data.groups) {
+        if (elGroup.id === userGroup.id) return true;
+      }
+    }
+    return false;
+  }, [element, user.data]);
+
+  const activeAddMove = (hovered || showAdd || showPermissions) && editParent;
+  const activePerms = (hovered || showAdd || showPermissions) && edit;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={`relative w-full max-w-md rounded-lg border-2 bg-white p-2 transition-colors ${
-        active ? "border-slate-300" : "border-white"
+        activeAddMove ? "border-slate-300" : "border-white"
       } ${blur ? "opacity-20" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
         className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row space-x-1 pr-5 text-neutral transition-opacity ${
-          active ? "opacity-100" : "opacity-0"
+          activeAddMove ? "opacity-100" : "opacity-0"
         }`}
         {...listeners}
         {...attributes}
@@ -145,9 +161,9 @@ const Item = ({ element, parent, blur }: ItemProps) => {
       </div>
       {element ? (
         element.type === "Text" ? (
-          <TextElement element={element} edit={true} />
+          <TextElement element={element} edit={edit} />
         ) : element.type === "Page" ? (
-          <PageElement element={{ ...element, children: [] }} edit={true} />
+          <PageElement element={{ ...element, children: [] }} />
         ) : (
           <p>No element found...</p>
         )
@@ -156,8 +172,8 @@ const Item = ({ element, parent, blur }: ItemProps) => {
       )}
       {element && (
         <div
-          className={`absolute top-0 right-0 z-10 transition-opacity ${
-            active ? "opacity-100" : "opacity-0"
+          className={`absolute top-0 right-1 z-10 transition-opacity ${
+            activePerms ? "opacity-100" : "opacity-0"
           }`}
         >
           <Permissions

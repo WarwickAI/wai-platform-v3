@@ -57,11 +57,38 @@ export const elementRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const parent = input.parentId
+        ? await ctx.prisma.element.findFirst({
+            where: { id: input.parentId },
+            include: {
+              masterGroups: true,
+              editGroups: true,
+              interactGroups: true,
+              viewGroups: true,
+            },
+          })
+        : null;
+
+      const adminGroup = await ctx.prisma.group.findFirstOrThrow({
+        where: { name: "Admin" },
+      });
+
+      const masterGroups = parent?.masterGroups ?? [adminGroup];
+      const editGroups = parent?.editGroups ?? [adminGroup];
+      const interactGroups = parent?.interactGroups ?? [adminGroup];
+      const viewGroups = parent?.viewGroups ?? [adminGroup];
+
       return ctx.prisma.element.create({
         data: {
           ...input,
           atts: { create: input.atts },
           userId: ctx.session.user.id,
+          masterGroups: { connect: masterGroups.map((g) => ({ id: g.id })) },
+          editGroups: { connect: editGroups.map((g) => ({ id: g.id })) },
+          interactGroups: {
+            connect: interactGroups.map((g) => ({ id: g.id })),
+          },
+          viewGroups: { connect: viewGroups.map((g) => ({ id: g.id })) },
         },
       });
     }),

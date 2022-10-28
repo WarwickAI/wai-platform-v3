@@ -19,13 +19,17 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Attribute, Element, User } from "@prisma/client";
+import { Attribute, Element, Group, User } from "@prisma/client";
 
 const Home: NextPage = () => {
   const [items, setItems] = useState<
     (Element & {
       user: User;
       atts: Attribute[];
+      masterGroups: Group[];
+      editGroups: Group[];
+      interactGroups: Group[];
+      viewGroups: Group[];
     })[]
   >([]);
 
@@ -93,10 +97,10 @@ const Home: NextPage = () => {
             >
               {items.length > 0 ? (
                 items.map((element) => (
-                  <Item key={element.id} element={element} />
+                  <Item key={element.id} element={element} editParent={false} />
                 ))
               ) : (
-                <Item />
+                <Item editParent={false} />
               )}
             </SortableContext>
           </DndContext>

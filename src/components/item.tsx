@@ -112,6 +112,11 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   const activeAddMove = (hovered || showAdd || showPermissions) && editParent;
   const activePerms = (hovered || showAdd || showPermissions) && edit;
 
+  // Fixes issue where after removing permission, showPermissions stays true
+  if (showPermissions && !edit) {
+    setShowPermissions(false);
+  }
+
   return (
     <div
       ref={setNodeRef}

@@ -6,7 +6,7 @@ type GroupAttributeProps = {
   edit: boolean;
 };
 
-const GroupAttribute = ({ attribute, edit }: GroupAttributeProps) => {
+const GroupAttribute = ({ attribute }: GroupAttributeProps) => {
   const group = trpc.group.get.useQuery(attribute.value as string);
 
   return <div>{group.data && <GroupBadge group={group.data} />}</div>;

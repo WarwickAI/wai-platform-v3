@@ -1,4 +1,4 @@
-import { router, execProcedure, authedProcedure } from "../trpc";
+import { router, execProcedure } from "../trpc";
 import { z } from "zod";
 
 export const userRouter = router({

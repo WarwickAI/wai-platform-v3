@@ -95,7 +95,7 @@ enum AttributeType {
 model Element {
   id             String      @id @default(cuid())
   index          Int         @default(0)
-  route          String?     @unique
+  route          String      @unique @default(uuid())
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   type           ElementType

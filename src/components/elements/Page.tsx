@@ -27,7 +27,7 @@ import { DocumentIcon } from "@heroicons/react/24/solid";
 export const PageRequiredAttributes: {
   name: string;
   type: AttributeType;
-  value: object | string;
+  value: string | string[];
 }[] = [{ name: "Title", type: "Text", value: "Page Title" }];
 
 export const PageDescription = "A page is a container for other elements.";
@@ -105,7 +105,18 @@ const PageElement = ({ element, page }: PageElementProps) => {
 
   if (!page) {
     return (
-      <Link href={"/" + (element.route || element.id)}>
+      <Link
+        href={
+          "/" +
+          (titleAttribute
+            ? (titleAttribute.value as string)
+                .replaceAll("-", "_")
+                .replaceAll(" ", "_")
+            : "No_Title") +
+          "-" +
+          element.route
+        }
+      >
         {titleAttribute?.value as string}
       </Link>
     );

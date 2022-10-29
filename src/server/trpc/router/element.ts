@@ -19,7 +19,7 @@ export const elementRouter = router({
     .input(z.object({ route: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.element.findFirstOrThrow({
-        where: { id: input.route, type: "Page" },
+        where: { route: input.route, type: "Page" },
         include: {
           user: true,
           atts: true,
@@ -50,7 +50,7 @@ export const elementRouter = router({
           .object({
             name: z.string(),
             type: z.nativeEnum(AttributeType),
-            value: z.object({}).or(z.string()),
+            value: z.string().or(z.string().array()),
             required: z.boolean(),
           })
           .array(),

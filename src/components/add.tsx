@@ -28,7 +28,7 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
     let atts: {
       name: string;
       type: AttributeType;
-      value: object | string;
+      value: string | string[];
       required: boolean;
     }[] = [];
 
@@ -48,7 +48,7 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
         onSuccess: () => {
           utils.element.getAll.invalidate();
           utils.element.getPage.invalidate({
-            route: parent?.route || parent?.id || "",
+            route: parent?.route || "",
           });
           setOpen(false);
         },
@@ -58,16 +58,18 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className={`rounded-full transition-colors ${
-          open ? "bg-neutral" : "bg-white"
-        }`}
-      >
-        <PlusIcon
-          className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
-        />
-      </button>
+      <div className="tooltip" data-tip="Add Element">
+        <button
+          onClick={() => setOpen(!open)}
+          className={`rounded-full transition-colors ${
+            open ? "bg-neutral" : "bg-white"
+          }`}
+        >
+          <PlusIcon
+            className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
+          />
+        </button>
+      </div>
       <div
         className={`absolute z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
           open ? "opacity-100" : "invisible opacity-0"

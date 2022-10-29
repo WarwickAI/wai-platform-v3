@@ -19,5 +19,5 @@ type GroupBadgeProps = {
 };
 
 export const GroupBadge = ({ group }: GroupBadgeProps) => {
-  return <div className="badge max-w-xs truncate text-ellipsis">{group.name}</div>;
+  return <div className="badge truncate text-ellipsis">{group.name}</div>;
 };

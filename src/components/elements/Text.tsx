@@ -6,7 +6,7 @@ import MarkdownAttribute from "../attributes/Markdown";
 export const TextRequiredAttributes: {
   name: string;
   type: AttributeType;
-  value: object | string;
+  value: string | string[];
 }[] = [{ name: "Markdown", type: "Markdown", value: "**Some Test Markdown**" }];
 
 export const TextDescription = "A text element, supports Markdown.";

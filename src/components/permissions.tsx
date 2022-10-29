@@ -1,8 +1,7 @@
-import { LockClosedIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { Element, Group } from "@prisma/client";
-import { useState } from "react";
 import { trpc } from "../utils/trpc";
-import { GroupBadge } from "./attributes/Group";
+import { GroupsEdit } from "./attributes/Groups";
 
 type PermissionsProps = {
   element: Element & {
@@ -18,18 +17,20 @@ type PermissionsProps = {
 const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
   return (
     <div>
-      <button
-        className={`rounded-full p-1 transition-colors ${
-          open ? "bg-neutral" : "bg-white"
-        }`}
-        onClick={() => setOpen(!open)}
-      >
-        <LockClosedIcon
-          className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
-        />
-      </button>
+      <div className="tooltip" data-tip="Edit Permissions">
+        <button
+          className={`rounded-full p-1 transition-colors ${
+            open ? "bg-neutral" : "bg-white"
+          }`}
+          onClick={() => setOpen(!open)}
+        >
+          <LockClosedIcon
+            className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
+          />
+        </button>
+      </div>
       <div
-        className={`absolute right-0 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+        className={`absolute right-0 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
           open ? "opacity-100" : "invisible opacity-0"
         }`}
       >
@@ -71,10 +72,7 @@ const PermissionSelect = ({
   groups,
   element,
 }: PermissionSelectProps) => {
-  const [selected, setSelected] = useState<Group | null>(null);
-
   const utils = trpc.useContext();
-  const allGroups = trpc.group.getAll.useQuery();
   const updatePerms = trpc.element.addPerms.useMutation();
   const removePerms = trpc.element.removePerms.useMutation();
 
@@ -85,7 +83,7 @@ const PermissionSelect = ({
       {
         onSuccess: () => {
           utils.element.getAll.invalidate();
-          utils.element.getPage.invalidate({ route: element.parentId || "" });
+          utils.element.getPage.invalidate({ route: element.route || "" });
         },
       }
     );
@@ -98,7 +96,7 @@ const PermissionSelect = ({
       {
         onSuccess: () => {
           utils.element.getAll.invalidate();
-          utils.element.getPage.invalidate({ route: element.parentId || "" });
+          utils.element.getPage.invalidate({ route: element.route || "" });
         },
       }
     );
@@ -106,54 +104,18 @@ const PermissionSelect = ({
 
   return (
     <>
-      <div className="flex flex-row items-center justify-end">
-        <label className="input-group flex-grow">
-          <span className="w-20 text-sm capitalize">{permissionName}</span>
-          <select
-            className="select-bordered select select-sm w-56"
-            name={permissionName}
-            id={permissionName}
-            value={selected?.id || 0}
-            onChange={(e) =>
-              setSelected(
-                allGroups.data?.find((g) => g.id === e.target.value) || null
-              )
-            }
-          >
-            <option value="0">Select a group to add</option>
-            {allGroups.data &&
-              allGroups.data.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-          </select>
-        </label>
-        <button
-          className="btn-sm btn"
-          onClick={() => {
-            if (selected) {
-              handlePermChange(selected);
-              setSelected(null);
-            }
-          }}
-        >
-          Add
-        </button>
+      <div
+        className="tooltip text-left z-20"
+        data-tip={`Edit groups for ${permissionName} permissions`}
+      >
+        <p className="text-sm font-semibold capitalize">{permissionName}</p>
       </div>
-      <div className="flex flex-row flex-wrap space-x-4">
-        {groups.map((g) => (
-          <div key={g.id} className="relative">
-            <GroupBadge group={g} />
-            <button
-              className="absolute top-0 -right-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-red-700"
-              onClick={() => handlePermRemove(g)}
-            >
-              <TrashIcon className="h-4 w-4 text-white" />
-            </button>
-          </div>
-        ))}
-      </div>
+      <GroupsEdit
+        groupIds={groups.map((g) => g.id)}
+        onAdd={handlePermChange}
+        onRemove={handlePermRemove}
+        edit={true}
+      />
     </>
   );
 };

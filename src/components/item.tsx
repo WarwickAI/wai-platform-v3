@@ -10,6 +10,7 @@ import { MD5 } from "crypto-js";
 import PageElement from "./elements/Page";
 import Permissions from "./permissions";
 import Add from "./add";
+import Modify from "./modify";
 
 type ItemProps = {
   element?: Element & {
@@ -34,6 +35,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
 
   const [hovered, setHovered] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);
+  const [showModify, setShowModify] = useState<boolean>(false);
   const [showPermissions, setShowPermissions] = useState<boolean>(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -42,22 +44,6 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
-  };
-
-  const handleDelete = () => {
-    if (!element) return;
-
-    deleteElement.mutate(
-      { id: element.id },
-      {
-        onSuccess: () => {
-          utils.element.getAll.invalidate();
-          utils.element.getPage.invalidate({
-            route: parent?.route || parent?.id || "",
-          });
-        },
-      }
-    );
   };
 
   const edit = useMemo(() => {
@@ -76,8 +62,10 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
     return false;
   }, [element, user.data]);
 
-  const activeAddMove = (hovered || showAdd || showPermissions) && editParent;
-  const activePerms = (hovered || showAdd || showPermissions) && edit;
+  const activeAddMove =
+    (hovered || showAdd || showModify || showPermissions) && editParent;
+  const activePerms =
+    (hovered || showAdd || showModify || showPermissions) && edit;
 
   // Fixes issue where after removing permission, showPermissions stays true
   if (showPermissions && !edit) {
@@ -101,26 +89,47 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
         {...listeners}
         {...attributes}
       >
-        <Image
-          alt={element?.user.email + "profile picture"}
-          width={24}
-          height={24}
-          className={"rounded-full"}
-          src={
-            "https://www.gravatar.com/avatar/" +
-            MD5(element?.user.email || "") +
-            "?s=24"
+        <div
+          className="tooltip"
+          data-tip={
+            "Created by " +
+            element?.user.email +
+            " at " +
+            element?.createdAt.toLocaleString()
           }
-        />
+        >
+          <Image
+            alt={element?.user.email + "profile picture"}
+            width={24}
+            height={24}
+            className={"rounded-full"}
+            src={
+              "https://www.gravatar.com/avatar/" +
+              MD5(element?.user.email || "") +
+              "?s=24"
+            }
+          />
+        </div>
         <Add
           parent={parent}
           index={element?.index || 0}
           open={showAdd}
-          setOpen={setShowAdd}
+          setOpen={(v) => {
+            setShowAdd(v);
+            v && setShowModify(false);
+            v && setShowPermissions(false);
+          }}
         />
-        <button onClick={handleDelete}>
-          <Bars4Icon className="h-6 w-6" />
-        </button>
+        <Modify
+          parent={parent}
+          element={element}
+          open={showModify}
+          setOpen={(v) => {
+            setShowModify(v);
+            v && setShowAdd(false);
+            v && setShowPermissions(false);
+          }}
+        />
       </div>
       {element ? (
         element.type === "Text" ? (
@@ -142,7 +151,11 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
           <Permissions
             element={element}
             open={showPermissions}
-            setOpen={setShowPermissions}
+            setOpen={(v) => {
+              setShowPermissions(v);
+              v && setShowAdd(false);
+              v && setShowModify(false);
+            }}
           />
         </div>
       )}

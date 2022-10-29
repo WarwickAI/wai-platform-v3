@@ -50,6 +50,7 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           utils.element.getPage.invalidate({
             route: parent?.route || parent?.id || "",
           });
+          setOpen(false);
         },
       }
     );
@@ -57,8 +58,15 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)}>
-        <PlusIcon className="h-6 w-6" />
+      <button
+        onClick={() => setOpen(!open)}
+        className={`rounded-full transition-colors ${
+          open ? "bg-neutral" : "bg-white"
+        }`}
+      >
+        <PlusIcon
+          className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
+        />
       </button>
       <div
         className={`absolute z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${

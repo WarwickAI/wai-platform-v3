@@ -18,12 +18,19 @@ type PermissionsProps = {
 const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
   return (
     <div>
-      <button className="bg-neutral p-1 rounded-full" onClick={() => setOpen(!open)}>
-        <LockClosedIcon className="h-4 w-4 text-white" />
+      <button
+        className={`rounded-full p-1 transition-colors ${
+          open ? "bg-neutral" : "bg-white"
+        }`}
+        onClick={() => setOpen(!open)}
+      >
+        <LockClosedIcon
+          className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
+        />
       </button>
       <div
-        className={`absolute right-0 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 ${
-          open ? "visible" : "invisible"
+        className={`absolute right-0 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+          open ? "opacity-100" : "invisible opacity-0"
         }`}
       >
         <PermissionSelect
@@ -139,7 +146,7 @@ const PermissionSelect = ({
           <div key={g.id} className="relative">
             <GroupBadge group={g} />
             <button
-              className="absolute top-0 -right-3 flex h-6 w-6 items-center justify-center rounded-full bg-red-700 z-10"
+              className="absolute top-0 -right-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-red-700"
               onClick={() => handlePermRemove(g)}
             >
               <TrashIcon className="h-4 w-4 text-white" />

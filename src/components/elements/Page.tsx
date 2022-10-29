@@ -22,12 +22,17 @@ import { Attribute, AttributeType, Element, Group, User } from "@prisma/client";
 import TextAttribute from "../attributes/Text";
 import { trpc } from "../../utils/trpc";
 import Link from "next/link";
+import { DocumentIcon } from "@heroicons/react/24/solid";
 
 export const PageRequiredAttributes: {
   name: string;
   type: AttributeType;
   value: object | string;
 }[] = [{ name: "Title", type: "Text", value: "Page Title" }];
+
+export const PageDescription = "A page is a container for other elements.";
+
+export const PageIcon = DocumentIcon;
 
 type PageElementProps = {
   element: Element & {

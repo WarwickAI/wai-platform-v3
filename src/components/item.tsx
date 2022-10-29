@@ -1,21 +1,15 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bars4Icon, PlusIcon } from "@heroicons/react/24/solid";
-import {
-  Attribute,
-  AttributeType,
-  Element,
-  ElementType,
-  Group,
-  User,
-} from "@prisma/client";
+import { Bars4Icon } from "@heroicons/react/24/solid";
+import { Attribute, Element, Group, User } from "@prisma/client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";
-import TextElement, { TextRequiredAttributes } from "./elements/Text";
+import TextElement from "./elements/Text";
 import { MD5 } from "crypto-js";
-import PageElement, { PageRequiredAttributes } from "./elements/Page";
+import PageElement from "./elements/Page";
 import Permissions from "./permissions";
+import Add from "./add";
 
 type ItemProps = {
   element?: Element & {
@@ -36,7 +30,6 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
 
   const user = trpc.user.getMe.useQuery();
 
-  const createElement = trpc.element.create.useMutation();
   const deleteElement = trpc.element.delete.useMutation();
 
   const [hovered, setHovered] = useState<boolean>(false);
@@ -49,37 +42,6 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
-  };
-
-  const handleCreate = (type: ElementType, index: number) => {
-    let atts: {
-      name: string;
-      type: AttributeType;
-      value: object | string;
-      required: boolean;
-    }[] = [];
-
-    if (type === "Text") {
-      atts = TextRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else if (type === "Page") {
-      atts = PageRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    }
-
-    createElement.mutate(
-      { type, index, atts, parentId: parent?.id },
-      {
-        onSuccess: () => {
-          utils.element.getAll.invalidate();
-          utils.element.getPage.invalidate({
-            route: parent?.route || parent?.id || "",
-          });
-        },
-      }
-    );
   };
 
   const handleDelete = () => {
@@ -150,21 +112,12 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
             "?s=24"
           }
         />
-        <button onClick={() => setShowAdd(!showAdd)}>
-          <PlusIcon className="h-6 w-6" />
-          <div
-            className={`absolute z-10 bg-white transition-opacity ${
-              showAdd ? "opacity-100" : "invisible opacity-0"
-            }`}
-          >
-            <button onClick={() => handleCreate("Text", element?.index || 0)}>
-              Text
-            </button>
-            <button onClick={() => handleCreate("Page", element?.index || 0)}>
-              Page
-            </button>
-          </div>
-        </button>
+        <Add
+          parent={parent}
+          index={element?.index || 0}
+          open={showAdd}
+          setOpen={setShowAdd}
+        />
         <button onClick={handleDelete}>
           <Bars4Icon className="h-6 w-6" />
         </button>

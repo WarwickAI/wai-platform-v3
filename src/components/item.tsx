@@ -101,6 +101,11 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   const edit = useMemo(() => {
     if (!element || !user.data) return false;
 
+    // Check it the user is an admin
+    for (const userGroup of user.data.groups) {
+      if (userGroup.name === "Admin") return true;
+    }
+
     for (const elGroup of element.editGroups) {
       for (const userGroup of user.data.groups) {
         if (elGroup.id === userGroup.id) return true;

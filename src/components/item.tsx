@@ -1,6 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Bars4Icon } from "@heroicons/react/24/solid";
 import { Attribute, Element, Group, User } from "@prisma/client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
@@ -27,11 +26,7 @@ type ItemProps = {
 };
 
 const Item = ({ element, parent, blur, editParent }: ItemProps) => {
-  const utils = trpc.useContext();
-
   const user = trpc.user.getMe.useQuery();
-
-  const deleteElement = trpc.element.delete.useMutation();
 
   const [hovered, setHovered] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);

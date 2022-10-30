@@ -10,6 +10,7 @@ import PageElement from "./elements/Page";
 import Permissions from "./permissions";
 import Add from "./add";
 import Modify from "./modify";
+import EventElement from "./elements/Event";
 
 type ItemProps = {
   element?: Element & {
@@ -128,9 +129,11 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
       </div>
       {element ? (
         element.type === "Text" ? (
-          <TextElement element={element} edit={edit} />
+          <TextElement element={{ ...element, children: [] }} edit={edit} />
         ) : element.type === "Page" ? (
-          <PageElement element={{ ...element, children: [] }} />
+          <PageElement element={{ ...element, children: [] }} edit={edit} />
+        ) : element.type === "Event" ? (
+          <EventElement element={{ ...element, children: [] }} edit={edit} />
         ) : (
           <p>No element found...</p>
         )

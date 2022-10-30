@@ -1,4 +1,3 @@
-import { Attribute } from "@prisma/client";
 import dynamic from "next/dynamic";
 const SimpleMDEReact = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -12,13 +11,9 @@ import ReactMarkdown from "react-markdown";
 import ReactDOMServer from "react-dom/server";
 import remarkGfm from "remark-gfm";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { AttributeProps } from "./utils";
 
-type MarkdownAttributeProps = {
-  attribute: Attribute;
-  edit: boolean;
-};
-
-const MarkdownAttribute = ({ attribute, edit }: MarkdownAttributeProps) => {
+const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
   const [value, setValue] = useState<string>("");
   const [editMode, setEditMode] = useState<boolean>(false);
 
@@ -83,7 +78,7 @@ const MarkdownAttribute = ({ attribute, edit }: MarkdownAttributeProps) => {
         </div>
       ) : (
         <article className="prose" onClick={() => setEditMode(true)}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{!edit || value.length > 0 ? value : "*click to edit markdown...*"}</ReactMarkdown>
         </article>
       )}
     </div>

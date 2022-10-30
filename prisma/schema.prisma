@@ -83,6 +83,7 @@ model VerificationToken {
 enum ElementType {
   Text
   Page
+  Event
 }
 
 enum AttributeType {
@@ -90,6 +91,8 @@ enum AttributeType {
   Number
   Boolean
   Markdown
+  Date
+  Location
 }
 
 model Element {

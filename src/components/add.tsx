@@ -2,6 +2,11 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { AttributeType, Element, ElementType } from "@prisma/client";
 import { trpc } from "../utils/trpc";
 import {
+  EventDescription,
+  EventIcon,
+  EventRequiredAttributes,
+} from "./elements/Event";
+import {
   PageDescription,
   PageIcon,
   PageRequiredAttributes,
@@ -38,6 +43,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
       });
     } else if (type === "Page") {
       atts = PageRequiredAttributes.map((a) => {
+        return { ...a, required: true };
+      });
+    } else if (type === "Event") {
+      atts = EventRequiredAttributes.map((a) => {
         return { ...a, required: true };
       });
     }
@@ -83,6 +92,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           type="Page"
           create={(type) => handleCreate(type, index)}
         />
+        <AddElementType
+          type="Event"
+          create={(type) => handleCreate(type, index)}
+        />
       </div>
     </div>
   );
@@ -96,8 +109,14 @@ type AddElementTypeProps = {
 };
 
 const AddElementType = ({ type, create }: AddElementTypeProps) => {
-  const description = type === "Text" ? TextDescription : PageDescription;
-  const Icon = type === "Text" ? TextIcon : PageIcon;
+  const description =
+    type === "Text"
+      ? TextDescription
+      : type === "Page"
+      ? PageDescription
+      : EventDescription;
+  const Icon =
+    type === "Text" ? TextIcon : type === "Page" ? PageIcon : EventIcon;
 
   return (
     <button

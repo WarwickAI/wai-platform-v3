@@ -1,15 +1,10 @@
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
-import { Attribute, Group } from "@prisma/client";
+import { Group } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { GroupBadge } from "./Group";
-
-type GroupsAttributeProps = {
-  attribute: Attribute;
-  edit: boolean;
-};
-
-const GroupAttribute = ({ attribute, edit }: GroupsAttributeProps) => {
+import { AttributeProps } from "./utils";
+const GroupAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();
 
   const editAttribute = trpc.attribute.editValue.useMutation();

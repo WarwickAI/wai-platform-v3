@@ -1,15 +1,13 @@
-import { Attribute } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { trpc } from "../../utils/trpc";
+import { AttributeProps } from "./utils";
 
-type TextAttributeProps = {
-  attribute: Attribute;
-  isTitle?: boolean;
-  edit: boolean;
+type TextAttributeProps = AttributeProps & {
+  size: "sm" | "md" | "lg" | "xl";
 };
 
-const TextAttribute = ({ attribute, isTitle, edit }: TextAttributeProps) => {
+const TextAttribute = ({ attribute, size, edit }: TextAttributeProps) => {
   const [value, setValue] = useState<string>("");
 
   useEffect(() => {
@@ -35,7 +33,15 @@ const TextAttribute = ({ attribute, isTitle, edit }: TextAttributeProps) => {
     <div>
       <input
         className={`input-ghost input w-full border-0 ${
-          isTitle ? "input-lg text-4xl font-extrabold" : ""
+          size === "xl"
+            ? "input-lg text-4xl font-extrabold"
+            : size === "lg"
+            ? "input-md text-2xl font-bold"
+            : size === "md"
+            ? "input-sm text-lg font-medium"
+            : size === "sm"
+            ? "input-xs text-sm font-normal"
+            : ""
         } ${!edit ? "pointer-events-none" : ""}`}
         value={value as string}
         onChange={(e) => {

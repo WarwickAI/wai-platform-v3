@@ -1,12 +1,8 @@
-import { Attribute, Group } from "@prisma/client";
+import { Group } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
+import { AttributeProps } from "./utils";
 
-type GroupAttributeProps = {
-  attribute: Attribute;
-  edit: boolean;
-};
-
-const GroupAttribute = ({ attribute }: GroupAttributeProps) => {
+const GroupAttribute = ({ attribute }: AttributeProps) => {
   const group = trpc.group.get.useQuery(attribute.value as string);
 
   return <div>{group.data && <GroupBadge group={group.data} />}</div>;

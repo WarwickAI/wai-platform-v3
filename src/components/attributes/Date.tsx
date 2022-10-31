@@ -30,9 +30,9 @@ const DateAttribute = ({ attribute, edit }: AttributeProps) => {
   return (
     <div>
       {edit && editMode ? (
-        <div className="flex flex-row space-x-2">
+        <div className="flex flex-row items-center space-x-1">
           <input
-            className={``}
+            className={`input input-sm px-0`}
             type="date"
             value={dateValue?.toISOString().split("T")[0]}
             onChange={(e) => {
@@ -49,7 +49,7 @@ const DateAttribute = ({ attribute, edit }: AttributeProps) => {
             }}
           />
           <input
-            className={``}
+            className={`input input-sm px-0`}
             type="time"
             value={
               dateValue
@@ -74,11 +74,21 @@ const DateAttribute = ({ attribute, edit }: AttributeProps) => {
             }}
           />
           <button onClick={() => setEditMode(false)}>
-            <XMarkIcon className="h-8 w-8" />
+            <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
       ) : (
-        <p onClick={() => setEditMode(true)}>{dateValue?.toISOString()}</p>
+        <p onClick={() => setEditMode(true)} className="text-base">
+          {dateValue
+            ? dateValue?.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })
+            : edit && "click to edit date..."}
+        </p>
       )}
     </div>
   );

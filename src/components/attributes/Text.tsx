@@ -5,9 +5,15 @@ import { AttributeProps } from "./utils";
 
 type TextAttributeProps = AttributeProps & {
   size: "sm" | "md" | "lg" | "xl";
+  placeholder?: string;
 };
 
-const TextAttribute = ({ attribute, size, edit }: TextAttributeProps) => {
+const TextAttribute = ({
+  attribute,
+  size,
+  edit,
+  placeholder,
+}: TextAttributeProps) => {
   const [value, setValue] = useState<string>("");
 
   useEffect(() => {
@@ -44,6 +50,7 @@ const TextAttribute = ({ attribute, size, edit }: TextAttributeProps) => {
             : ""
         } ${!edit ? "pointer-events-none" : ""}`}
         value={value as string}
+        placeholder={edit && placeholder ? placeholder : ""}
         onChange={(e) => {
           setValue(e.target.value);
           debounced(e.target.value);

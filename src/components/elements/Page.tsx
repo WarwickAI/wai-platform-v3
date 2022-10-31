@@ -107,7 +107,12 @@ const PageElement = ({ element, page }: ElementProps) => {
         <main className="container mx-auto flex min-h-screen max-w-2xl flex-col p-8">
           <div className="flex flex-row space-x-2">
             {titleAttribute && (
-              <TextAttribute attribute={titleAttribute} size="xl" edit={edit} />
+              <TextAttribute
+                attribute={titleAttribute}
+                size="xl"
+                edit={edit}
+                placeholder="Edit page title..."
+              />
             )}
           </div>
 

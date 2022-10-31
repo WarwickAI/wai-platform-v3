@@ -28,20 +28,36 @@ const EventElement = ({ element, edit, page }: ElementProps) => {
   return (
     <div>
       {titleAttribute && (
-        <TextAttribute attribute={titleAttribute} edit={edit} size="lg" />
+        <TextAttribute
+          attribute={titleAttribute}
+          edit={edit}
+          size="lg"
+          placeholder="Edit event title..."
+        />
       )}
       {descriptionAttribute && (
         <MarkdownAttribute attribute={descriptionAttribute} edit={edit} />
       )}
-      {startDateAttribute && (
-        <DateAttribute attribute={startDateAttribute} edit={edit} />
-      )}
-      {endDateAttribute && (
-        <DateAttribute attribute={endDateAttribute} edit={edit} />
-      )}
-      {locationAttribute && (
-        <TextAttribute attribute={locationAttribute} edit={edit} size="sm" />
-      )}
+      <div className="flex flex-row flex-wrap space-x-2">
+        {startDateAttribute && (
+          <DateAttribute attribute={startDateAttribute} edit={edit} />
+        )}
+        <p className="text-base">→</p>
+        {endDateAttribute && (
+          <DateAttribute attribute={endDateAttribute} edit={edit} />
+        )}
+      </div>
+      <div className="flex flex-row flex-wrap items-center">
+        <p className="text-md">📍</p>
+        {locationAttribute && (
+          <TextAttribute
+            attribute={locationAttribute}
+            edit={edit}
+            size="sm"
+            placeholder="Edit location..."
+          />
+        )}
+      </div>
     </div>
   );
 };

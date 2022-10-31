@@ -61,7 +61,7 @@ const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
   return (
     <div>
       {edit && editMode ? (
-        <div>
+        <div className="relative">
           <SimpleMDEReact
             value={value as string}
             onChange={(v) => {

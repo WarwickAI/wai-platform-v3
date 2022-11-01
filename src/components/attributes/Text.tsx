@@ -31,7 +31,17 @@ const TextAttribute = ({
   const handleEdit = (newValue: string) => {
     editAttribute.mutate(
       { id: attribute.id, value: newValue },
-      { onSuccess: () => utils.element.getAll.invalidate() }
+      {
+        onSuccess: (data) => {
+          utils.element.getAll.invalidate();
+          utils.element.get.invalidate(data.elementId);
+          utils.element.queryAll.invalidate({ type: data.element.type });
+          data.element.parent &&
+            utils.element.getPage.invalidate({
+              route: data.element.parent.route,
+            });
+        },
+      }
     );
   };
 

@@ -6,16 +6,11 @@ import { DatabaseRequiredAttributes } from "../elements/Database";
 import { AttributeProps } from "./utils";
 
 const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
-  const [selected, setSelected] = useState<string | null>(null);
   const [value, setValue] = useState<string>("");
 
   useEffect(() => {
     setValue(attribute.value as string);
   }, [attribute.value]);
-
-  const debounced = useDebouncedCallback((v: string) => {
-    handleEdit(v);
-  }, 1000);
 
   const utils = trpc.useContext();
 
@@ -24,7 +19,17 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
   const handleEdit = (newValue: string) => {
     editAttribute.mutate(
       { id: attribute.id, value: newValue },
-      { onSuccess: () => utils.element.getAll.invalidate() }
+      {
+        onSuccess: (data) => {
+          utils.element.getAll.invalidate();
+          utils.element.get.invalidate(data.elementId);
+          utils.element.queryAll.invalidate({ type: data.element.type });
+          data.element.parent &&
+            utils.element.getPage.invalidate({
+              route: data.element.parent.route,
+            });
+        },
+      }
     );
   };
 
@@ -68,7 +73,7 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
         placeholder={edit ? "Edit database..." : ""}
         onChange={(e) => {
           setValue(e.target.value);
-          debounced(e.target.value);
+          handleEdit(e.target.value);
         }}
       >
         <option value={0} disabled>

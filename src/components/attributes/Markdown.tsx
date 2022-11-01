@@ -32,7 +32,17 @@ const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
   const handleEdit = (newValue: string) => {
     editAttribute.mutate(
       { id: attribute.id, value: newValue },
-      { onSuccess: () => utils.element.getAll.invalidate() }
+      {
+        onSuccess: (data) => {
+          utils.element.getAll.invalidate();
+          utils.element.get.invalidate(data.elementId);
+          utils.element.queryAll.invalidate({ type: data.element.type });
+          data.element.parent &&
+            utils.element.getPage.invalidate({
+              route: data.element.parent.route,
+            });
+        },
+      }
     );
   };
 
@@ -78,7 +88,9 @@ const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
         </div>
       ) : (
         <article className="prose" onClick={() => setEditMode(true)}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{!edit || value.length > 0 ? value : "*click to edit markdown...*"}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {!edit || value.length > 0 ? value : "*click to edit markdown...*"}
+          </ReactMarkdown>
         </article>
       )}
     </div>

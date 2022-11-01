@@ -2,6 +2,11 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { AttributeType, Element, ElementType } from "@prisma/client";
 import { trpc } from "../utils/trpc";
 import {
+  DatabaseViewDescription,
+  DatabaseViewIcon,
+  DatabaseViewRequiredAttributes,
+} from "./elements/DatabaseView";
+import {
   EventDescription,
   EventIcon,
   EventRequiredAttributes,
@@ -49,6 +54,12 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
       atts = EventRequiredAttributes.map((a) => {
         return { ...a, required: true };
       });
+    } else if (type === "DatabaseView") {
+      atts = DatabaseViewRequiredAttributes.map((a) => {
+        return { ...a, required: true };
+      });
+    } else {
+      throw new Error("Unknown element type");
     }
 
     createElement.mutate(
@@ -96,6 +107,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           type="Event"
           create={(type) => handleCreate(type, index)}
         />
+        <AddElementType
+          type="DatabaseView"
+          create={(type) => handleCreate(type, index)}
+        />
       </div>
     </div>
   );
@@ -114,9 +129,17 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
       ? TextDescription
       : type === "Page"
       ? PageDescription
-      : EventDescription;
+      : type === "Event"
+      ? EventDescription
+      : DatabaseViewDescription;
   const Icon =
-    type === "Text" ? TextIcon : type === "Page" ? PageIcon : EventIcon;
+    type === "Text"
+      ? TextIcon
+      : type === "Page"
+      ? PageIcon
+      : type === "Event"
+      ? EventIcon
+      : DatabaseViewIcon;
 
   return (
     <button

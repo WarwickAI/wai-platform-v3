@@ -3,6 +3,31 @@ import { z } from "zod";
 import { AttributeType, ElementType } from "@prisma/client";
 
 export const elementRouter = router({
+  get: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+    return ctx.prisma.element.findUniqueOrThrow({
+      where: {
+        id: input,
+      },
+      include: {
+        user: true,
+        atts: true,
+        children: {
+          include: {
+            user: true,
+            atts: true,
+            masterGroups: true,
+            editGroups: true,
+            interactGroups: true,
+            viewGroups: true,
+          },
+        },
+        masterGroups: true,
+        editGroups: true,
+        interactGroups: true,
+        viewGroups: true,
+      },
+    });
+  }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.element.findMany({
       include: {
@@ -15,6 +40,18 @@ export const elementRouter = router({
       },
     });
   }),
+  queryAll: publicProcedure
+    .input(z.object({ type: z.nativeEnum(ElementType) }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.element.findMany({
+        where: {
+          type: input.type,
+        },
+        include: {
+          atts: true,
+        },
+      });
+    }),
   getPage: publicProcedure
     .input(z.object({ route: z.string() }))
     .query(({ ctx, input }) => {

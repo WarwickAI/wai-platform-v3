@@ -11,6 +11,7 @@ import Permissions from "./permissions";
 import Add from "./add";
 import Modify from "./modify";
 import EventElement from "./elements/Event";
+import DatabaseViewElement from "./elements/DatabaseView";
 
 type ItemProps = {
   element?: Element & {
@@ -134,6 +135,11 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
           <PageElement element={{ ...element, children: [] }} edit={edit} />
         ) : element.type === "Event" ? (
           <EventElement element={{ ...element, children: [] }} edit={edit} />
+        ) : element.type === "DatabaseView" ? (
+          <DatabaseViewElement
+            element={{ ...element, children: [] }}
+            edit={edit}
+          />
         ) : (
           <p>No element found...</p>
         )

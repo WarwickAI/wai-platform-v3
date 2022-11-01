@@ -84,6 +84,8 @@ enum ElementType {
   Text
   Page
   Event
+  Database
+  DatabaseView
 }
 
 enum AttributeType {
@@ -93,6 +95,9 @@ enum AttributeType {
   Markdown
   Date
   Location
+  DatabaseBaseType
+  DatabaseViewType
+  Database
 }
 
 model Element {

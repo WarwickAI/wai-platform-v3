@@ -25,7 +25,6 @@ import { DocumentIcon } from "@heroicons/react/24/solid";
 import {
   ElementProps,
   ElementWithAttsGroups,
-  ElementWithAttsGroupsChildren,
   RequiredAttribute,
 } from "./utils";
 

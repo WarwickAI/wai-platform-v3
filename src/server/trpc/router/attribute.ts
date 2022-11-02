@@ -13,6 +13,13 @@ export const attributeRouter = router({
       return ctx.prisma.attribute.update({
         where: { id: input.id },
         data: { value: input.value },
+        include: {
+          element: {
+            include: {
+              parent: true,
+            },
+          },
+        },
       });
     }),
 });

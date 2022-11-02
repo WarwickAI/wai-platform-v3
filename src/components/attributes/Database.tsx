@@ -6,7 +6,6 @@ import { DatabaseRequiredAttributes } from "../elements/Database";
 import { AttributeProps } from "./utils";
 
 const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
-  const [selected, setSelected] = useState<string | null>(null);
   const [value, setValue] = useState<string>("");
 
   useEffect(() => {
@@ -64,7 +63,7 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
         className={`select-ghost select select-sm w-full border-0 text-lg font-medium ${
           !edit ? "pointer-events-none" : ""
         }`}
-        value={value as string}
+        value={(value as string) || 0}
         placeholder={edit ? "Edit database..." : ""}
         onChange={(e) => {
           setValue(e.target.value);

@@ -16,7 +16,7 @@ type PermissionsProps = {
 
 const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
   return (
-    <div>
+    <div className="relative">
       <div className="tooltip" data-tip="Edit Permissions">
         <button
           className={`rounded-full p-1 transition-colors ${
@@ -30,7 +30,7 @@ const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
         </button>
       </div>
       <div
-        className={`absolute right-0 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+        className={`absolute top-10 right-0 z-10 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
           open ? "opacity-100" : "invisible opacity-0"
         }`}
       >
@@ -105,7 +105,7 @@ const PermissionSelect = ({
   return (
     <>
       <div
-        className="tooltip text-left z-20"
+        className="tooltip z-20 text-left"
         data-tip={`Edit groups for ${permissionName} permissions`}
       >
         <p className="text-sm font-semibold capitalize">{permissionName}</p>

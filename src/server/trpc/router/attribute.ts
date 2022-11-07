@@ -6,7 +6,7 @@ export const attributeRouter = router({
     .input(
       z.object({
         id: z.string(),
-        value: z.string().or(z.string().array()),
+        value: z.string().or(z.any().array()),
       })
     )
     .mutation(async ({ ctx, input }) => {

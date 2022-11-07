@@ -1,9 +1,11 @@
+import { CircleStackIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { AttributeType } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { trpc } from "../../utils/trpc";
 import { DatabaseRequiredAttributes } from "../elements/Database";
 import { AttributeProps } from "./utils";
+
+export const DatabaseAttibuteIcon = CircleStackIcon;
 
 const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
   const [value, setValue] = useState<string>("");
@@ -58,15 +60,16 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
           utils.element.getAll.invalidate();
           utils.element.queryAll.invalidate({ type: "Database" });
           utils.element.get.invalidate(data.id);
+          handleEdit(data.id);
         },
       }
     );
   };
 
   return (
-    <div>
+    <div className="flex flex-row justify-between">
       <select
-        className={`select-ghost select select-sm w-full border-0 text-lg font-medium ${
+        className={`select-ghost select select-sm border-0 text-lg font-medium ${
           !edit ? "pointer-events-none" : ""
         }`}
         value={(value as string) || 0}
@@ -87,7 +90,9 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
             </option>
           ))}
       </select>
-      <button onClick={handleCreate}>Create Database</button>
+      <button onClick={handleCreate}>
+        <PlusIcon className="h-6 w-6 text-neutral" />
+      </button>
     </div>
   );
 };

@@ -10,8 +10,10 @@ import { Options } from "easymde";
 import ReactMarkdown from "react-markdown";
 import ReactDOMServer from "react-dom/server";
 import remarkGfm from "remark-gfm";
-import { XMarkIcon } from "@heroicons/react/24/solid";
+import { DocumentTextIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { AttributeProps } from "./utils";
+
+export const MarkdownAttributeIcon = DocumentTextIcon;
 
 const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
   const [value, setValue] = useState<string>("");

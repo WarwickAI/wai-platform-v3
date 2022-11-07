@@ -87,7 +87,12 @@ export const elementRouter = router({
           .object({
             name: z.string(),
             type: z.nativeEnum(AttributeType),
-            value: z.string().or(z.string().array()),
+            value: z
+              .string()
+              .or(z.number())
+              .or(z.boolean())
+              .or(z.any().array())
+              .nullable(),
             required: z.boolean(),
           })
           .array(),

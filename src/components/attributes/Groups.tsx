@@ -1,10 +1,13 @@
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { PlusIcon, TrashIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 import { Group } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { GroupBadge } from "./Group";
 import { AttributeProps } from "./utils";
-const GroupAttribute = ({ attribute, edit }: AttributeProps) => {
+
+export const GroupsAttibuteIcon = UserGroupIcon;
+
+const GroupsAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();
 
   const editAttribute = trpc.attribute.editValue.useMutation();
@@ -42,7 +45,7 @@ const GroupAttribute = ({ attribute, edit }: AttributeProps) => {
   );
 };
 
-export default GroupAttribute;
+export default GroupsAttribute;
 
 type GroupsEditProps = {
   groupIds: string[];

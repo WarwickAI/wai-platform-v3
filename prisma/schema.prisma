@@ -98,6 +98,7 @@ enum AttributeType {
   DatabaseBaseType
   DatabaseViewType
   Database
+  Attributes
 }
 
 model Element {

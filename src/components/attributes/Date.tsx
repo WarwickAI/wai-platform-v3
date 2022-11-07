@@ -1,7 +1,9 @@
-import { XMarkIcon } from "@heroicons/react/24/solid";
+import { CalendarDaysIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
+
+export const DateAttibuteIcon = CalendarDaysIcon;
 
 const DateAttribute = ({ attribute, edit }: AttributeProps) => {
   const [editMode, setEditMode] = useState<boolean>(false);

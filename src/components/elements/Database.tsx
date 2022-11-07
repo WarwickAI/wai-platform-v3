@@ -1,9 +1,11 @@
 import { CircleStackIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
-import { AttributeHeader } from "../attributes/Attributes";
+import { ColumnHeader } from "../attributes/Columns";
+import DateAttribute from "../attributes/Date";
+import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
-import { DBAttributeType } from "../attributes/utils";
+import { DBColumnType } from "../attributes/utils";
 import Permissions from "../permissions";
 import {
   ElementProps,
@@ -14,7 +16,7 @@ import {
 export const DatabaseRequiredAttributes: RequiredAttribute[] = [
   { name: "Title", type: "Text", value: "Database Title" },
   { name: "Base Type", type: "DatabaseBaseType", value: "" },
-  { name: "Attributes", type: "Attributes", value: [] },
+  { name: "Columns", type: "Columns", value: [] },
 ];
 
 export const DatabaseDescription = "Stores a list of items.";
@@ -29,17 +31,17 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
   const editAttribute = trpc.attribute.editValue.useMutation();
 
   const attributesAtt = element.atts.find(
-    (attribute) => attribute.name === "Attributes"
+    (attribute) => attribute.name === "Columns"
   );
 
-  const attributes = useMemo(() => {
-    return attributesAtt?.value as DBAttributeType[];
+  const columns = useMemo(() => {
+    return attributesAtt?.value as DBColumnType[];
   }, [attributesAtt]);
 
   const databaseTitle = element.atts.find((a) => a.name === "Title");
 
   const handleAddRow = () => {
-    const newElementAtts = attributes.map((a) => {
+    const newElementAtts = columns.map((a) => {
       return { ...a, required: true };
     });
 
@@ -58,8 +60,8 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
     );
   };
 
-  const handleAddAttribute = () => {
-    const newAtts = [...attributes];
+  const handleAddColumn = () => {
+    const newAtts = [...columns];
 
     newAtts.push({
       name: "New Attribute" + Math.floor(Math.random() * 1000),
@@ -67,30 +69,30 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
       value: "",
       required: false,
     });
-    handleEdit(newAtts);
+    handleEditColumnsAttribute(newAtts);
   };
 
-  const handleEditAttribute = (oldName: string, newValue: DBAttributeType) => {
-    const newAtts = [...attributes];
+  const handleEditColumn = (oldName: string, newValue: DBColumnType) => {
+    const newAtts = [...columns];
 
     const index = newAtts.findIndex((a) => a.name === oldName);
 
     newAtts[index] = newValue;
 
-    handleEdit(newAtts);
+    handleEditColumnsAttribute(newAtts);
   };
 
-  const handleDeleteAttribute = (name: string) => {
-    const newAtts = [...attributes];
+  const handleDeleteColumn = (name: string) => {
+    const newAtts = [...columns];
 
     const index = newAtts.findIndex((a) => a.name === name);
 
     newAtts.splice(index, 1);
 
-    handleEdit(newAtts);
+    handleEditColumnsAttribute(newAtts);
   };
 
-  const handleEdit = (newValue: DBAttributeType[]) => {
+  const handleEditColumnsAttribute = (newValue: DBColumnType[]) => {
     if (!attributesAtt) return;
     editAttribute.mutate(
       { id: attributesAtt.id, value: newValue },
@@ -123,12 +125,13 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
         />
       </div>
       <DatabaseTable
-        columns={attributes}
+        columns={columns || []}
         edit={edit}
         elements={element.children}
-        handleAddAttribute={handleAddAttribute}
-        handleEditAttribute={handleEditAttribute}
-        handleDeleteAttribute={handleDeleteAttribute}
+        handleAddRow={handleAddRow}
+        handleAddColumn={handleAddColumn}
+        handleEditColumn={handleEditColumn}
+        handleDeleteColumn={handleDeleteColumn}
       />
     </div>
   );
@@ -137,13 +140,13 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
 export default DatabaseElement;
 
 type DatabaseTableProps = {
-  columns: DBAttributeType[];
+  columns: DBColumnType[];
   elements: ElementWithAttsGroups[];
   edit: boolean;
   handleAddRow: () => void;
-  handleAddAttribute: () => void;
-  handleEditAttribute: (oldName: string, newValue: DBAttributeType) => void;
-  handleDeleteAttribute: (name: string) => void;
+  handleAddColumn: () => void;
+  handleEditColumn: (oldName: string, newValue: DBColumnType) => void;
+  handleDeleteColumn: (name: string) => void;
 };
 
 const DatabaseTable = ({
@@ -151,9 +154,9 @@ const DatabaseTable = ({
   elements,
   edit,
   handleAddRow,
-  handleAddAttribute,
-  handleEditAttribute,
-  handleDeleteAttribute,
+  handleAddColumn,
+  handleEditColumn,
+  handleDeleteColumn,
 }: DatabaseTableProps) => {
   const [attrHeaderOpen, setAttrHeaderOpen] = useState<string>("");
 
@@ -164,11 +167,11 @@ const DatabaseTable = ({
           <tr>
             {columns.map((att) => (
               <th key={att.name} className="text-base font-normal normal-case">
-                <AttributeHeader
-                  attribute={att}
+                <ColumnHeader
+                  column={att}
                   edit={edit}
-                  editAttribute={handleEditAttribute}
-                  deleteAttribute={handleDeleteAttribute}
+                  editColumn={handleEditColumn}
+                  deleteColumn={handleDeleteColumn}
                   open={attrHeaderOpen === att.name}
                   setOpen={(open) => {
                     if (open) {
@@ -181,8 +184,8 @@ const DatabaseTable = ({
               </th>
             ))}
             <th className="text-base font-normal normal-case">
-              <div className="tooltip" data-tip="Add Database Attribute">
-                <button onClick={handleAddAttribute}>
+              <div className="tooltip" data-tip="Add Database Column">
+                <button onClick={handleAddColumn}>
                   <PlusIcon className="h-6 w-6 text-neutral" />
                 </button>
               </div>
@@ -203,12 +206,22 @@ const DatabaseTable = ({
                     {att.type === "Text" && (
                       <TextAttribute attribute={att} edit={edit} size="sm" />
                     )}
+                    {att.type === "Date" && (
+                      <DateAttribute attribute={att} edit={edit} />
+                    )}
+                    {att.type === "Markdown" && (
+                      <MarkdownAttribute attribute={att} edit={edit} />
+                    )}
                   </td>
                 ))}
               <td></td>
             </tr>
           ))}
-          <tr></tr>
+          <tr>
+            <button onClick={handleAddRow}>
+              <PlusIcon className="h-6 w-6 text-neutral" />
+            </button>
+          </tr>
         </tbody>
       </table>
     </div>

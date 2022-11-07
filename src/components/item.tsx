@@ -73,7 +73,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative w-full max-w-md rounded-lg border-2 bg-white p-2 transition-colors ${
+      className={`relative w-full max-w-4xl rounded-lg border-2 bg-white p-2 transition-colors ${
         activeAddMove ? "border-slate-300" : "border-white"
       } ${blur ? "opacity-20" : ""}`}
       onMouseEnter={() => setHovered(true)}

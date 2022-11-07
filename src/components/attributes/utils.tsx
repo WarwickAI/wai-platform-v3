@@ -5,7 +5,7 @@ export type AttributeProps = {
   edit: boolean;
 };
 
-export type DBAttributeType = {
+export type DBColumnType = {
   name: string;
   type: AttributeType;
   value: Prisma.JsonValue;

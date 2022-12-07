@@ -136,6 +136,11 @@ const Home: NextPage = () => {
 
 export default Home;
 
+/* TODO move; move client id to some ENV accessible to client */
+function discordConnect() {
+  window.location.href = "https://discord.com/oauth2/authorize?scope=identify+email&client_id=1049843047338356746&response_type=code";
+}
+
 const AuthShowcase: React.FC = () => {
   const { data: secretMessage } = trpc.auth.getSecretMessage.useQuery();
 
@@ -157,6 +162,13 @@ const AuthShowcase: React.FC = () => {
       >
         {sessionData ? "Sign out" : "Sign in"}
       </button>
+
+      {sessionData && (
+        <button
+          className="rounded-md border border-black bg-violet-50 px-4 py-2 text-xl shadow-lg hover:bg-violet-100"
+          onClick={() => discordConnect()}
+        >Connect Discord Account</button>
+      )}
     </div>
   );
 };

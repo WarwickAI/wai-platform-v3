@@ -53,8 +53,7 @@ export const ColumnHeader = ({
   const [required, setRequired] = useState(column.required);
 
   const debounced = useDebouncedCallback(
-    (newAttribute: DBColumnType) =>
-      editColumn(column.name, newAttribute),
+    (newAttribute: DBColumnType) => editColumn(column.name, newAttribute),
     1000
   );
 
@@ -65,32 +64,36 @@ export const ColumnHeader = ({
   }, [column]);
 
   const columnTypes: {
-    name: AttributeType, icon: (props: SVGProps<SVGSVGElement> & {
-      title?: string | undefined;
-      titleId?: string | undefined;
-    }) => JSX.Element
+    name: AttributeType;
+    icon: (
+      props: SVGProps<SVGSVGElement> & {
+        title?: string | undefined;
+        titleId?: string | undefined;
+      }
+    ) => JSX.Element;
   }[] = [
-      {
-        name: "Text",
-        icon: TextAttibuteIcon,
-      },
-      {
-        name: "Markdown",
-        icon: MarkdownAttributeIcon,
-      },
-      {
-        name: "Date",
-        icon: DateAttibuteIcon,
-      },
-    ]
+    {
+      name: "Text",
+      icon: TextAttibuteIcon,
+    },
+    {
+      name: "Markdown",
+      icon: MarkdownAttributeIcon,
+    },
+    {
+      name: "Date",
+      icon: DateAttibuteIcon,
+    },
+  ];
 
   return (
     <div className="relative flex flex-row space-x-2">
       {Icon && (
         <div className="tooltip" data-tip={column.type}>
           <button
-            className={`rounded-full p-1 transition-colors ${open ? "bg-neutral" : "bg-white"
-              }`}
+            className={`rounded-full p-1 transition-colors ${
+              open ? "bg-neutral" : "bg-white"
+            }`}
             onClick={() => setOpen(!open)}
           >
             <Icon
@@ -113,16 +116,18 @@ export const ColumnHeader = ({
         }}
       />
       <div
-        className={` absolute top-10 right-0 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${open ? "opacity-100" : "invisible opacity-0"
-          }`}
+        className={` absolute top-10 right-0 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+          open ? "opacity-100" : "invisible opacity-0"
+        }`}
       >
         <div className="flex flex-col space-y-2">
           <div className="flex flex-row items-center space-x-2 rounded-md p-2">
             {columnTypes.map((col) => (
-              <div className="tooltip" data-tip={col.name}>
+              <div key={col.name} className="tooltip" data-tip={col.name}>
                 <button
-                  className={`rounded-full p-1 transition-colors ${column.type === col.name ? "bg-neutral" : "bg-white"
-                    }`}
+                  className={`rounded-full p-1 transition-colors ${
+                    column.type === col.name ? "bg-neutral" : "bg-white"
+                  }`}
                   onClick={() => {
                     editColumn(column.name, {
                       name: column.name,
@@ -130,12 +135,12 @@ export const ColumnHeader = ({
                       value,
                       required,
                     });
-
                   }}
                 >
                   <col.icon
-                    className={`h-6 w-6 ${column.type === col.name ? "text-white" : "text-neutral"
-                      }`}
+                    className={`h-6 w-6 ${
+                      column.type === col.name ? "text-white" : "text-neutral"
+                    }`}
                   />
                 </button>
               </div>

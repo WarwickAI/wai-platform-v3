@@ -90,7 +90,9 @@ const PageElement = ({ element, page }: ElementProps) => {
           element.route
         }
       >
-        {titleAttribute?.value as string}
+        <p className="text-xl font-bold hover:cursor-pointer">
+          {titleAttribute?.value as string}
+        </p>
       </Link>
     );
   } else {

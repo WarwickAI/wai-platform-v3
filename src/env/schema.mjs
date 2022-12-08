@@ -20,7 +20,8 @@ export const serverSchema = z.object({
   COGNITO_CLIENT_SECRET: z.string(),
   COGNITO_ISSUER: z.string(),
   DISCORD_CLIENT_ID: z.string(),
-  DISCORD_CLIENT_SECRET: z.string()
+  DISCORD_CLIENT_SECRET: z.string(),
+  DISCORD_REDIRECT_URI: z.string(),
 });
 
 /**
@@ -29,7 +30,8 @@ export const serverSchema = z.object({
  * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 export const clientSchema = z.object({
-  // NEXT_PUBLIC_BAR: z.string(),
+  NEXT_PUBLIC_DISCORD_CLIENT_ID: z.string(),
+  NEXT_PUBLIC_DISCORD_REDIRECT_URI: z.string(),
 });
 
 /**
@@ -40,4 +42,6 @@ export const clientSchema = z.object({
  */
 export const clientEnv = {
   // NEXT_PUBLIC_BAR: process.env.NEXT_PUBLIC_BAR,
+  NEXT_PUBLIC_DISCORD_CLIENT_ID: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID,
+  NEXT_PUBLIC_DISCORD_REDIRECT_URI: process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI,
 };

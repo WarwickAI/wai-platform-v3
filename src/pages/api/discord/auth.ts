@@ -15,11 +15,11 @@ const auth = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log("AUTH CODE: " + code);
 
   const params = {
-    "client_id": env.DISCORD_CLIENT_ID,
+    "client_id": env.NEXT_PUBLIC_DISCORD_CLIENT_ID,
     "client_secret": env.DISCORD_CLIENT_SECRET,
     "grant_type": "authorization_code",
     "code": code,
-    "redirect_uri": "http://localhost:3000/api/discord/auth" // TODO: MAKE ENV
+    "redirect_uri": env.NEXT_PUBLIC_DISCORD_REDIRECT_URI,
   };
 
   const response = await fetch("https://discord.com/api/oauth2/token", {
@@ -32,6 +32,8 @@ const auth = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   const body = await response.json();
+
+  console.log(body)
 
   if (response.status == 200) {
     const accessToken = body?.access_token;

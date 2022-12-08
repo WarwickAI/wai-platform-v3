@@ -20,6 +20,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Attribute, Element, Group, User } from "@prisma/client";
+import { env } from "../env/client.mjs";
 
 const Home: NextPage = () => {
   const [items, setItems] = useState<
@@ -138,7 +139,7 @@ export default Home;
 
 /* TODO move; move client id to some ENV accessible to client */
 function discordConnect() {
-  window.location.href = "https://discord.com/oauth2/authorize?scope=identify+email&client_id=1049843047338356746&response_type=code";
+  window.location.href = `https://discord.com/oauth2/authorize?scope=identify+email&client_id=${env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${env.NEXT_PUBLIC_DISCORD_REDIRECT_URI}`;
 }
 
 const AuthShowcase: React.FC = () => {
@@ -167,7 +168,9 @@ const AuthShowcase: React.FC = () => {
         <button
           className="rounded-md border border-black bg-violet-50 px-4 py-2 text-xl shadow-lg hover:bg-violet-100"
           onClick={() => discordConnect()}
-        >Connect Discord Account</button>
+        >
+          Connect Discord Account
+        </button>
       )}
     </div>
   );

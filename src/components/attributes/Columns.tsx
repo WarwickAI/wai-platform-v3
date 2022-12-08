@@ -89,7 +89,7 @@ export const ColumnHeader = ({
   return (
     <div className="relative flex flex-row space-x-2">
       {Icon && (
-        <div className="tooltip" data-tip={column.type}>
+        <div className="tooltip tooltip-right" data-tip={column.type}>
           <button
             className={`rounded-full p-1 transition-colors ${
               open ? "bg-neutral" : "bg-white"
@@ -103,7 +103,7 @@ export const ColumnHeader = ({
         </div>
       )}
       <input
-        className="input-ghost input input-sm w-24"
+        className="input-ghost input input-sm"
         value={name}
         onChange={(e) => {
           setName(e.target.value);
@@ -116,7 +116,7 @@ export const ColumnHeader = ({
         }}
       />
       <div
-        className={` absolute top-10 right-0 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+        className={`absolute top-10 left-0 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
           open ? "opacity-100" : "invisible opacity-0"
         }`}
       >

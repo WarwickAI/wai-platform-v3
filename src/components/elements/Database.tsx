@@ -204,12 +204,15 @@ const DatabaseTable = ({
   const [attrHeaderOpen, setAttrHeaderOpen] = useState<string>("");
 
   return (
-    <div className="">
-      <table className="table-compact z-0 table w-full">
+    <div className="overflow-x-auto overflow-y-scroll">
+      <table className="table-compact w-full">
         <thead>
-          <tr>
+          <tr className="bg-gray-200">
             {columns.map((att) => (
-              <th key={att.name} className="text-base font-normal normal-case">
+              <th
+                key={att.name}
+                className="border-r border-r-gray-300 text-base font-normal normal-case"
+              >
                 <ColumnHeader
                   column={att}
                   edit={edit}
@@ -227,7 +230,10 @@ const DatabaseTable = ({
               </th>
             ))}
             <th className="text-base font-normal normal-case">
-              <div className="tooltip" data-tip="Add Database Column">
+              <div
+                className="tooltip tooltip-left"
+                data-tip="Add Database Column"
+              >
                 <button onClick={handleAddColumn}>
                   <PlusIcon className="h-6 w-6 text-neutral" />
                 </button>
@@ -245,7 +251,10 @@ const DatabaseTable = ({
                     columns.findIndex((c) => b.name === c.name)
                 )
                 .map((att) => (
-                  <td key={element.id + att.name}>
+                  <td
+                    key={element.id + att.name}
+                    className="border-r border-r-gray-300"
+                  >
                     {att.type === "Text" && (
                       <TextAttribute attribute={att} edit={edit} size="sm" />
                     )}
@@ -261,7 +270,11 @@ const DatabaseTable = ({
             </tr>
           ))}
           <tr>
-            <button onClick={handleAddRow}>
+            <button
+              onClick={handleAddRow}
+              className="tooltip tooltip-right p-2"
+              data-tip="Add Row"
+            >
               <PlusIcon className="h-6 w-6 text-neutral" />
             </button>
           </tr>

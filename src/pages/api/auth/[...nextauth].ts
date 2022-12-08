@@ -19,10 +19,6 @@ export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
   providers: [
-    // DiscordProvider({
-    //   clientId: env.DISCORD_CLIENT_ID,
-    //   clientSecret: env.DISCORD_CLIENT_SECRET,
-    // }),
     CognitoProvider({
       clientId: env.COGNITO_CLIENT_ID,
       clientSecret: env.COGNITO_CLIENT_SECRET,

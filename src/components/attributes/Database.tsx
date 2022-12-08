@@ -1,4 +1,4 @@
-import { CircleStackIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { CircleStackIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { AttributeType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
@@ -17,6 +17,7 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();
 
   const editAttribute = trpc.attribute.editValue.useMutation();
+  const deleteElement = trpc.element.delete.useMutation();
 
   const handleEdit = (newValue: string) => {
     editAttribute.mutate(
@@ -31,6 +32,19 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
               route: data.element.parent.route,
             });
         },
+      }
+    );
+  };
+
+  const handleDelete = () => {
+    deleteElement.mutate(
+      { id: value },
+      {
+        onSuccess: (data) => {
+          utils.element.getAll.invalidate();
+          utils.element.get.invalidate(data.id);
+          utils.element.queryAll.invalidate({ type: data.type });
+        }
       }
     );
   };
@@ -69,9 +83,8 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
   return (
     <div className="flex flex-row justify-between">
       <select
-        className={`select-ghost select select-sm border-0 text-lg font-medium ${
-          !edit ? "pointer-events-none" : ""
-        }`}
+        className={`select-ghost select select-sm border-0 text-lg font-medium ${!edit ? "pointer-events-none" : ""
+          }`}
         value={(value as string) || 0}
         placeholder={edit ? "Edit database..." : ""}
         onChange={(e) => {
@@ -90,6 +103,9 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
             </option>
           ))}
       </select>
+      <button onClick={handleDelete}>
+        <TrashIcon className="h-6 w-6 text-neutral" />
+      </button>
       <button onClick={handleCreate}>
         <PlusIcon className="h-6 w-6 text-neutral" />
       </button>

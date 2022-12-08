@@ -1,4 +1,5 @@
 import { CircleStackIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { ElementType } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { ColumnHeader } from "../attributes/Columns";
@@ -7,6 +8,8 @@ import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
 import { DBColumnType } from "../attributes/utils";
 import Permissions from "../permissions";
+import { EventRequiredAttributes } from "./Event";
+import { PageRequiredAttributes } from "./Page";
 import {
   ElementProps,
   ElementWithAttsGroups,
@@ -110,6 +113,40 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
     );
   };
 
+  // Check if the database has columns/attributes that match exisitng elements
+  const matchingElements = useMemo(() => {
+    let matching = {
+      event: true,
+      page: true,
+    };
+
+    for (const attribute of EventRequiredAttributes) {
+      if (
+        !columns ||
+        columns.find(
+          (a) => a.name === attribute.name && a.type === attribute.type
+        ) === undefined
+      ) {
+        matching.event = false;
+        break;
+      }
+    }
+
+    for (const attribute of PageRequiredAttributes) {
+      if (
+        !columns ||
+        columns.find(
+          (a) => a.name === attribute.name && a.type === attribute.type
+        ) === undefined
+      ) {
+        matching.page = false;
+        break;
+      }
+    }
+
+    return matching;
+  }, [columns]);
+
   return (
     <div>
       <div className="flex flex-row space-x-2">
@@ -123,6 +160,12 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
             setDbPermsOpen(v);
           }}
         />
+        {matchingElements.event && (
+          <div className="badge-primary badge badge-sm">Event</div>
+        )}
+        {matchingElements.page && (
+          <div className="badge-primary badge badge-sm">Page</div>
+        )}
       </div>
       <DatabaseTable
         columns={columns || []}

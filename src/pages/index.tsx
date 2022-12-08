@@ -139,7 +139,7 @@ export default Home;
 
 /* TODO move; move client id to some ENV accessible to client */
 function discordConnect() {
-  window.location.href = `https://discord.com/oauth2/authorize?scope=identify+email&client_id=${env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${env.NEXT_PUBLIC_DISCORD_REDIRECT_URI}`;
+  window.location.href = `https://discord.com/oauth2/authorize?scope=identify&client_id=${env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${env.NEXT_PUBLIC_DISCORD_REDIRECT_URI}`;
 }
 
 const AuthShowcase: React.FC = () => {
@@ -147,11 +147,14 @@ const AuthShowcase: React.FC = () => {
 
   const { data: sessionData } = useSession();
 
+  const { data: userData } = trpc.user.getMe.useQuery();
+
   return (
     <div className="flex flex-col items-center justify-center gap-2">
       {sessionData && (
         <p className="text-2xl text-blue-500">
-          Logged in as {sessionData?.user?.name || sessionData?.user?.email}
+          Logged in as {sessionData?.user?.name || sessionData?.user?.email}{" "}
+          with Discord ID {userData?.discordId || "none"}
         </p>
       )}
       {secretMessage && (

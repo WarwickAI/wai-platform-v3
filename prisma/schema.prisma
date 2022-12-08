@@ -57,6 +57,7 @@ model User {
   sessions      Session[]
   elements      Element[]
   groups        Group[]
+  discordId     String?   @unique
 }
 
 model Group {

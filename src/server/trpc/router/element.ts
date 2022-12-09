@@ -92,6 +92,7 @@ export const elementRouter = router({
               .or(z.number())
               .or(z.boolean())
               .or(z.any().array())
+              .or(z.any())
               .nullable(),
             required: z.boolean(),
           })

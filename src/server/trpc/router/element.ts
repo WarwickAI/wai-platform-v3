@@ -101,14 +101,14 @@ export const elementRouter = router({
     .mutation(async ({ ctx, input }) => {
       const parent = input.parentId
         ? await ctx.prisma.element.findFirst({
-          where: { id: input.parentId },
-          include: {
-            masterGroups: true,
-            editGroups: true,
-            interactGroups: true,
-            viewGroups: true,
-          },
-        })
+            where: { id: input.parentId },
+            include: {
+              masterGroups: true,
+              editGroups: true,
+              interactGroups: true,
+              viewGroups: true,
+            },
+          })
         : null;
 
       const adminGroup = await ctx.prisma.group.findFirstOrThrow({

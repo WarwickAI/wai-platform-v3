@@ -1,5 +1,4 @@
 import { CircleStackIcon, PlusIcon } from "@heroicons/react/24/solid";
-import { ElementType } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { ColumnHeader } from "../attributes/Columns";
@@ -115,7 +114,7 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
 
   // Check if the database has columns/attributes that match exisitng elements
   const matchingElements = useMemo(() => {
-    let matching = {
+    const matching = {
       event: true,
       page: true,
     };

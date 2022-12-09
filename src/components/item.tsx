@@ -86,27 +86,29 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
         {...listeners}
         {...attributes}
       >
-        <div
-          className="tooltip"
-          data-tip={
-            "Created by " +
-            element?.user.email +
-            " at " +
-            element?.createdAt.toLocaleString()
-          }
-        >
-          <Image
-            alt={element?.user.email + "profile picture"}
-            width={24}
-            height={24}
-            className={"rounded-full"}
-            src={
-              "https://www.gravatar.com/avatar/" +
-              MD5(element?.user.email || "") +
-              "?s=24"
+        {element && (
+          <div
+            className="tooltip"
+            data-tip={
+              "Created by " +
+              element?.user.email +
+              " at " +
+              element?.createdAt.toLocaleString()
             }
-          />
-        </div>
+          >
+            <Image
+              alt={element?.user.email + "profile picture"}
+              width={24}
+              height={24}
+              className={"rounded-full"}
+              src={
+                "https://www.gravatar.com/avatar/" +
+                MD5(element?.user.email || "") +
+                "?s=24"
+              }
+            />
+          </div>
+        )}
         <Add
           parent={parent}
           index={element?.index || 0}

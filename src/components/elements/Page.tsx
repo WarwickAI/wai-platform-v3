@@ -27,6 +27,7 @@ import {
   ElementWithAttsGroups,
   RequiredAttribute,
 } from "./utils";
+import Add from "../add";
 
 export const PageRequiredAttributes: RequiredAttribute[] = [
   { name: "Title", type: "Text", value: "Page Title" },
@@ -42,6 +43,8 @@ const PageElement = ({ element, page }: ElementProps) => {
   useEffect(() => {
     setItems(element.children.sort((a, b) => a.index - b.index));
   }, [element.children]);
+
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   const user = trpc.user.getMe.useQuery();
 
@@ -137,7 +140,14 @@ const PageElement = ({ element, page }: ElementProps) => {
                         editParent={edit}
                       />
                     ))
-                  : edit && <Item parent={element} editParent={edit} />}
+                  : edit && (
+                      <Add
+                        index={0}
+                        open={isAddOpen}
+                        setOpen={(v) => setIsAddOpen(v)}
+                        parent={element}
+                      />
+                    )}
                 <DragOverlay>
                   {activeId ? (
                     <Item

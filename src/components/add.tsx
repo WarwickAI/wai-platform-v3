@@ -21,6 +21,11 @@ import {
   TextIcon,
   TextRequiredAttributes,
 } from "./elements/Text";
+import {
+  BadgeDescription,
+  BadgeIcon,
+  BadgeRequiredAttributes,
+} from "./elements/Badge";
 
 type AddProps = {
   parent?: Element;
@@ -56,6 +61,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
       });
     } else if (type === "DatabaseView") {
       atts = DatabaseViewRequiredAttributes.map((a) => {
+        return { ...a, required: true };
+      });
+    } else if (type === "Badge") {
+      atts = BadgeRequiredAttributes.map((a) => {
         return { ...a, required: true };
       });
     } else {
@@ -111,6 +120,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           type="DatabaseView"
           create={(type) => handleCreate(type, index)}
         />
+        <AddElementType
+          type="Badge"
+          create={(type) => handleCreate(type, index)}
+        />
       </div>
     </div>
   );
@@ -131,6 +144,8 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
       ? PageDescription
       : type === "Event"
       ? EventDescription
+      : type === "Badge"
+      ? BadgeDescription
       : DatabaseViewDescription;
   const Icon =
     type === "Text"
@@ -139,6 +154,8 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
       ? PageIcon
       : type === "Event"
       ? EventIcon
+      : type === "Badge"
+      ? BadgeIcon
       : DatabaseViewIcon;
 
   return (

@@ -6,6 +6,7 @@ import { DatabaseAttibuteIcon } from "./Database";
 import { DateAttibuteIcon } from "./Date";
 import { MarkdownAttributeIcon } from "./Markdown";
 import { TextAttibuteIcon } from "./Text";
+import { UsersAttibuteIcon } from "./Users";
 import { DBColumnType } from "./utils";
 
 type ColumnHeaderProps = {
@@ -46,6 +47,8 @@ export const ColumnHeader = ({
     case "Text":
       Icon = TextAttibuteIcon;
       break;
+    case "Users":
+      Icon = UsersAttibuteIcon;
   }
 
   const [name, setName] = useState(column.name);
@@ -84,6 +87,10 @@ export const ColumnHeader = ({
       name: "Date",
       icon: DateAttibuteIcon,
     },
+    {
+      name: "Users",
+      icon: UsersAttibuteIcon,
+    }
   ];
 
   return (
@@ -156,7 +163,7 @@ export const ColumnHeader = ({
 
             <div className="text-start">
               <p className="text-sm font-bold">Delete</p>
-              <p className="text-xs">Remove this element</p>
+              <p className="text-xs">Remove this attribute</p>
             </div>
           </button>
         </div>

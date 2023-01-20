@@ -5,6 +5,7 @@ import { ColumnHeader } from "../attributes/Columns";
 import DateAttribute from "../attributes/Date";
 import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
+import UsersAttribute from "../attributes/Users";
 import { DBColumnType } from "../attributes/utils";
 import Permissions from "../permissions";
 import { EventRequiredAttributes } from "./Event";

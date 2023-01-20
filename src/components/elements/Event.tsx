@@ -1,7 +1,9 @@
-import { CalendarIcon } from "@heroicons/react/24/solid";
+import { CalendarIcon, TicketIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
 import DateAttribute from "../attributes/Date";
 import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
+import UsersAttribute from "../attributes/Users";
 import { ElementProps, RequiredAttribute } from "./utils";
 
 export const EventRequiredAttributes: RequiredAttribute[] = [
@@ -10,6 +12,7 @@ export const EventRequiredAttributes: RequiredAttribute[] = [
   { name: "Start Date", type: "Date", value: "" },
   { name: "End Date", type: "Date", value: "" },
   { name: "Location", type: "Text", value: "" },
+  { name: "Attendees", type: "Users", value: [] },
 ];
 
 export const EventDescription = "Scheduled event with location and time.";
@@ -58,8 +61,40 @@ const EventElement = ({ element, edit, page }: ElementProps) => {
           />
         )}
       </div>
+      {edit && <AttendeesPopover element={element} edit={edit} page={page} />}
     </div>
   );
 };
 
 export default EventElement;
+
+const AttendeesPopover = ({ element, edit }: ElementProps) => {
+  const usersAttribute = element.atts.find((a) => a.name === "Attendees");
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <div
+        className="flex flex-row items-center space-x-2 hover:cursor-pointer"
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+      >
+        <TicketIcon className="w-6" />
+        <span className="text-sm">Attendees</span>
+      </div>
+      <div
+        className={`absolute top-10 left-0 z-10 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+          isOpen ? "opacity-100" : "invisible opacity-0"
+        }`}
+      >
+        {usersAttribute ? (
+          <UsersAttribute attribute={usersAttribute} edit={edit} />
+        ) : (
+          <p>loading attendees...</p>
+        )}
+      </div>
+    </div>
+  );
+};

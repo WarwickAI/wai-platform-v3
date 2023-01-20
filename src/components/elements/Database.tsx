@@ -44,7 +44,7 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
 
   const handleAddRow = () => {
     const newElementAtts = columns.map((a) => {
-      return { ...a, required: true };
+      return { ...a, required: true, value: a.value || "" };
     });
 
     addElement.mutate(
@@ -203,7 +203,7 @@ const DatabaseTable = ({
   const [attrHeaderOpen, setAttrHeaderOpen] = useState<string>("");
 
   return (
-    <div className="overflow-x-auto overflow-y-scroll">
+    <div className="overflow-x-auto">
       <table className="table-compact w-full">
         <thead>
           <tr className="bg-gray-200">
@@ -262,6 +262,9 @@ const DatabaseTable = ({
                     )}
                     {att.type === "Markdown" && (
                       <MarkdownAttribute attribute={att} edit={edit} />
+                    )}
+                    {att.type === "Users" && (
+                      <UsersAttribute attribute={att} edit={edit} />
                     )}
                   </td>
                 ))}

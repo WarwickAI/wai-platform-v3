@@ -21,12 +21,12 @@ export const attributeRouter = router({
               children: {
                 include: {
                   atts: true,
-                }
-              }
-            }
-          }
-        }
-      })
+                },
+              },
+            },
+          },
+        },
+      });
 
       // If we are updating the columns of a database, make sure to update the children of the
       // element to contain all the columns as attributes
@@ -60,7 +60,7 @@ export const attributeRouter = router({
                 data: {
                   name: column.name,
                   type: column.type,
-                  value: column.value,
+                  value: column.value || "",
                   required: column.required,
                   element: {
                     connect: {

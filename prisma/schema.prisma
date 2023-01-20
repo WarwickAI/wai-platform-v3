@@ -87,6 +87,7 @@ enum ElementType {
   Event
   Database
   DatabaseView
+  Badge
 }
 
 enum AttributeType {
@@ -100,6 +101,8 @@ enum AttributeType {
   DatabaseViewType
   Database
   Columns
+  User
+  Users
 }
 
 model Element {

@@ -8,6 +8,6 @@ export type AttributeProps = {
 export type DBColumnType = {
   name: string;
   type: AttributeType;
-  value: Prisma.JsonValue;
+  value: any;
   required: boolean;
 };

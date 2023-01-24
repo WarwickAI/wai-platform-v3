@@ -1,8 +1,14 @@
+import { Popover } from "@headlessui/react";
 import {
   CalendarIcon,
   TicketIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/solid";
+import {
+  CalendarIcon as CalendarOutlineIcon,
+  TicketIcon as TicketOutlineIcon,
+  QrCodeIcon as QrCodeOutlineIcon,
+} from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { clientEnv } from "../../env/schema.mjs";
@@ -107,36 +113,39 @@ const AttendeesPopover = ({ element, edit }: ElementProps) => {
 };
 
 const EventQRPopover = ({ element }: ElementProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   const url = `${clientEnv.NEXT_PUBLIC_URL}/${element.id}`;
 
   return (
-    <div className="relative">
-      <div
-        className="flex flex-row items-center space-x-2"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <QrCodeIcon className="w-6" />
-        <span className="text-sm">QR Code</span>
-      </div>
-      <div
-        className={`absolute top-10 left-0 z-10 flex flex-col items-center space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
-          isOpen ? "opacity-100" : "invisible opacity-0"
-        }`}
-      >
-        <QRCode
-          value={url}
-          size={500}
-          logoHeight={120}
-          logoWidth={120}
-          ecLevel={"Q"}
-          eyeRadius={5}
-          removeQrCodeBehindLogo
-          logoImage={"/static/logo2.png"}
-        />
-        <code className="text-sm">{url}</code>
-      </div>
-    </div>
+    <Popover className="relative">
+      {({ open }) => (
+        <>
+          <Popover.Button
+            className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+              open ? "outline-2" : "outline-none"
+            }`}
+          >
+            {open ? (
+              <QrCodeIcon className="w-6" />
+            ) : (
+              <QrCodeOutlineIcon className="w-6" />
+            )}
+            <span className="text-sm">QR Code</span>
+          </Popover.Button>
+          <Popover.Panel className="absolute top-10 left-0 z-10 flex flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+            <QRCode
+              value={url}
+              size={400}
+              logoHeight={110}
+              logoWidth={110}
+              ecLevel={"Q"}
+              eyeRadius={5}
+              removeQrCodeBehindLogo
+              logoImage={"/static/logo2.png"}
+            />
+            <code className="text-sm">{url}</code>
+          </Popover.Panel>
+        </>
+      )}
+    </Popover>
   );
 };

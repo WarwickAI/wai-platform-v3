@@ -23,6 +23,7 @@ export const authOptions: NextAuthOptions = {
       clientId: env.COGNITO_CLIENT_ID,
       clientSecret: env.COGNITO_CLIENT_SECRET,
       issuer: env.COGNITO_ISSUER,
+      checks: ["nonce"],
     }),
   ],
 };

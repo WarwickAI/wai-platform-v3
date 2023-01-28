@@ -208,27 +208,33 @@ const DatabaseTable = ({
       <table className="table-compact w-full">
         <thead>
           <tr className="bg-gray-200">
-            {columns.map((att) => (
-              <th
-                key={att.name}
-                className="border-r border-r-gray-300 text-base font-normal normal-case"
-              >
-                <ColumnHeader
-                  column={att}
-                  edit={edit}
-                  editColumn={handleEditColumn}
-                  deleteColumn={handleDeleteColumn}
-                  open={attrHeaderOpen === att.name}
-                  setOpen={(open) => {
-                    if (open) {
-                      setAttrHeaderOpen(att.name);
-                    } else {
-                      setAttrHeaderOpen("");
-                    }
-                  }}
-                />
-              </th>
-            ))}
+            {columns
+              .sort(
+                (a, b) =>
+                  columns.findIndex((c) => a.name === c.name) -
+                  columns.findIndex((c) => b.name === c.name)
+              )
+              .map((att) => (
+                <th
+                  key={att.name}
+                  className="border-r border-r-gray-300 text-base font-normal normal-case"
+                >
+                  <ColumnHeader
+                    column={att}
+                    edit={edit}
+                    editColumn={handleEditColumn}
+                    deleteColumn={handleDeleteColumn}
+                    open={attrHeaderOpen === att.name}
+                    setOpen={(open) => {
+                      if (open) {
+                        setAttrHeaderOpen(att.name);
+                      } else {
+                        setAttrHeaderOpen("");
+                      }
+                    }}
+                  />
+                </th>
+              ))}
             <th className="text-base font-normal normal-case">
               <div
                 className="tooltip tooltip-left"

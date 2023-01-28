@@ -1,7 +1,11 @@
+import { Popover } from "@headlessui/react";
 import { PresentationChartBarIcon } from "@heroicons/react/24/solid";
 import { AttributeType } from "@prisma/client";
 import { useMemo } from "react";
 import { trpc } from "../../utils/trpc";
+import SurveyQuestionsAttribute, {
+  SurveyQuestion,
+} from "../attributes/SurveyQuestion";
 import TextAttribute from "../attributes/Text";
 import SurveyResponseElement, {
   SurveyResponseRequiredAttributes,
@@ -19,6 +23,7 @@ export const SurveyIcon = PresentationChartBarIcon;
 
 const SurveyElement = ({ element, edit }: ElementProps) => {
   const userData = trpc.user.getMe.useQuery();
+  const utils = trpc.useContext();
 
   const surveyData = trpc.element.get.useQuery(element.id);
 
@@ -43,8 +48,8 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
   }, [surveyElement]);
 
   //   Create a SurveyResponse
-  const handleCreateRepsonse = () => {
-    if (!surveyElement) return;
+  const handleCreateResponse = () => {
+    if (!surveyElement || !questionsAttribute) return;
 
     let atts: {
       name: string;
@@ -57,12 +62,32 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
       return { ...a, required: true };
     });
 
-    createElement.mutate({
-      parentId: surveyElement.id,
-      index: surveyElement.children.length,
-      type: "SurveyResponse",
-      atts,
-    });
+    // Also add all the questions from the parent survey as attributes
+    atts = atts.concat(
+      (questionsAttribute.value as SurveyQuestion[]).map((q) => {
+        return {
+          name: q.id,
+          type: q.type,
+          value: "",
+          required: false,
+        };
+      })
+    );
+
+    createElement.mutate(
+      {
+        parentId: surveyElement.id,
+        index: surveyElement.children.length,
+        type: "SurveyResponse",
+        atts,
+      },
+      {
+        onSuccess: () => {
+          utils.element.getAll.invalidate();
+          utils.element.get.invalidate(surveyElement.id);
+        },
+      }
+    );
   };
 
   //   Find amongst SurveyRepsonse children if the user has responded to this survey
@@ -80,7 +105,7 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
     })[0];
   }, [surveyElement, user]);
 
-  return titleAttribute && questionsAttribute ? (
+  return titleAttribute && questionsAttribute && surveyElement ? (
     <div>
       <TextAttribute
         attribute={titleAttribute}
@@ -89,12 +114,35 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
         placeholder="Edit survey title..."
       />
       {userSurveyResponse && (
-        <SurveyResponseElement element={userSurveyResponse} edit={edit} />
+        <SurveyResponseElement
+          element={userSurveyResponse}
+          parent={surveyElement}
+        />
       )}
       {!user && <p>Log in to respond to this survey.</p>}
       {!userSurveyResponse && user && (
-        <div onClick={handleCreateRepsonse}>Create Response</div>
+        <div onClick={handleCreateResponse}>Create Response</div>
       )}
+      {/* Popup for creating the survey questions */}
+      <Popover className="relative">
+        {({ open }) => (
+          <>
+            <Popover.Button
+              className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+                open ? "outline-2" : "outline-none"
+              }`}
+            >
+              <span className="text-sm">Questions</span>
+            </Popover.Button>
+            <Popover.Panel className="absolute top-10 left-0 z-10 flex flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+              <SurveyQuestionsAttribute
+                attribute={questionsAttribute}
+                edit={edit}
+              />
+            </Popover.Panel>
+          </>
+        )}
+      </Popover>
     </div>
   ) : (
     <p>loading survey...</p>

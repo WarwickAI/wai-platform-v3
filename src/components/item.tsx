@@ -13,6 +13,7 @@ import Modify from "./modify";
 import EventElement from "./elements/Event";
 import DatabaseViewElement from "./elements/DatabaseView";
 import BadgeElement from "./elements/Badge";
+import SurveyElement from "./elements/Survey";
 
 type ItemProps = {
   element?: Element & {
@@ -140,6 +141,8 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
           <EventElement element={{ ...element, children: [] }} edit={edit} />
         ) : element.type === "Badge" ? (
           <BadgeElement element={{ ...element, children: [] }} edit={edit} />
+        ) : element.type === "Survey" ? (
+          <SurveyElement element={{ ...element, children: [] }} edit={edit} />
         ) : element.type === "DatabaseView" ? (
           <DatabaseViewElement
             element={{ ...element, children: [] }}

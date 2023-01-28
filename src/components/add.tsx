@@ -26,6 +26,11 @@ import {
   BadgeIcon,
   BadgeRequiredAttributes,
 } from "./elements/Badge";
+import {
+  SurveyDescription,
+  SurveyIcon,
+  SurveyRequiredAttributes,
+} from "./elements/Survey";
 
 type AddProps = {
   parent?: Element;
@@ -65,6 +70,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
       });
     } else if (type === "Badge") {
       atts = BadgeRequiredAttributes.map((a) => {
+        return { ...a, required: true };
+      });
+    } else if (type === "Survey") {
+      atts = SurveyRequiredAttributes.map((a) => {
         return { ...a, required: true };
       });
     } else {
@@ -124,6 +133,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           type="Badge"
           create={(type) => handleCreate(type, index)}
         />
+        <AddElementType
+          type="Survey"
+          create={(type) => handleCreate(type, index)}
+        />
       </div>
     </div>
   );
@@ -146,6 +159,8 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
       ? EventDescription
       : type === "Badge"
       ? BadgeDescription
+      : type === "Survey"
+      ? SurveyDescription
       : DatabaseViewDescription;
   const Icon =
     type === "Text"
@@ -156,6 +171,8 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
       ? EventIcon
       : type === "Badge"
       ? BadgeIcon
+      : type === "Survey"
+      ? SurveyIcon
       : DatabaseViewIcon;
 
   return (

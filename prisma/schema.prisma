@@ -88,6 +88,8 @@ enum ElementType {
   Database
   DatabaseView
   Badge
+  Survey
+  SurveyResponse
 }
 
 enum AttributeType {
@@ -103,6 +105,7 @@ enum AttributeType {
   Columns
   User
   Users
+  SurveyQuestions
 }
 
 model Element {

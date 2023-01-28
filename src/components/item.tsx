@@ -4,16 +4,11 @@ import { Attribute, Element, Group, User } from "@prisma/client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";
-import TextElement from "./elements/Text";
 import { MD5 } from "crypto-js";
-import PageElement from "./elements/Page";
 import Permissions from "./permissions";
 import Add from "./add";
 import Modify from "./modify";
-import EventElement from "./elements/Event";
-import DatabaseViewElement from "./elements/DatabaseView";
-import BadgeElement from "./elements/Badge";
-import SurveyElement from "./elements/Survey";
+import Elements from "./elements";
 
 type ItemProps = {
   element?: Element & {
@@ -70,6 +65,9 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   if (showPermissions && !edit) {
     setShowPermissions(false);
   }
+
+  const ElementTypeData = element && Elements[element.type];
+  const Element = ElementTypeData?.element;
 
   return (
     <div
@@ -133,21 +131,8 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
         />
       </div>
       {element ? (
-        element.type === "Text" ? (
-          <TextElement element={{ ...element, children: [] }} edit={edit} />
-        ) : element.type === "Page" ? (
-          <PageElement element={{ ...element, children: [] }} edit={edit} />
-        ) : element.type === "Event" ? (
-          <EventElement element={{ ...element, children: [] }} edit={edit} />
-        ) : element.type === "Badge" ? (
-          <BadgeElement element={{ ...element, children: [] }} edit={edit} />
-        ) : element.type === "Survey" ? (
-          <SurveyElement element={{ ...element, children: [] }} edit={edit} />
-        ) : element.type === "DatabaseView" ? (
-          <DatabaseViewElement
-            element={{ ...element, children: [] }}
-            edit={edit}
-          />
+        Element ? (
+          <Element element={{ ...element, children: [] }} edit={edit} />
         ) : (
           <p>No element found...</p>
         )

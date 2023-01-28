@@ -1,6 +1,5 @@
-import { CheckBadgeIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { UsersIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
-import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
 import UsersAttribute from "../attributes/Users";
 import { ElementProps, RequiredAttribute } from "./utils";
@@ -9,10 +8,6 @@ export const BadgeRequiredAttributes: RequiredAttribute[] = [
   { name: "Name", type: "Text", value: "" },
   { name: "Users", type: "Users", value: [] },
 ];
-
-export const BadgeDescription = "A text element, supports Markdown.";
-
-export const BadgeIcon = CheckBadgeIcon;
 
 const BadgeElement = ({ element, edit }: ElementProps) => {
   const nameAttribute = useMemo(() => {

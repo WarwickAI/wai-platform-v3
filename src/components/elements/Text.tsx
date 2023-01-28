@@ -1,4 +1,3 @@
-import { PencilIcon } from "@heroicons/react/24/solid";
 import { useMemo } from "react";
 import MarkdownAttribute from "../attributes/Markdown";
 import { ElementProps, RequiredAttribute } from "./utils";
@@ -6,10 +5,6 @@ import { ElementProps, RequiredAttribute } from "./utils";
 export const TextRequiredAttributes: RequiredAttribute[] = [
   { name: "Markdown", type: "Markdown", value: "**Some Test Markdown**" },
 ];
-
-export const TextDescription = "A text element, supports Markdown.";
-
-export const TextIcon = PencilIcon;
 
 const TextElement = ({ element, edit }: ElementProps) => {
   const markdownAttribute = useMemo(() => {

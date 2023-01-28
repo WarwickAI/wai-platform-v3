@@ -1,36 +1,7 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { AttributeType, Element, ElementType } from "@prisma/client";
+import { Element, ElementType } from "@prisma/client";
 import { trpc } from "../utils/trpc";
-import {
-  DatabaseViewDescription,
-  DatabaseViewIcon,
-  DatabaseViewRequiredAttributes,
-} from "./elements/DatabaseView";
-import {
-  EventDescription,
-  EventIcon,
-  EventRequiredAttributes,
-} from "./elements/Event";
-import {
-  PageDescription,
-  PageIcon,
-  PageRequiredAttributes,
-} from "./elements/Page";
-import {
-  TextDescription,
-  TextIcon,
-  TextRequiredAttributes,
-} from "./elements/Text";
-import {
-  BadgeDescription,
-  BadgeIcon,
-  BadgeRequiredAttributes,
-} from "./elements/Badge";
-import {
-  SurveyDescription,
-  SurveyIcon,
-  SurveyRequiredAttributes,
-} from "./elements/Survey";
+import Elements from "./elements";
 
 type AddProps = {
   parent?: Element;
@@ -45,40 +16,15 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
   const createElement = trpc.element.create.useMutation();
 
   const handleCreate = (type: ElementType, index: number) => {
-    let atts: {
-      name: string;
-      type: AttributeType;
-      value: string | string[];
-      required: boolean;
-    }[] = [];
+    const elementData = Elements[type];
 
-    if (type === "Text") {
-      atts = TextRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else if (type === "Page") {
-      atts = PageRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else if (type === "Event") {
-      atts = EventRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else if (type === "DatabaseView") {
-      atts = DatabaseViewRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else if (type === "Badge") {
-      atts = BadgeRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else if (type === "Survey") {
-      atts = SurveyRequiredAttributes.map((a) => {
-        return { ...a, required: true };
-      });
-    } else {
+    if (!elementData) {
       throw new Error("Unknown element type");
     }
+
+    const atts = elementData.requiredAtts.map((a) => {
+      return { ...a, required: true };
+    });
 
     createElement.mutate(
       { type, index, atts, parentId: parent?.id },
@@ -113,30 +59,13 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           open ? "opacity-100" : "invisible opacity-0"
         }`}
       >
-        <AddElementType
-          type="Text"
-          create={(type) => handleCreate(type, index)}
-        />
-        <AddElementType
-          type="Page"
-          create={(type) => handleCreate(type, index)}
-        />
-        <AddElementType
-          type="Event"
-          create={(type) => handleCreate(type, index)}
-        />
-        <AddElementType
-          type="DatabaseView"
-          create={(type) => handleCreate(type, index)}
-        />
-        <AddElementType
-          type="Badge"
-          create={(type) => handleCreate(type, index)}
-        />
-        <AddElementType
-          type="Survey"
-          create={(type) => handleCreate(type, index)}
-        />
+        {Object.keys(Elements).map((type) => (
+          <AddElementType
+            key={type}
+            type={type as ElementType}
+            create={(type) => handleCreate(type, index)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -150,32 +79,10 @@ type AddElementTypeProps = {
 };
 
 const AddElementType = ({ type, create }: AddElementTypeProps) => {
-  const description =
-    type === "Text"
-      ? TextDescription
-      : type === "Page"
-      ? PageDescription
-      : type === "Event"
-      ? EventDescription
-      : type === "Badge"
-      ? BadgeDescription
-      : type === "Survey"
-      ? SurveyDescription
-      : DatabaseViewDescription;
-  const Icon =
-    type === "Text"
-      ? TextIcon
-      : type === "Page"
-      ? PageIcon
-      : type === "Event"
-      ? EventIcon
-      : type === "Badge"
-      ? BadgeIcon
-      : type === "Survey"
-      ? SurveyIcon
-      : DatabaseViewIcon;
+  const description = Elements[type]?.description;
+  const Icon = Elements[type]?.icon;
 
-  return (
+  return description && Icon ? (
     <button
       onClick={() => create(type)}
       className="flex flex-row items-center space-x-2 rounded-md p-2 hover:bg-slate-100"
@@ -188,5 +95,5 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
         <p className="text-xs">{description}</p>
       </div>
     </button>
-  );
+  ) : null;
 };

@@ -1,14 +1,6 @@
 import { Popover } from "@headlessui/react";
-import {
-  CalendarIcon,
-  TicketIcon,
-  QrCodeIcon,
-} from "@heroicons/react/24/solid";
-import {
-  CalendarIcon as CalendarOutlineIcon,
-  TicketIcon as TicketOutlineIcon,
-  QrCodeIcon as QrCodeOutlineIcon,
-} from "@heroicons/react/24/outline";
+import { TicketIcon, QrCodeIcon } from "@heroicons/react/24/solid";
+import { QrCodeIcon as QrCodeOutlineIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { clientEnv } from "../../env/schema.mjs";
@@ -26,10 +18,6 @@ export const EventRequiredAttributes: RequiredAttribute[] = [
   { name: "Location", type: "Text", value: "" },
   { name: "Attendees", type: "Users", value: [] },
 ];
-
-export const EventDescription = "Scheduled event with location and time.";
-
-export const EventIcon = CalendarIcon;
 
 const EventElement = ({ element, edit, page }: ElementProps) => {
   const titleAttribute = element.atts.find((a) => a.name === "Title");

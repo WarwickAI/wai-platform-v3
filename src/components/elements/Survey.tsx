@@ -17,10 +17,6 @@ export const SurveyRequiredAttributes: RequiredAttribute[] = [
   { name: "Questions", type: "SurveyQuestions", value: [] },
 ];
 
-export const SurveyDescription = "A survey element, with questions.";
-
-export const SurveyIcon = PresentationChartBarIcon;
-
 const SurveyElement = ({ element, edit }: ElementProps) => {
   const userData = trpc.user.getMe.useQuery();
   const utils = trpc.useContext();

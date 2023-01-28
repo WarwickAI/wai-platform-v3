@@ -1,4 +1,4 @@
-import { CircleStackIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { PlusIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { ColumnHeader } from "../attributes/Columns";
@@ -21,10 +21,6 @@ export const DatabaseRequiredAttributes: RequiredAttribute[] = [
   { name: "Base Type", type: "DatabaseBaseType", value: "" },
   { name: "Columns", type: "Columns", value: [] },
 ];
-
-export const DatabaseDescription = "Stores a list of items.";
-
-export const DatabaseIcon = CircleStackIcon;
 
 const DatabaseElement = ({ element, edit }: ElementProps) => {
   const [dbPermsOpen, setDbPermsOpen] = useState(false);

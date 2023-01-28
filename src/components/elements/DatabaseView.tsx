@@ -1,4 +1,4 @@
-import { CircleStackIcon, TableCellsIcon } from "@heroicons/react/24/solid";
+import { CircleStackIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import DatabaseAttribute from "../attributes/Database";
@@ -9,10 +9,6 @@ export const DatabaseViewRequiredAttributes: RequiredAttribute[] = [
   { name: "View Type", type: "DatabaseViewType", value: "Table" },
   { name: "Database", type: "Database", value: "" },
 ];
-
-export const DatabaseViewDescription = "Shows a database's items.";
-
-export const DatabaseViewIcon = TableCellsIcon;
 
 const DatabaseViewElement = ({ element, edit }: ElementProps) => {
   const [selectOpen, setSelectOpen] = useState(false);

@@ -21,7 +21,6 @@ import {
 import TextAttribute from "../attributes/Text";
 import { trpc } from "../../utils/trpc";
 import Link from "next/link";
-import { DocumentIcon } from "@heroicons/react/24/solid";
 import {
   ElementProps,
   ElementWithAttsGroups,
@@ -32,10 +31,6 @@ import Add from "../add";
 export const PageRequiredAttributes: RequiredAttribute[] = [
   { name: "Title", type: "Text", value: "Page Title" },
 ];
-
-export const PageDescription = "A page is a container for other elements.";
-
-export const PageIcon = DocumentIcon;
 
 const PageElement = ({ element, page }: ElementProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);

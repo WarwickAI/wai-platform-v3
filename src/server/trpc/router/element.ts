@@ -1,7 +1,11 @@
 import { router, publicProcedure, authedProcedure } from "../trpc";
 import { z } from "zod";
 import { AttributeType, ElementType, Group } from "@prisma/client";
-import { ElementWithAttsGroups } from "../../../components/elements/utils";
+import {
+  ElementOperations,
+  ElementWithAttsGroups,
+  ElementWithGroups,
+} from "../../../components/elements/utils";
 
 const groupsInclude = {
   masterGroups: true,
@@ -30,15 +34,15 @@ export const elementRouter = router({
       },
     });
 
-    if (!(await defaultPermsCheck(ctx, element, "View"))) {
+    if (!(await defaultPermsCheck(ctx, element, "ElementView"))) {
       throw new Error("No permission to view element");
     }
 
     // Filter only elements user has permission to view
     element.children = await asyncFilter(
       element.children,
-      (e: ElementWithAttsGroups) => {
-        return defaultPermsCheck(ctx, e, "View");
+      (e: ElementWithGroups) => {
+        return defaultPermsCheck(ctx, e, "ElementView");
       }
     );
 
@@ -55,7 +59,7 @@ export const elementRouter = router({
 
     // Filter only elements user has permission to view
     const filtered = await asyncFilter(elements, (e: ElementWithAttsGroups) => {
-      return defaultPermsCheck(ctx, e, "View");
+      return defaultPermsCheck(ctx, e, "ElementView");
     });
 
     return filtered;
@@ -77,7 +81,7 @@ export const elementRouter = router({
       const filtered = await asyncFilter(
         elements,
         (e: ElementWithAttsGroups) => {
-          return defaultPermsCheck(ctx, e, "View");
+          return defaultPermsCheck(ctx, e, "ElementView");
         }
       );
 
@@ -102,7 +106,7 @@ export const elementRouter = router({
         },
       });
 
-      if (!(await defaultPermsCheck(ctx, page, "View"))) {
+      if (!(await defaultPermsCheck(ctx, page, "ElementView"))) {
         throw new Error("No permission to view page");
       }
 
@@ -110,7 +114,7 @@ export const elementRouter = router({
       page.children = await asyncFilter(
         page.children,
         (e: ElementWithAttsGroups) => {
-          return defaultPermsCheck(ctx, e, "View");
+          return defaultPermsCheck(ctx, e, "ElementView");
         }
       );
 
@@ -151,7 +155,7 @@ export const elementRouter = router({
 
       // Check if user can create element in parent (i.e. has edit access)
       // By default, no parent means the user cannot create the element (unless Admin)
-      if (!(await defaultPermsCheck(ctx, parent, "Edit"))) {
+      if (!(await defaultPermsCheck(ctx, parent, "ElementEdit"))) {
         throw new Error("No permission to create element in parent");
       }
 
@@ -186,7 +190,7 @@ export const elementRouter = router({
       });
 
       // Check if user can delete element (i.e. has edit access)
-      if (!(await defaultPermsCheck(ctx, element, "Delete"))) {
+      if (!(await defaultPermsCheck(ctx, element, "ElementDelete"))) {
         throw new Error("No permission to delete element");
       }
 
@@ -215,7 +219,7 @@ export const elementRouter = router({
         });
 
         // Check if the user can edit the parent element
-        if (!(await defaultPermsCheck(ctx, parent, "Edit"))) {
+        if (!(await defaultPermsCheck(ctx, parent, "ElementEdit"))) {
           throw new Error("No permission to edit parent element");
         }
 
@@ -270,7 +274,7 @@ export const elementRouter = router({
       });
 
       // Check if user can edit the perms (i.e. has master access)
-      if (!(await defaultPermsCheck(ctx, element, "EditPerms"))) {
+      if (!(await defaultPermsCheck(ctx, element, "ElementEditPerms"))) {
         throw new Error("No permission to edit element perms");
       }
 
@@ -344,8 +348,8 @@ export const elementRouter = router({
 
 const defaultPermsCheck = async (
   ctx: any,
-  element: Omit<ElementWithAttsGroups, "atts"> | undefined | null,
-  op: "View" | "Edit" | "Delete" | "Interact" | "EditPerms"
+  element: ElementWithGroups | undefined | null,
+  op: ElementOperations
 ) => {
   // Get user with groups
   const user =
@@ -378,21 +382,23 @@ const defaultPermsCheck = async (
   usersGroups.push(allGroup);
 
   switch (op) {
-    case "View":
+    case "ElementView":
       return checkGroups(usersGroups, element.viewGroups);
 
-    case "Edit":
+    case "ElementEdit":
       return checkGroups(usersGroups, element.editGroups);
 
-    case "Delete":
+    case "ElementDelete":
       return checkGroups(usersGroups, element.editGroups);
 
-    case "Interact":
+    case "ElementInteract":
       return checkGroups(usersGroups, element.interactGroups);
 
-    case "EditPerms":
+    case "ElementEditPerms":
       return checkGroups(usersGroups, element.masterGroups);
   }
+
+  return false;
 };
 
 // Simply check if one of the groups in the user's groups is in the element's groups

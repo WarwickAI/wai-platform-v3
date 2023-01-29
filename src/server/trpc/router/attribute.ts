@@ -3,6 +3,7 @@ import { z } from "zod";
 import { DBColumnType } from "../../../components/attributes/utils";
 import { AttributeType } from "@prisma/client";
 import { SurveyQuestion } from "../../../components/attributes/SurveyQuestion";
+import elements from "../../../components/elements";
 
 export const attributeRouter = router({
   create: authedProcedure
@@ -72,6 +73,7 @@ export const attributeRouter = router({
               children: {
                 include: {
                   atts: true,
+                  user: true,
                 },
               },
             },
@@ -79,125 +81,23 @@ export const attributeRouter = router({
         },
       });
 
-      // If we are updating the columns of a database, make sure to update the children of the
-      // element to contain all the columns as attributes
-      if (attribute.type === "Columns") {
-        const columns = value as DBColumnType[];
+      const user =
+        ctx.session?.user &&
+        (await ctx.prisma.user.findUniqueOrThrow({
+          where: { id: ctx.session.user.id },
+          include: {
+            groups: true,
+          },
+        }));
 
-        // Get all the children of the element
-        const children = attribute.element.children;
+      const sideEffectsFn = elements[attribute.element.type]?.sideEffects;
 
-        // Loop through all attributes of the children, and remove any that are not in the columns
-        // and add any that are not in the children, and check that the types match
-        for (const child of children) {
-          // Get all the attributes of the child
-          const atts = child.atts;
-
-          // Loop through all the attributes of the child
-          for (const att of atts) {
-            // If the attribute is not in the columns, delete it
-            if (!columns.find((c) => c.name === att.name)) {
-              await ctx.prisma.attribute.delete({
-                where: { id: att.id },
-              });
-            }
-          }
-
-          // Loop through all the columns
-          for (const column of columns) {
-            // If the column is not in the attributes, add it
-            if (!atts.find((a) => a.name === column.name)) {
-              await ctx.prisma.attribute.create({
-                data: {
-                  name: column.name,
-                  type: column.type,
-                  value: column.value || "",
-                  required: column.required,
-                  element: {
-                    connect: {
-                      id: child.id,
-                    },
-                  },
-                },
-              });
-            }
-          }
-
-          // Loop through all the attributes of the child
-          for (const att of atts) {
-            // If the attribute type does not match the column type, update it
-            const column = columns.find((c) => c.name === att.name);
-            if (column && column.type !== att.type) {
-              await ctx.prisma.attribute.update({
-                where: { id: att.id },
-                data: {
-                  type: column.type,
-                },
-              });
-            }
-          }
-        }
-      }
-
-      // If we are updating the questions in a survey, make sure that the children
-      // (i.e. the survey responses) have all the questions as attributes
-      if (attribute.type === "SurveyQuestions") {
-        const questions = value as SurveyQuestion[];
-
-        // Get all the children of the element
-        const children = attribute.element.children;
-
-        // Loop through all attributes of the children, and remove any that are not in the questions
-        // and add any that are not in the children, and check that the types match
-        for (const child of children) {
-          // Get all the attributes of the child
-          const atts = child.atts;
-
-          // Loop through all the attributes of the child
-          for (const att of atts) {
-            // If the attribute is not in the questions, delete it
-            if (!questions.find((q) => q.id === att.name)) {
-              await ctx.prisma.attribute.delete({
-                where: { id: att.id },
-              });
-            }
-          }
-
-          // Loop through all the questions
-          for (const question of questions) {
-            // If the question is not in the attributes, add it
-            if (!atts.find((a) => a.name === question.id)) {
-              await ctx.prisma.attribute.create({
-                data: {
-                  name: question.id,
-                  type: question.type,
-                  value: "",
-                  required: false,
-                  element: {
-                    connect: {
-                      id: child.id,
-                    },
-                  },
-                },
-              });
-            }
-          }
-
-          // Loop through all the attributes of the child
-          for (const att of atts) {
-            // If the attribute type does not match the question type, update it
-            const question = questions.find((q) => q.id === att.name);
-            if (question && question.type !== att.type) {
-              await ctx.prisma.attribute.update({
-                where: { id: att.id },
-                data: {
-                  type: question.type,
-                },
-              });
-            }
-          }
-        }
-      }
+      sideEffectsFn &&
+        await sideEffectsFn(ctx.prisma, attribute.element, user, "AttributeEdit", {
+          attributeId: attribute.id,
+          newValue: value,
+          attributeType: attribute.type,
+        });
 
       return ctx.prisma.attribute.update({
         where: { id: input.id },

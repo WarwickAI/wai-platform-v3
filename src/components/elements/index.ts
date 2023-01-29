@@ -11,13 +11,19 @@ import { ElementType } from "@prisma/client";
 import { SVGProps } from "react";
 import TextElement, { TextRequiredAttributes } from "./Text";
 import PageElement, { PageRequiredAttributes } from "./Page";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, RequiredAttribute, SideEffects } from "./utils";
 import EventElement, { EventRequiredAttributes } from "./Event";
-import DatabaseElement, { DatabaseRequiredAttributes } from "./Database";
+import DatabaseElement, {
+  DatabaseRequiredAttributes,
+  databaseSideEffects,
+} from "./Database";
 import DatabaseViewElement, {
   DatabaseViewRequiredAttributes,
 } from "./DatabaseView";
-import SurveyElement, { SurveyRequiredAttributes } from "./Survey";
+import SurveyElement, {
+  SurveyRequiredAttributes,
+  surveySideEffects,
+} from "./Survey";
 import BadgeElement, { BadgeRequiredAttributes } from "./Badge";
 
 type ElementIcon = (
@@ -34,6 +40,7 @@ const elements: {
     icon: ElementIcon;
     element: ({ element, edit }: ElementProps) => JSX.Element;
     requiredAtts: RequiredAttribute[];
+    sideEffects?: SideEffects;
   };
 } = {
   [ElementType.Text]: {
@@ -70,6 +77,7 @@ const elements: {
     icon: CircleStackIcon,
     element: DatabaseElement,
     requiredAtts: DatabaseRequiredAttributes,
+    sideEffects: databaseSideEffects,
   },
   [ElementType.DatabaseView]: {
     name: "Database View",
@@ -84,6 +92,7 @@ const elements: {
     icon: PresentationChartBarIcon,
     element: SurveyElement,
     requiredAtts: SurveyRequiredAttributes,
+    sideEffects: surveySideEffects,
   },
 };
 

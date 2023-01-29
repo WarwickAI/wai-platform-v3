@@ -1,4 +1,5 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { AttributeType } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { ColumnHeader } from "../attributes/Columns";
@@ -11,9 +12,11 @@ import Permissions from "../permissions";
 import { EventRequiredAttributes } from "./Event";
 import { PageRequiredAttributes } from "./Page";
 import {
+  AttributeOperations,
   ElementProps,
   ElementWithAttsGroups,
   RequiredAttribute,
+  SideEffects,
 } from "./utils";
 
 export const DatabaseRequiredAttributes: RequiredAttribute[] = [
@@ -287,4 +290,83 @@ const DatabaseTable = ({
       </table>
     </div>
   );
+};
+
+export const databaseSideEffects: SideEffects = async (
+  prisma,
+  element,
+  user,
+  operation,
+  data
+) => {
+  // Check if the operation is an attribute one
+  if (operation === "AttributeEdit") {
+    const attributeEditData = data as {
+      attributeId: string;
+      newValue: any;
+      attributeType: AttributeType;
+    };
+
+    // If we are updating the columns of a database, make sure to update the children of the
+    // element to contain all the columns as attributes
+    if (attributeEditData.attributeType === "Columns") {
+      const columns = attributeEditData.newValue as DBColumnType[];
+
+      // Get all the children of the element
+      const children = element.children;
+
+      // Loop through all attributes of the children, and remove any that are not in the columns
+      // and add any that are not in the children, and check that the types match
+      for (const child of children) {
+        // Get all the attributes of the child
+        const atts = child.atts;
+
+        // Loop through all the attributes of the child
+        for (const att of atts) {
+          // If the attribute is not in the columns, delete it
+          if (!columns.find((c) => c.name === att.name)) {
+            await prisma.attribute.delete({
+              where: { id: att.id },
+            });
+          }
+        }
+
+        // Loop through all the columns
+        for (const column of columns) {
+          // If the column is not in the attributes, add it
+          if (!atts.find((a) => a.name === column.name)) {
+            await prisma.attribute.create({
+              data: {
+                name: column.name,
+                type: column.type,
+                value: column.value || "",
+                required: column.required,
+                element: {
+                  connect: {
+                    id: child.id,
+                  },
+                },
+              },
+            });
+          }
+        }
+
+        // Loop through all the attributes of the child
+        for (const att of atts) {
+          // If the attribute type does not match the column type, update it
+          const column = columns.find((c) => c.name === att.name);
+          if (column && column.type !== att.type) {
+            await prisma.attribute.update({
+              where: { id: att.id },
+              data: {
+                type: column.type,
+              },
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return;
 };

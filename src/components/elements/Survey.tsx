@@ -10,7 +10,7 @@ import TextAttribute from "../attributes/Text";
 import SurveyResponseElement, {
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, RequiredAttribute, SideEffects } from "./utils";
 
 export const SurveyRequiredAttributes: RequiredAttribute[] = [
   { name: "Title", type: "Text", value: "" },
@@ -90,14 +90,9 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
   const userSurveyResponse = useMemo(() => {
     if (!user || !surveyElement) return null;
 
-    // Find a child who has a match in users groups and the child's edit groups
+    // Find a child who was created by the current user
     return surveyElement.children.filter((child) => {
-      return (
-        child.type === "SurveyResponse" &&
-        user.groups.some((group) =>
-          child.editGroups.map((g) => g.id).includes(group.id)
-        )
-      );
+      return child.user.id === user.id;
     })[0];
   }, [surveyElement, user]);
 
@@ -146,3 +141,81 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
 };
 
 export default SurveyElement;
+
+export const surveySideEffects: SideEffects = async (
+  prisma,
+  element,
+  user,
+  operation,
+  data
+) => {
+  if (operation === "AttributeEdit") {
+    const attributeEditData = data as {
+      attributeId: string;
+      newValue: any;
+      attributeType: AttributeType;
+    };
+
+    // If we are updating the questions in a survey, make sure that the children
+    // (i.e. the survey responses) have all the questions as attributes
+    if (attributeEditData.attributeType === "SurveyQuestions") {
+      const questions = attributeEditData.newValue as SurveyQuestion[];
+
+      // Get all the children of the element
+      const children = element.children;
+
+      // Loop through all attributes of the children, and remove any that are not in the questions
+      // and add any that are not in the children, and check that the types match
+      for (const child of children) {
+        // Get all the attributes of the child
+        const atts = child.atts;
+
+        // Loop through all the attributes of the child
+        for (const att of atts) {
+          // If the attribute is not in the questions, delete it
+          if (!questions.find((q) => q.id === att.name)) {
+            await prisma.attribute.delete({
+              where: { id: att.id },
+            });
+          }
+        }
+
+        // Loop through all the questions
+        for (const question of questions) {
+          // If the question is not in the attributes, add it
+          if (!atts.find((a) => a.name === question.id)) {
+            await prisma.attribute.create({
+              data: {
+                name: question.id,
+                type: question.type,
+                value: "",
+                required: false,
+                element: {
+                  connect: {
+                    id: child.id,
+                  },
+                },
+              },
+            });
+          }
+        }
+
+        // Loop through all the attributes of the child
+        for (const att of atts) {
+          // If the attribute type does not match the question type, update it
+          const question = questions.find((q) => q.id === att.name);
+          if (question && question.type !== att.type) {
+            await prisma.attribute.update({
+              where: { id: att.id },
+              data: {
+                type: question.type,
+              },
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return;
+};

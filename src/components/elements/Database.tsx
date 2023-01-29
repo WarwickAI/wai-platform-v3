@@ -275,13 +275,13 @@ const DatabaseTable = ({
             </tr>
           ))}
           <tr>
-            <button
+            <td
               onClick={handleAddRow}
               className="tooltip tooltip-right p-2"
               data-tip="Add Row"
             >
               <PlusIcon className="h-6 w-6 text-neutral" />
-            </button>
+            </td>
           </tr>
         </tbody>
       </table>

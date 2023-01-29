@@ -65,10 +65,10 @@ const DateAttribute = ({ attribute, edit }: AttributeProps) => {
             value={
               dateValue
                 ? dateValue?.getHours() +
-                ":" +
-                (dateValue?.getMinutes() < 10
-                  ? "0" + dateValue.getMinutes()
-                  : dateValue.getMinutes())
+                  ":" +
+                  (dateValue?.getMinutes() < 10
+                    ? "0" + dateValue.getMinutes()
+                    : dateValue.getMinutes())
                 : ""
             }
             onChange={(e) => {
@@ -89,17 +89,17 @@ const DateAttribute = ({ attribute, edit }: AttributeProps) => {
           </button>
         </div>
       ) : (
-        <p onClick={() => setEditMode(true)} className="text-base">
+        <article className="prose" onClick={() => setEditMode(true)}>
           {dateValue
             ? dateValue?.toLocaleDateString("en-US", {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-            })
-            : edit && <article className="prose"><em>click to edit date...</em></article>}
-        </p>
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })
+            : edit && <em>click to edit date...</em>}
+        </article>
       )}
     </div>
   );

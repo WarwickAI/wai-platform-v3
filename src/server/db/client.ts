@@ -51,6 +51,20 @@ const setUpGroups = async () => {
     });
   }
 
+  let allGroup = await prisma.group.findFirst({
+    where: {
+      name: "All",
+    },
+  });
+
+  if (!allGroup) {
+    allGroup = await prisma.group.create({
+      data: {
+        name: "All",
+      },
+    });
+  }
+
   const edward = await prisma.user.findFirst({
     where: {
       email: "edward.upton@warwick.ac.uk",

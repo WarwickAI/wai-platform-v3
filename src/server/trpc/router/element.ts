@@ -1,10 +1,18 @@
 import { router, publicProcedure, authedProcedure } from "../trpc";
 import { z } from "zod";
-import { AttributeType, ElementType } from "@prisma/client";
+import { AttributeType, ElementType, Group } from "@prisma/client";
+import { ElementWithAttsGroups } from "../../../components/elements/utils";
+
+const groupsInclude = {
+  masterGroups: true,
+  editGroups: true,
+  interactGroups: true,
+  viewGroups: true,
+};
 
 export const elementRouter = router({
-  get: publicProcedure.input(z.string()).query(({ ctx, input }) => {
-    return ctx.prisma.element.findUniqueOrThrow({
+  get: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const element = await ctx.prisma.element.findUniqueOrThrow({
       where: {
         id: input,
       },
@@ -15,47 +23,70 @@ export const elementRouter = router({
           include: {
             user: true,
             atts: true,
-            masterGroups: true,
-            editGroups: true,
-            interactGroups: true,
-            viewGroups: true,
+            ...groupsInclude,
           },
         },
-        masterGroups: true,
-        editGroups: true,
-        interactGroups: true,
-        viewGroups: true,
+        ...groupsInclude,
       },
     });
+
+    if (!(await defaultPermsCheck(ctx, element, "View"))) {
+      throw new Error("No permission to view element");
+    }
+
+    // Filter only elements user has permission to view
+    element.children = await asyncFilter(
+      element.children,
+      (e: ElementWithAttsGroups) => {
+        return defaultPermsCheck(ctx, e, "View");
+      }
+    );
+
+    return element;
   }),
-  getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.element.findMany({
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const elements = await ctx.prisma.element.findMany({
       include: {
         user: true,
         atts: true,
-        masterGroups: true,
-        editGroups: true,
-        interactGroups: true,
-        viewGroups: true,
+        ...groupsInclude,
       },
     });
+
+    // Filter only elements user has permission to view
+    const filtered = await asyncFilter(elements, (e: ElementWithAttsGroups) => {
+      return defaultPermsCheck(ctx, e, "View");
+    });
+
+    return filtered;
   }),
   queryAll: publicProcedure
     .input(z.object({ type: z.nativeEnum(ElementType) }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.element.findMany({
+    .query(async ({ ctx, input }) => {
+      const elements = await ctx.prisma.element.findMany({
         where: {
           type: input.type,
         },
         include: {
           atts: true,
+          ...groupsInclude,
         },
       });
+
+      // Filter only elements user has permission to view
+      const filtered = await asyncFilter(
+        elements,
+        (e: ElementWithAttsGroups) => {
+          return defaultPermsCheck(ctx, e, "View");
+        }
+      );
+
+      return filtered;
     }),
   getPage: publicProcedure
     .input(z.object({ route: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.element.findFirstOrThrow({
+    .query(async ({ ctx, input }) => {
+      const page = await ctx.prisma.element.findFirstOrThrow({
         where: { route: input.route, type: "Page" },
         include: {
           user: true,
@@ -64,18 +95,28 @@ export const elementRouter = router({
             include: {
               user: true,
               atts: true,
-              masterGroups: true,
-              editGroups: true,
-              interactGroups: true,
-              viewGroups: true,
+              ...groupsInclude,
             },
           },
-          masterGroups: true,
-          editGroups: true,
-          interactGroups: true,
-          viewGroups: true,
+          ...groupsInclude,
         },
       });
+
+      if (!(await defaultPermsCheck(ctx, page, "View"))) {
+        throw new Error("No permission to view page");
+      }
+
+      // Filter out children user doesn't have permission to view
+      page.children = await asyncFilter(
+        page.children,
+        (e: ElementWithAttsGroups) => {
+          return defaultPermsCheck(ctx, e, "View");
+        }
+      );
+
+      console.log("Num children after: ", page.children.length);
+
+      return page;
     }),
   create: authedProcedure
     .input(
@@ -102,22 +143,22 @@ export const elementRouter = router({
         ? await ctx.prisma.element.findFirst({
             where: { id: input.parentId },
             include: {
-              masterGroups: true,
-              editGroups: true,
-              interactGroups: true,
-              viewGroups: true,
+              ...groupsInclude,
+              user: true,
             },
           })
         : null;
 
-      const adminGroup = await ctx.prisma.group.findFirstOrThrow({
-        where: { name: "Admin" },
-      });
+      // Check if user can create element in parent (i.e. has edit access)
+      // By default, no parent means the user cannot create the element (unless Admin)
+      if (!(await defaultPermsCheck(ctx, parent, "Edit"))) {
+        throw new Error("No permission to create element in parent");
+      }
 
-      const masterGroups = parent?.masterGroups ?? [adminGroup];
-      const editGroups = parent?.editGroups ?? [adminGroup];
-      const interactGroups = parent?.interactGroups ?? [adminGroup];
-      const viewGroups = parent?.viewGroups ?? [adminGroup];
+      const masterGroups = parent?.masterGroups ?? [];
+      const editGroups = parent?.editGroups ?? [];
+      const interactGroups = parent?.interactGroups ?? [];
+      const viewGroups = parent?.viewGroups ?? [];
 
       return ctx.prisma.element.create({
         data: {
@@ -136,7 +177,22 @@ export const elementRouter = router({
   delete: authedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.element.delete({ where: { id: input.id } });
+      const element = await ctx.prisma.element.findFirst({
+        where: { id: input.id },
+        include: {
+          ...groupsInclude,
+          user: true,
+        },
+      });
+
+      // Check if user can delete element (i.e. has edit access)
+      if (!(await defaultPermsCheck(ctx, element, "Delete"))) {
+        throw new Error("No permission to delete element");
+      }
+
+      return ctx.prisma.element.delete({
+        where: { id: input.id },
+      });
     }),
 
   order: authedProcedure
@@ -150,6 +206,19 @@ export const elementRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       for (const { id, index } of input) {
+        const parent = await ctx.prisma.element.findFirst({
+          where: { children: { some: { id } } },
+          include: {
+            ...groupsInclude,
+            user: true,
+          },
+        });
+
+        // Check if the user can edit the parent element
+        if (!(await defaultPermsCheck(ctx, parent, "Edit"))) {
+          throw new Error("No permission to edit parent element");
+        }
+
         await ctx.prisma.element.update({
           where: { id },
           data: { index },
@@ -192,6 +261,19 @@ export const elementRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const element = await ctx.prisma.element.findFirstOrThrow({
+        where: { id: input.id },
+        include: {
+          ...groupsInclude,
+          user: true,
+        },
+      });
+
+      // Check if user can edit the perms (i.e. has master access)
+      if (!(await defaultPermsCheck(ctx, element, "EditPerms"))) {
+        throw new Error("No permission to edit element perms");
+      }
+
       return ctx.prisma.element.update({
         where: { id: input.id },
         data: {
@@ -259,3 +341,73 @@ export const elementRouter = router({
       return (updated.value as string[]).includes(ctx.session.user.id);
     }),
 });
+
+const defaultPermsCheck = async (
+  ctx: any,
+  element: Omit<ElementWithAttsGroups, "atts"> | undefined | null,
+  op: "View" | "Edit" | "Delete" | "Interact" | "EditPerms"
+) => {
+  // Get user with groups
+  const user =
+    ctx.session?.user &&
+    (await ctx.prisma.user.findFirstOrThrow({
+      where: { id: ctx.session.user.id },
+      include: { groups: true },
+    }));
+
+  const usersGroups = user?.groups || [];
+
+  // Get 'All' and 'Admin' group
+  const allGroup = await ctx.prisma.group.findFirst({
+    where: { name: "All" },
+  });
+  const adminGroup = await ctx.prisma.group.findFirst({
+    where: { name: "Admin" },
+  });
+
+  // If user has admin group, return true
+  if (usersGroups.some((g: Group) => g.id === adminGroup?.id)) {
+    return true;
+  }
+
+  // If element is undefined, return false
+  if (!element) {
+    return false;
+  }
+
+  usersGroups.push(allGroup);
+
+  switch (op) {
+    case "View":
+      return checkGroups(usersGroups, element.viewGroups);
+
+    case "Edit":
+      return checkGroups(usersGroups, element.editGroups);
+
+    case "Delete":
+      return checkGroups(usersGroups, element.editGroups);
+
+    case "Interact":
+      return checkGroups(usersGroups, element.interactGroups);
+
+    case "EditPerms":
+      return checkGroups(usersGroups, element.masterGroups);
+  }
+};
+
+// Simply check if one of the groups in the user's groups is in the element's groups
+// using the IDs
+const checkGroups = (usersGroups: Group[], elementsGroups: Group[]) => {
+  return usersGroups.some((g) =>
+    elementsGroups.map((eg) => eg.id).includes(g.id)
+  );
+};
+
+const asyncFilter = async (
+  arr: any[],
+  predicate: (e: any) => Promise<boolean>
+) =>
+  arr.reduce(
+    async (memo, e) => ((await predicate(e)) ? [...(await memo), e] : memo),
+    []
+  );

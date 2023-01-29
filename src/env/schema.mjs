@@ -33,6 +33,7 @@ export const clientSchema = z.object({
   NEXT_PUBLIC_URL: z.string(),
   NEXT_PUBLIC_DISCORD_CLIENT_ID: z.string(),
   NEXT_PUBLIC_DISCORD_REDIRECT_URI: z.string(),
+  NEXT_PUBLIC_HOME_PAGE_ROUTE: z.string().nullish(),
 });
 
 /**
@@ -47,4 +48,5 @@ export const clientEnv = {
   NEXT_PUBLIC_DISCORD_CLIENT_ID: process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID,
   NEXT_PUBLIC_DISCORD_REDIRECT_URI:
     process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI,
+  NEXT_PUBLIC_HOME_PAGE_ROUTE: process.env.NEXT_PUBLIC_HOME_PAGE_ROUTE,
 };

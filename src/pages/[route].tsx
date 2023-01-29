@@ -2,9 +2,12 @@ import { NextPage } from "next";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
-import PageElement from "../components/elements/Page";
 import { ElementProps } from "../components/elements/utils";
 import { trpc } from "../utils/trpc";
+import Elements from "../components/elements";
+import { ElementType } from "@prisma/client";
+
+const PageElement = Elements[ElementType.Page]!.element;
 
 const Route: NextPage = () => {
   const router = useRouter();

@@ -12,7 +12,6 @@ import Permissions from "../permissions";
 import { EventRequiredAttributes } from "./Event";
 import { PageRequiredAttributes } from "./Page";
 import {
-  AttributeOperations,
   ElementProps,
   ElementWithAttsGroups,
   RequiredAttribute,

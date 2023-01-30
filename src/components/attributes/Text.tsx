@@ -7,7 +7,7 @@ import { AttributeProps } from "./utils";
 export const TextAttibuteIcon = Bars2Icon;
 
 type TextAttributeProps = AttributeProps & {
-  size: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl";
   placeholder?: string;
 };
 
@@ -63,7 +63,7 @@ const TextAttribute = ({
             : ""
         } ${!edit ? "pointer-events-none" : ""} p-0`}
         value={value as string}
-        placeholder={edit && placeholder ? placeholder : ""}
+        placeholder={edit && placeholder ? placeholder : "Edit text..."}
         onChange={(e) => {
           setValue(e.target.value);
           debounced(e.target.value);

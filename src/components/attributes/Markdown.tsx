@@ -99,7 +99,7 @@ const MarkdownAttribute = ({
       ) : (
         <article className="prose" onClick={() => setEditMode(true)}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {!edit || value.length > 0 ? value : placeholder ? placeholder : ""}
+            {!edit || value.length > 0 ? value : placeholder ? placeholder : "*Edit markdown...*"}
           </ReactMarkdown>
         </article>
       )}

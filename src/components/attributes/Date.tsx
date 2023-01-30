@@ -106,7 +106,7 @@ const DateAttribute = ({
                 hour: "numeric",
                 minute: "numeric",
               })
-            : edit && <em>{placeholder}</em>}
+            : edit && <em>{placeholder || "Edit date..."}</em>}
         </article>
       )}
     </div>

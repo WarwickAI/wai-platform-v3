@@ -11,18 +11,18 @@ import { ElementType } from "@prisma/client";
 import { SVGProps } from "react";
 import TextElement, { TextRequiredAttributes } from "./Text";
 import PageElement, { PageRequiredAttributes } from "./Page";
-import { ElementProps, RequiredAttribute, SideEffects } from "./utils";
+import { ElementProps, RequiredAttribute, PreAttributeEditFn } from "./utils";
 import EventElement, { EventRequiredAttributes } from "./Event";
 import DatabaseElement, {
   DatabaseRequiredAttributes,
-  databaseSideEffects,
+  databasePreAttributeEdit,
 } from "./Database";
 import DatabaseViewElement, {
   DatabaseViewRequiredAttributes,
 } from "./DatabaseView";
 import SurveyElement, {
   SurveyRequiredAttributes,
-  surveySideEffects,
+  surveyPreAttributeEdit,
 } from "./Survey";
 import BadgeElement, { BadgeRequiredAttributes } from "./Badge";
 
@@ -40,7 +40,7 @@ const elements: {
     icon: ElementIcon;
     element: ({ element, edit }: ElementProps) => JSX.Element;
     requiredAtts: RequiredAttribute[];
-    sideEffects?: SideEffects;
+    preAttributeEditFn?: PreAttributeEditFn;
   };
 } = {
   [ElementType.Text]: {
@@ -77,7 +77,7 @@ const elements: {
     icon: CircleStackIcon,
     element: DatabaseElement,
     requiredAtts: DatabaseRequiredAttributes,
-    sideEffects: databaseSideEffects,
+    preAttributeEditFn: databasePreAttributeEdit,
   },
   [ElementType.DatabaseView]: {
     name: "Database View",
@@ -92,7 +92,7 @@ const elements: {
     icon: PresentationChartBarIcon,
     element: SurveyElement,
     requiredAtts: SurveyRequiredAttributes,
-    sideEffects: surveySideEffects,
+    preAttributeEditFn: surveyPreAttributeEdit,
   },
 };
 

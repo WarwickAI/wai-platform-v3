@@ -6,6 +6,7 @@ import {
   ElementWithAttsGroups,
   ElementWithGroups,
 } from "../../../components/elements/utils";
+import { ElementCreateInputSchema } from "./schemas";
 
 const groupsInclude = {
   masterGroups: true,
@@ -123,25 +124,7 @@ export const elementRouter = router({
       return page;
     }),
   create: authedProcedure
-    .input(
-      z.object({
-        type: z.nativeEnum(ElementType),
-        index: z.number(),
-        parentId: z.string().nullish(),
-        atts: z
-          .object({
-            name: z.string(),
-            type: z.nativeEnum(AttributeType),
-            value: z
-              .string()
-              .or(z.number())
-              .or(z.boolean())
-              .or(z.any().array()),
-            required: z.boolean(),
-          })
-          .array(),
-      })
-    )
+    .input(ElementCreateInputSchema)
     .mutation(async ({ ctx, input }) => {
       const parent = input.parentId
         ? await ctx.prisma.element.findFirst({

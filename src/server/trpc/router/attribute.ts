@@ -4,6 +4,7 @@ import { DBColumnType } from "../../../components/attributes/utils";
 import { AttributeType } from "@prisma/client";
 import { SurveyQuestion } from "../../../components/attributes/SurveyQuestion";
 import elements from "../../../components/elements";
+import { AttributeEditInputSchema } from "./schemas";
 
 export const attributeRouter = router({
   create: authedProcedure
@@ -56,12 +57,7 @@ export const attributeRouter = router({
       });
     }),
   editValue: authedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        value: z.string().or(z.any().array()),
-      })
-    )
+    .input(AttributeEditInputSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, value } = input;
 
@@ -90,14 +86,17 @@ export const attributeRouter = router({
           },
         }));
 
-      const sideEffectsFn = elements[attribute.element.type]?.sideEffects;
+      const preAttributeEditFn =
+        elements[attribute.element.type]?.preAttributeEditFn;
 
-      sideEffectsFn &&
-        await sideEffectsFn(ctx.prisma, attribute.element, user, "AttributeEdit", {
-          attributeId: attribute.id,
-          newValue: value,
-          attributeType: attribute.type,
-        });
+      preAttributeEditFn &&
+        (await preAttributeEditFn(
+          ctx.prisma,
+          attribute.element,
+          attribute,
+          input,
+          user
+        ));
 
       return ctx.prisma.attribute.update({
         where: { id: input.id },

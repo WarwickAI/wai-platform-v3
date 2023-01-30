@@ -5,7 +5,15 @@ import { AttributeProps } from "./utils";
 
 export const DateAttibuteIcon = CalendarDaysIcon;
 
-const DateAttribute = ({ attribute, edit }: AttributeProps) => {
+type DateAttributeProps = AttributeProps & {
+  placeholder?: string;
+};
+
+const DateAttribute = ({
+  attribute,
+  edit,
+  placeholder,
+}: DateAttributeProps) => {
   const [editMode, setEditMode] = useState<boolean>(false);
 
   const [dateValue, setDateValue] = useState<Date | null>(
@@ -98,7 +106,7 @@ const DateAttribute = ({ attribute, edit }: AttributeProps) => {
                 hour: "numeric",
                 minute: "numeric",
               })
-            : edit && <em>click to edit date...</em>}
+            : edit && <em>{placeholder}</em>}
         </article>
       )}
     </div>

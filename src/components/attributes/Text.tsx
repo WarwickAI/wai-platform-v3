@@ -61,7 +61,7 @@ const TextAttribute = ({
             : size === "sm"
             ? "input-xs text-sm font-normal"
             : ""
-        } ${!edit ? "pointer-events-none" : ""}`}
+        } ${!edit ? "pointer-events-none" : ""} p-0`}
         value={value as string}
         placeholder={edit && placeholder ? placeholder : ""}
         onChange={(e) => {

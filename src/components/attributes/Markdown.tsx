@@ -15,7 +15,15 @@ import { AttributeProps } from "./utils";
 
 export const MarkdownAttributeIcon = DocumentTextIcon;
 
-const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
+type MarkdownAttributeProps = AttributeProps & {
+  placeholder?: string;
+};
+
+const MarkdownAttribute = ({
+  attribute,
+  edit,
+  placeholder,
+}: MarkdownAttributeProps) => {
   const [value, setValue] = useState<string>("");
   const [editMode, setEditMode] = useState<boolean>(false);
 
@@ -91,7 +99,7 @@ const MarkdownAttribute = ({ attribute, edit }: AttributeProps) => {
       ) : (
         <article className="prose" onClick={() => setEditMode(true)}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {!edit || value.length > 0 ? value : "*click to edit markdown...*"}
+            {!edit || value.length > 0 ? value : placeholder ? placeholder : ""}
           </ReactMarkdown>
         </article>
       )}

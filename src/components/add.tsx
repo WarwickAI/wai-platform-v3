@@ -59,13 +59,15 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
           open ? "opacity-100" : "invisible opacity-0"
         }`}
       >
-        {Object.keys(Elements).map((type) => (
-          <AddElementType
-            key={type}
-            type={type as ElementType}
-            create={(type) => handleCreate(type, index)}
-          />
-        ))}
+        {Object.keys(Elements)
+          .filter((type) => Elements[type as ElementType]?.showInPicker)
+          .map((type) => (
+            <AddElementType
+              key={type}
+              type={type as ElementType}
+              create={(type) => handleCreate(type, index)}
+            />
+          ))}
       </div>
     </div>
   );

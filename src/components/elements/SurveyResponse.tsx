@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { PresentationChartBarIcon } from "@heroicons/react/24/solid";
 import { trpc } from "../../utils/trpc";
 import {
-  ElementWithAtts,
-  ElementWithAttsGroups,
+  ElementCreateCheckPermsFn,
+  ElementProps,
   RequiredAttribute,
 } from "./utils";
 import { SurveyQuestion } from "../attributes/SurveyQuestion";
@@ -18,13 +18,7 @@ export const SurveyResponseIcon = PresentationChartBarIcon;
 
 // This element is only used within the Survey element, so it doesn't need to be
 // as rigorous as other elements.
-const SurveyResponseElement = ({
-  element,
-  parent,
-}: {
-  element: ElementWithAttsGroups;
-  parent: ElementWithAtts;
-}) => {
+const SurveyResponseElement = ({ element, parent }: ElementProps) => {
   const deleteElement = trpc.element.delete.useMutation();
 
   const userData = trpc.user.getMe.useQuery();
@@ -36,7 +30,7 @@ const SurveyResponseElement = ({
   // If the parent (which is a Survey) contains questions in its SurveyQuestions attribute,
   // that do not exist as an attribute in this element, then add them.
   const surveyQuestionsAttribute = useMemo(() => {
-    return parent.atts.find((att) => att.name === "Questions");
+    return parent?.atts.find((att) => att.name === "Questions");
   }, [parent]);
 
   const edit = useMemo(() => {
@@ -98,3 +92,26 @@ const SurveyResponseElement = ({
 };
 
 export default SurveyResponseElement;
+
+export const surveyCreateCheckPerms: ElementCreateCheckPermsFn = async (
+  primsa,
+  user,
+  input,
+  parent
+) => {
+  // Only care about adding a new survey.
+  // This should be allowed if the user can interact with the parent element.
+  if (input.type !== "SurveyResponse" || !user || !parent) return;
+
+  // Check if the user can interact with the parent element
+  if (
+    user.groups.some((g) =>
+      parent.interactGroups.map((g2) => g2.id).includes(g.id)
+    ) ||
+    parent.interactGroups.find((g) => g.name === "All")
+  ) {
+    return true;
+  }
+
+  return;
+};

@@ -45,6 +45,7 @@ export type RequiredAttribute = {
 
 export type ElementProps = {
   element: ElementWithAttsGroupsChildren;
+  parent?: ElementWithAttsGroupsChildren;
   edit: boolean;
   page?: boolean;
 };
@@ -66,6 +67,14 @@ type SmpPrismaClient = PrismaClient<
   never,
   Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
 >;
+
+// Run when checking permissions, return true if the user has permission, false if not, and undefined to use the default permission check#
+export type ElementCreateCheckPermsFn = (
+  prisma: SmpPrismaClient,
+  user: (User & { groups: Group[] }) | undefined,
+  input: ElementCreateInputType,
+  parent?: ElementWithGroups
+) => Promise<boolean | void>;
 
 // Run before an element is created
 export type PreElementCreationFn = (

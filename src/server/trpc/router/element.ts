@@ -1,12 +1,13 @@
 import { router, publicProcedure, authedProcedure } from "../trpc";
 import { z } from "zod";
-import { AttributeType, ElementType, Group } from "@prisma/client";
+import { ElementType, Group } from "@prisma/client";
 import {
   ElementOperations,
   ElementWithAttsGroups,
   ElementWithGroups,
 } from "../../../components/elements/utils";
 import { ElementCreateInputSchema } from "./schemas";
+import elements from "../../../components/elements";
 
 const groupsInclude = {
   masterGroups: true,
@@ -136,9 +137,30 @@ export const elementRouter = router({
           })
         : null;
 
+      const user = await ctx.prisma.user.findFirst({
+        where: { id: ctx.session.user.id },
+        include: {
+          groups: true,
+        },
+      });
+
+      const elementCreatePermsCheck =
+        elements[input.type]?.elementCreatePermsCheck;
+
+      const specialPermsCheck =
+        elementCreatePermsCheck &&
+        (await elementCreatePermsCheck(
+          ctx.prisma,
+          user || undefined,
+          input,
+          parent || undefined
+        ));
+
+      const defaultCheck = await defaultPermsCheck(ctx, parent, "ElementEdit");
+
       // Check if user can create element in parent (i.e. has edit access)
       // By default, no parent means the user cannot create the element (unless Admin)
-      if (!(await defaultPermsCheck(ctx, parent, "ElementEdit"))) {
+      if (!specialPermsCheck && !defaultCheck) {
         throw new Error("No permission to create element in parent");
       }
 
@@ -356,6 +378,10 @@ const defaultPermsCheck = async (
   if (usersGroups.some((g: Group) => g.id === adminGroup?.id)) {
     return true;
   }
+
+  // Start making decisions based on the operation
+
+  //
 
   // If element is undefined, return false
   if (!element) {

@@ -86,14 +86,23 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
   };
 
   //   Find amongst SurveyRepsonse children if the user has responded to this survey
-  const userSurveyResponse = useMemo(() => {
-    if (!user || !surveyElement) return null;
+  const userSurveyResponseId = useMemo(() => {
+    if (!user || !surveyElement) return undefined;
 
     // Find a child who was created by the current user
     return surveyElement.children.filter((child) => {
       return child.user.id === user.id;
-    })[0];
+    })[0]?.id;
   }, [surveyElement, user]);
+
+  const userSurveyResponseData = trpc.element.get.useQuery(
+    userSurveyResponseId || "",
+    { enabled: !!userSurveyResponseId }
+  );
+
+  const userSurveyResponse = useMemo(() => {
+    return userSurveyResponseData.data;
+  }, [userSurveyResponseData]);
 
   return titleAttribute && questionsAttribute && surveyElement ? (
     <div>
@@ -107,6 +116,7 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
         <SurveyResponseElement
           element={userSurveyResponse}
           parent={surveyElement}
+          edit={edit}
         />
       )}
       {!user && <p>Log in to respond to this survey.</p>}

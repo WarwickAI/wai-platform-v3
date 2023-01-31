@@ -15,8 +15,14 @@ export default GroupAttribute;
 
 type GroupBadgeProps = {
   group: Group;
+  children?: React.ReactNode;
 };
 
-export const GroupBadge = ({ group }: GroupBadgeProps) => {
-  return <div className="badge truncate text-ellipsis">{group.name}</div>;
+export const GroupBadge = ({ group, children }: GroupBadgeProps) => {
+  return (
+    <div className="badge truncate text-ellipsis">
+      {group.name}
+      {children}
+    </div>
+  );
 };

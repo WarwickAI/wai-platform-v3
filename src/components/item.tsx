@@ -135,7 +135,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
             activePerms ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Permissions element={element} />
+          <Permissions element={element} parent={parent} />
         </div>
       )}
     </div>

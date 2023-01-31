@@ -255,6 +255,35 @@ export const elementRouter = router({
       }
     }),
 
+  modifyPerms: authedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        newGroups: z.string().array(),
+        permsKey: z.enum([
+          "masterGroups",
+          "editGroups",
+          "interactGroups",
+          "viewGroups",
+        ]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Set the groups to the new groups
+      return ctx.prisma.element.update({
+        where: { id: input.id },
+        data: {
+          [input.permsKey]: {
+            set: input.newGroups.map((gId) => {
+              return {
+                id: gId,
+              };
+            }),
+          },
+        },
+      });
+    }),
+
   addPerms: authedProcedure
     .input(
       z.object({

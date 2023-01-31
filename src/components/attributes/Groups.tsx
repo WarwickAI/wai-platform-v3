@@ -1,3 +1,4 @@
+import { Combobox } from "@headlessui/react";
 import { PlusIcon, TrashIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 import { Group } from "@prisma/client";
 import { useMemo, useState } from "react";
@@ -32,14 +33,7 @@ const GroupsAttribute = ({ attribute, edit }: AttributeProps) => {
   return (
     <GroupsEdit
       groupIds={attribute.value as string[]}
-      onAdd={(g) => {
-        const groups = attribute.value as string[];
-        handleEdit([...groups, g.id]);
-      }}
-      onRemove={(g) => {
-        const groups = attribute.value as string[];
-        handleEdit(groups.filter((id) => id !== g.id));
-      }}
+      onChange={(v) => handleEdit(v.map((g) => g.id))}
       edit={edit}
     />
   );
@@ -49,88 +43,90 @@ export default GroupsAttribute;
 
 type GroupsEditProps = {
   groupIds: string[];
-  onAdd: (group: Group) => void;
-  onRemove: (group: Group) => void;
+  onChange: (v: Group[]) => void;
   edit: boolean;
+  name?: string;
 };
 
 export const GroupsEdit = ({
   groupIds,
-  onAdd,
-  onRemove,
+  onChange,
   edit,
+  name,
 }: GroupsEditProps) => {
-  const [selected, setSelected] = useState<Group | null>(null);
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   const groupsData = trpc.group.getAll.useQuery();
 
-  const groups = useMemo(() => {
-    if (!groupsData.data) return [];
+  const groups = useMemo(() => groupsData.data || [], [groupsData.data]);
 
-    return groupsData.data.filter((group) => {
+  const groupsSelected = useMemo(() => {
+    return groups.filter((group) => {
       return (groupIds as string[]).includes(group.id);
     });
-  }, [groupsData.data, groupIds]);
+  }, [groups, groupIds]);
+
+  const filteredGroups = useMemo(() => {
+    if (query === "") return groups;
+
+    return groups.filter((group) =>
+      group.name.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [groups, query]);
 
   return (
-    <div className="flex flex-row flex-wrap items-end space-x-4">
-      {groups.map((g) => (
-        <div key={g.id} className="relative">
-          <GroupBadge group={g} />
-          {edit && (
-            <button
-              className="absolute top-0 -right-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-red-700"
-              onClick={() => {
-                onRemove(g);
-              }}
-            >
-              <TrashIcon className="h-4 w-4 text-white" />
-            </button>
-          )}
-        </div>
-      ))}
-      {edit && (
-        <div
-          className={`badge truncate text-ellipsis text-white ${
-            isSelectOpen ? "p-2" : "p-1"
-          }`}
-        >
-          {isSelectOpen && (
-            <select
-              className="select-ghost select select-sm w-40 text-xs"
-              value={selected?.id || 0}
-              onChange={(e) =>
-                setSelected(
-                  groupsData.data?.find((g) => g.id === e.target.value) || null
-                )
-              }
-            >
-              <option value="0" disabled>
-                Select a group
-              </option>
-              {groupsData.data &&
-                groupsData.data.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-            </select>
-          )}
-          <button
-            onClick={() => {
-              if (isSelectOpen) {
-                selected && onAdd(selected);
-                setSelected(null);
-              } else {
-                setIsSelectOpen(true);
-              }
-            }}
-          >
-            <PlusIcon className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+    // Shove in a div to stop divider lines from appearing
+    <div className="block">
+      <Combobox value={groupsSelected} onChange={onChange} multiple>
+        {groupsSelected.length > 0 &&
+          groupsSelected.map((g) => (
+            <GroupBadge key={g.id} group={g}>
+              {edit && (
+                <button
+                  className="flex h-6 w-6 items-center justify-center rounded-full"
+                  onClick={() => {
+                    onChange(
+                      groupsSelected.filter((group) => group.id !== g.id)
+                    );
+                  }}
+                >
+                  <TrashIcon className="h-4 w-4 text-white" />
+                </button>
+              )}
+            </GroupBadge>
+          ))}
+        {edit && (
+          <div className="relative w-full">
+            <div className="flex w-full flex-row space-x-2">
+              <p className="text-base">{name}</p>
+              <Combobox.Input
+                className="input input-sm"
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </div>
+            <Combobox.Options className="absolute right-0 z-10 flex w-full flex-col space-y-0 rounded-md border-2 bg-white p-2">
+              {filteredGroups.map((g) => (
+                <Combobox.Option key={g.id} value={g}>
+                  <GroupBadge group={g}>
+                    {groupsSelected.includes(g) && (
+                      <button
+                        className="flex h-6 w-6 items-center justify-center rounded-full"
+                        onClick={() => {
+                          onChange(
+                            groupsSelected.filter((group) => group.id !== g.id)
+                          );
+                        }}
+                      >
+                        <TrashIcon className="h-4 w-4 text-white" />
+                      </button>
+                    )}
+                  </GroupBadge>
+                </Combobox.Option>
+              ))}
+            </Combobox.Options>
+          </div>
+        )}
+      </Combobox>
     </div>
   );
 };

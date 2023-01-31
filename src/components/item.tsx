@@ -30,7 +30,6 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const [showAdd, setShowAdd] = useState<boolean>(false);
   const [showModify, setShowModify] = useState<boolean>(false);
-  const [showPermissions, setShowPermissions] = useState<boolean>(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: element?.id || 0 });
@@ -56,15 +55,8 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
     return false;
   }, [element, user.data]);
 
-  const activeAddMove =
-    (hovered || showAdd || showModify || showPermissions) && editParent;
-  const activePerms =
-    (hovered || showAdd || showModify || showPermissions) && edit;
-
-  // Fixes issue where after removing permission, showPermissions stays true
-  if (showPermissions && !edit) {
-    setShowPermissions(false);
-  }
+  const activeAddMove = (hovered || showAdd || showModify) && editParent;
+  const activePerms = (hovered || showAdd || showModify) && edit;
 
   const ElementTypeData = element && Elements[element.type];
   const Element = ElementTypeData?.element;
@@ -116,7 +108,6 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
           setOpen={(v) => {
             setShowAdd(v);
             v && setShowModify(false);
-            v && setShowPermissions(false);
           }}
         />
         <Modify
@@ -126,7 +117,6 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
           setOpen={(v) => {
             setShowModify(v);
             v && setShowAdd(false);
-            v && setShowPermissions(false);
           }}
         />
       </div>
@@ -145,15 +135,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
             activePerms ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Permissions
-            element={element}
-            open={showPermissions}
-            setOpen={(v) => {
-              setShowPermissions(v);
-              v && setShowAdd(false);
-              v && setShowModify(false);
-            }}
-          />
+          <Permissions element={element} />
         </div>
       )}
     </div>

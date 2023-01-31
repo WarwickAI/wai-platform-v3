@@ -1,3 +1,4 @@
+import { Popover } from "@headlessui/react";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { Element, Group } from "@prisma/client";
 import { trpc } from "../utils/trpc";
@@ -10,52 +11,47 @@ type PermissionsProps = {
     interactGroups: Group[];
     viewGroups: Group[];
   };
-  open: boolean;
-  setOpen: (open: boolean) => void;
 };
 
-const Permissions = ({ element, open, setOpen }: PermissionsProps) => {
+const Permissions = ({ element }: PermissionsProps) => {
   return (
-    <div className="relative">
-      <div className="tooltip" data-tip="Edit Permissions">
-        <button
-          className={`rounded-full p-1 transition-colors ${
-            open ? "bg-neutral" : "bg-white"
-          }`}
-          onClick={() => setOpen(!open)}
-        >
-          <LockClosedIcon
-            className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
-          />
-        </button>
-      </div>
-      <div
-        className={`absolute top-10 right-0 z-10 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
-          open ? "opacity-100" : "invisible opacity-0"
-        }`}
-      >
-        <PermissionSelect
-          permissionName="master"
-          groups={element.masterGroups}
-          element={element}
-        />
-        <PermissionSelect
-          permissionName="edit"
-          groups={element.editGroups}
-          element={element}
-        />
-        <PermissionSelect
-          permissionName="interact"
-          groups={element.interactGroups}
-          element={element}
-        />
-        <PermissionSelect
-          permissionName="view"
-          groups={element.viewGroups}
-          element={element}
-        />
-      </div>
-    </div>
+    <Popover className="relative">
+      {({ open }) => (
+        <>
+          <Popover.Button
+            className={`rounded-full p-1 transition-colors ${
+              open ? "bg-neutral" : "bg-white"
+            }`}
+          >
+            <LockClosedIcon
+              className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
+            />
+          </Popover.Button>
+          <Popover.Panel className="absolute top-10 right-0 z-10 flex flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+            <PermissionSelect
+              permissionName="master"
+              groups={element.masterGroups}
+              element={element}
+            />
+            <PermissionSelect
+              permissionName="edit"
+              groups={element.editGroups}
+              element={element}
+            />
+            <PermissionSelect
+              permissionName="interact"
+              groups={element.interactGroups}
+              element={element}
+            />
+            <PermissionSelect
+              permissionName="view"
+              groups={element.viewGroups}
+              element={element}
+            />
+          </Popover.Panel>
+        </>
+      )}
+    </Popover>
   );
 };
 

@@ -1,3 +1,4 @@
+import { Popover } from "@headlessui/react";
 import { Bars4Icon, TrashIcon } from "@heroicons/react/24/solid";
 import { Element } from "@prisma/client";
 import { useCallback } from "react";
@@ -32,39 +33,36 @@ const Modify = ({ parent, element, open, setOpen }: AddProps) => {
   }, [deleteElement, element, parent, utils]);
 
   return (
-    <div className="relative">
-      <div className="tooltip" data-tip="Modify Element">
-        <button
-          onClick={() => setOpen(!open)}
-          className={`rounded-full transition-colors ${
-            open ? "bg-neutral" : "bg-white"
-          }`}
-        >
-          <Bars4Icon
-            className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
-          />
-        </button>
-      </div>
-      <div
-        className={`absolute z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
-          open ? "opacity-100" : "invisible opacity-0"
-        }`}
-      >
-        <button
-          onClick={handleDelete}
-          className="flex flex-row items-center space-x-2 rounded-md p-2 hover:bg-slate-100"
-        >
-          <div>
-            <TrashIcon className="h-6 w-6 text-neutral" />
-          </div>
+    <Popover className="relative">
+      {({ open }) => (
+        <>
+          <Popover.Button
+            className={`rounded-full transition-colors ${
+              open ? "bg-neutral" : "bg-white"
+            }`}
+          >
+            <Bars4Icon
+              className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
+            />
+          </Popover.Button>
+          <Popover.Panel className="absolute left-0 top-10 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+            <button
+              onClick={handleDelete}
+              className="flex flex-row items-center space-x-2 rounded-md p-2 hover:bg-slate-100"
+            >
+              <div>
+                <TrashIcon className="h-6 w-6 text-neutral" />
+              </div>
 
-          <div className="text-start">
-            <p className="text-sm font-bold">Delete</p>
-            <p className="text-xs">Remove this element</p>
-          </div>
-        </button>
-      </div>
-    </div>
+              <div className="text-start">
+                <p className="text-sm font-bold">Delete</p>
+                <p className="text-xs">Remove this element</p>
+              </div>
+            </button>
+          </Popover.Panel>
+        </>
+      )}
+    </Popover>
   );
 };
 

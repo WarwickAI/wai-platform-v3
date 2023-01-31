@@ -1,3 +1,4 @@
+import { Popover } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { Element, ElementType } from "@prisma/client";
 import { trpc } from "../utils/trpc";
@@ -41,35 +42,32 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
   };
 
   return (
-    <div className="relative">
-      <div className="tooltip" data-tip="Add Element">
-        <button
-          onClick={() => setOpen(!open)}
-          className={`rounded-full transition-colors ${
-            open ? "bg-neutral" : "bg-white"
-          }`}
-        >
-          <PlusIcon
-            className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
-          />
-        </button>
-      </div>
-      <div
-        className={`absolute z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
-          open ? "opacity-100" : "invisible opacity-0"
-        }`}
-      >
-        {Object.keys(Elements)
-          .filter((type) => Elements[type as ElementType]?.showInPicker)
-          .map((type) => (
-            <AddElementType
-              key={type}
-              type={type as ElementType}
-              create={(type) => handleCreate(type, index)}
+    <Popover className="relative">
+      {({ open }) => (
+        <>
+          <Popover.Button
+            className={`rounded-full transition-colors ${
+              open ? "bg-neutral" : "bg-white"
+            }`}
+          >
+            <PlusIcon
+              className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
             />
-          ))}
-      </div>
-    </div>
+          </Popover.Button>
+          <Popover.Panel className="absolute top-10 left-0 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+            {Object.keys(Elements)
+              .filter((type) => Elements[type as ElementType]?.showInPicker)
+              .map((type) => (
+                <AddElementType
+                  key={type}
+                  type={type as ElementType}
+                  create={(type) => handleCreate(type, index)}
+                />
+              ))}
+          </Popover.Panel>
+        </>
+      )}
+    </Popover>
   );
 };
 

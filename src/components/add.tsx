@@ -43,7 +43,7 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
 
   return (
     <Popover className="relative">
-      {({ open }) => (
+      {({ open, close }) => (
         <>
           <Popover.Button
             className={`rounded-full transition-colors ${
@@ -61,7 +61,10 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
                 <AddElementType
                   key={type}
                   type={type as ElementType}
-                  create={(type) => handleCreate(type, index)}
+                  create={(type) => {
+                    handleCreate(type, index);
+                    close();
+                  }}
                 />
               ))}
           </Popover.Panel>

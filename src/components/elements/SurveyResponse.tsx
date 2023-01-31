@@ -4,6 +4,7 @@ import { trpc } from "../../utils/trpc";
 import {
   ElementCreateCheckPermsFn,
   ElementProps,
+  PreElementCreationFn,
   RequiredAttribute,
 } from "./utils";
 import { SurveyQuestion } from "../attributes/SurveyQuestion";
@@ -19,7 +20,14 @@ export const SurveyResponseIcon = PresentationChartBarIcon;
 // This element is only used within the Survey element, so it doesn't need to be
 // as rigorous as other elements.
 const SurveyResponseElement = ({ element, parent }: ElementProps) => {
-  const deleteElement = trpc.element.delete.useMutation();
+  const utils = trpc.useContext();
+
+  const deleteElement = trpc.element.delete.useMutation({
+    onSuccess: () => {
+      utils.element.getAll.invalidate();
+      utils.element.get.invalidate(parent?.id || "");
+    },
+  });
 
   const userData = trpc.user.getMe.useQuery();
 
@@ -93,7 +101,7 @@ const SurveyResponseElement = ({ element, parent }: ElementProps) => {
 
 export default SurveyResponseElement;
 
-export const surveyCreateCheckPerms: ElementCreateCheckPermsFn = async (
+export const surveyResponseCreateCheckPerms: ElementCreateCheckPermsFn = async (
   primsa,
   user,
   input,
@@ -114,4 +122,45 @@ export const surveyCreateCheckPerms: ElementCreateCheckPermsFn = async (
   }
 
   return;
+};
+
+export const surveyResponsePreCreate: PreElementCreationFn = async (
+  prisma,
+  input,
+  user,
+  perms
+) => {
+  // Make sure to add the user's group with edit perms
+
+  if (!user || !user.email) return;
+
+  let userGroup = await prisma.group.findFirst({
+    where: {
+      name: user.email,
+    },
+  });
+
+  // If doesn't exists, create
+  if (!userGroup) {
+    userGroup = await prisma.group.create({
+      data: {
+        name: user.email,
+        users: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
+    });
+  }
+
+  // Add the user's group to the view, interact and edit groups
+  perms.view.push(userGroup);
+  perms.interact.push(userGroup);
+  perms.edit.push(userGroup);
+
+  return {
+    input,
+    perms,
+  };
 };

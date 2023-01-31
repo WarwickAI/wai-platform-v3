@@ -164,22 +164,42 @@ export const elementRouter = router({
         throw new Error("No permission to create element in parent");
       }
 
-      const masterGroups = parent?.masterGroups ?? [];
-      const editGroups = parent?.editGroups ?? [];
-      const interactGroups = parent?.interactGroups ?? [];
-      const viewGroups = parent?.viewGroups ?? [];
+      let perms = {
+        master: parent?.masterGroups ?? [],
+        edit: parent?.editGroups ?? [],
+        interact: parent?.interactGroups ?? [],
+        view: parent?.viewGroups ?? [],
+      };
+
+      const preElementCreateFn = elements[input.type]?.preElementCreateFn;
+
+      if (preElementCreateFn) {
+        const preRes = await preElementCreateFn(
+          ctx.prisma,
+          input,
+          user || undefined,
+          perms
+        );
+
+        if (!preRes) {
+          throw new Error("Error in preElementCreateFn");
+        }
+
+        input = preRes.input;
+        perms = preRes.perms;
+      }
 
       return ctx.prisma.element.create({
         data: {
           ...input,
           atts: { create: input.atts },
           userId: ctx.session.user.id,
-          masterGroups: { connect: masterGroups.map((g) => ({ id: g.id })) },
-          editGroups: { connect: editGroups.map((g) => ({ id: g.id })) },
+          masterGroups: { connect: perms.master.map((g) => ({ id: g.id })) },
+          editGroups: { connect: perms.edit.map((g) => ({ id: g.id })) },
           interactGroups: {
-            connect: interactGroups.map((g) => ({ id: g.id })),
+            connect: perms.interact.map((g) => ({ id: g.id })),
           },
-          viewGroups: { connect: viewGroups.map((g) => ({ id: g.id })) },
+          viewGroups: { connect: perms.view.map((g) => ({ id: g.id })) },
         },
       });
     }),

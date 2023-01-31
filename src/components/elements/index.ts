@@ -16,6 +16,7 @@ import {
   RequiredAttribute,
   PreAttributeEditFn,
   ElementCreateCheckPermsFn,
+  PreElementCreationFn,
 } from "./utils";
 import EventElement, { EventRequiredAttributes } from "./Event";
 import DatabaseElement, {
@@ -31,7 +32,8 @@ import SurveyElement, {
 } from "./Survey";
 import BadgeElement, { BadgeRequiredAttributes } from "./Badge";
 import SurveyResponseElement, {
-  surveyCreateCheckPerms,
+  surveyResponseCreateCheckPerms,
+  surveyResponsePreCreate,
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
 
@@ -52,6 +54,7 @@ const elements: {
     requiredAtts: RequiredAttribute[];
     elementCreatePermsCheck?: ElementCreateCheckPermsFn;
     preAttributeEditFn?: PreAttributeEditFn;
+    preElementCreateFn?: PreElementCreationFn;
   };
 } = {
   [ElementType.Text]: {
@@ -119,7 +122,8 @@ const elements: {
     element: SurveyResponseElement,
     requiredAtts: SurveyResponseRequiredAttributes,
     showInPicker: false,
-    elementCreatePermsCheck: surveyCreateCheckPerms,
+    elementCreatePermsCheck: surveyResponseCreateCheckPerms,
+    preElementCreateFn: surveyResponsePreCreate,
   },
 };
 

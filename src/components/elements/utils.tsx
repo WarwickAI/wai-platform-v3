@@ -95,7 +95,7 @@ export type PreElementCreationFn = (
     interact: Group[];
     view: Group[];
   };
-}>;
+} | void>;
 
 // Run after an element is created
 export type PostElementCreationFn = (

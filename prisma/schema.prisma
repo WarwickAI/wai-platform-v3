@@ -106,6 +106,7 @@ enum AttributeType {
   User
   Users
   SurveyQuestions
+  DatabaseSort
 }
 
 model Element {

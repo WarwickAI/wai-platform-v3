@@ -2,6 +2,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { ColumnHeader } from "../attributes/Columns";
+import { DatabaseSortType } from "../attributes/DatabaseSort";
 import DateAttribute from "../attributes/Date";
 import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
@@ -18,7 +19,7 @@ import {
 } from "./utils";
 
 export const DatabaseRequiredAttributes: RequiredAttribute[] = [
-  { name: "Title", type: "Text", value: "Database Title" },
+  { name: "Title", type: "Text", value: "" },
   { name: "Base Type", type: "DatabaseBaseType", value: "" },
   { name: "Columns", type: "Columns", value: [] },
 ];
@@ -27,8 +28,8 @@ const DatabaseElement = ({
   element,
   edit,
   viewAs,
-}: ElementProps & { viewAs?: string }) => {
-  const [dbPermsOpen, setDbPermsOpen] = useState(false);
+  sorts,
+}: ElementProps & { viewAs?: string; sorts?: DatabaseSortType }) => {
   const utils = trpc.useContext();
 
   const addElement = trpc.element.create.useMutation();
@@ -148,21 +149,55 @@ const DatabaseElement = ({
     return matching;
   }, [columns]);
 
+  const sortedChildren = useMemo(() => {
+    const children = element.children;
+
+    if (!sorts) return children;
+
+    const sorted = children.sort((a, b) => {
+      let i = 0;
+      while (true) {
+        const sort = sorts[i];
+        if (!sort) return 0;
+
+        const aAtt = a.atts.find((att) => att.name === sort.columnName);
+        const bAtt = b.atts.find((att) => att.name === sort.columnName);
+
+        if (!aAtt || !bAtt) return 0;
+        if (!aAtt) return -1;
+        if (!bAtt) return 1;
+
+        if (aAtt.value !== bAtt.value) {
+          return sort.direction === "asc"
+            ? aAtt.value! > bAtt.value!
+              ? 1
+              : -1
+            : aAtt.value! < bAtt.value!
+            ? 1
+            : -1;
+        }
+
+        // Will only get to here if the values are the same
+        // So we need to check the next sort
+        i += 1;
+      }
+    });
+
+    return sorted;
+  }, [element.children, sorts]);
+
   return (
     <div>
       <div className="flex flex-row space-x-2">
         {databaseTitle && (
-          <TextAttribute attribute={databaseTitle} edit={edit} size="md" />
-        )}
-        {edit && (
-          <Permissions
-            element={element}
-            open={dbPermsOpen}
-            setOpen={(v) => {
-              setDbPermsOpen(v);
-            }}
+          <TextAttribute
+            attribute={databaseTitle}
+            edit={edit}
+            size="md"
+            placeholder="Edit database title..."
           />
         )}
+        {edit && <Permissions element={element} />}
         {edit && matchingElements.event && (
           <div className="badge-primary badge badge-sm">Event</div>
         )}
@@ -175,7 +210,7 @@ const DatabaseElement = ({
           <DatabaseTable
             columns={columns || []}
             edit={edit}
-            elements={element.children}
+            elements={sortedChildren}
             handleAddRow={handleAddRow}
             handleAddColumn={handleAddColumn}
             handleEditColumn={handleEditColumn}
@@ -184,7 +219,7 @@ const DatabaseElement = ({
         ))}
       {viewAs === "events" && (
         <DatabaseEvents
-          events={element.children}
+          events={sortedChildren}
           handleAddRow={handleAddRow}
           edit={edit}
         />

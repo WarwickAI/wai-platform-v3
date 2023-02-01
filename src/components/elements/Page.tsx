@@ -27,6 +27,7 @@ import {
   RequiredAttribute,
 } from "./utils";
 import Add from "../add";
+import Permissions from "../permissions";
 
 export const PageRequiredAttributes: RequiredAttribute[] = [
   { name: "Title", type: "Text", value: "Page Title" },
@@ -74,6 +75,22 @@ const PageElement = ({ element, page }: ElementProps) => {
     return false;
   }, [element, user]);
 
+  const permsEdit = useMemo(() => {
+    if (!element || !user.data) return false;
+
+    // Check it the user is an admin
+    for (const userGroup of user.data.groups) {
+      if (userGroup.name === "Admin") return true;
+    }
+
+    for (const elGroup of element.masterGroups) {
+      for (const userGroup of user.data.groups) {
+        if (elGroup.id === userGroup.id) return true;
+      }
+    }
+    return false;
+  }, [element, user]);
+
   if (!page) {
     return (
       <Link
@@ -112,6 +129,15 @@ const PageElement = ({ element, page }: ElementProps) => {
                 edit={edit}
                 placeholder="Edit page title..."
               />
+            )}
+            {element && (
+              <div
+                className={`absolute top-2 right-2 z-10 transition-opacity ${
+                  permsEdit ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <Permissions element={element} />
+              </div>
             )}
           </div>
 

@@ -8,7 +8,7 @@ import TextAttribute from "../attributes/Text";
 import UsersAttribute from "../attributes/Users";
 import { DBColumnType } from "../attributes/utils";
 import Permissions from "../permissions";
-import { EventRequiredAttributes } from "./Event";
+import EventElement, { EventRequiredAttributes } from "./Event";
 import { PageRequiredAttributes } from "./Page";
 import {
   ElementProps,
@@ -23,7 +23,11 @@ export const DatabaseRequiredAttributes: RequiredAttribute[] = [
   { name: "Columns", type: "Columns", value: [] },
 ];
 
-const DatabaseElement = ({ element, edit }: ElementProps) => {
+const DatabaseElement = ({
+  element,
+  edit,
+  viewAs,
+}: ElementProps & { viewAs?: string }) => {
   const [dbPermsOpen, setDbPermsOpen] = useState(false);
   const utils = trpc.useContext();
 
@@ -164,15 +168,25 @@ const DatabaseElement = ({ element, edit }: ElementProps) => {
           <div className="badge-primary badge badge-sm">Page</div>
         )}
       </div>
-      <DatabaseTable
-        columns={columns || []}
-        edit={edit}
-        elements={element.children}
-        handleAddRow={handleAddRow}
-        handleAddColumn={handleAddColumn}
-        handleEditColumn={handleEditColumn}
-        handleDeleteColumn={handleDeleteColumn}
-      />
+      {!viewAs ||
+        (viewAs === "table" && (
+          <DatabaseTable
+            columns={columns || []}
+            edit={edit}
+            elements={element.children}
+            handleAddRow={handleAddRow}
+            handleAddColumn={handleAddColumn}
+            handleEditColumn={handleEditColumn}
+            handleDeleteColumn={handleDeleteColumn}
+          />
+        ))}
+      {viewAs === "events" && (
+        <DatabaseEvents
+          events={element.children}
+          handleAddRow={handleAddRow}
+          edit={edit}
+        />
+      )}
     </div>
   );
 };
@@ -286,6 +300,36 @@ const DatabaseTable = ({
           </tr>
         </tbody>
       </table>
+    </div>
+  );
+};
+
+type DatabaseEventsProps = {
+  events: ElementWithAttsGroups[];
+  handleAddRow: () => void;
+  edit: boolean;
+};
+
+const DatabaseEvents = ({
+  events,
+  handleAddRow,
+  edit,
+}: DatabaseEventsProps) => {
+  return (
+    <div className="flex flex-row flex-wrap space-x-2">
+      {events.map((event) => (
+        <EventElement
+          key={event.id}
+          element={{ ...event, children: [] }}
+          edit={edit}
+        />
+      ))}
+      <div
+        className="hover:cursor-pointer hover:bg-slate-600"
+        onClick={handleAddRow}
+      >
+        +
+      </div>
     </div>
   );
 };

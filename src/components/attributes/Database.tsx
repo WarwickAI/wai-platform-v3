@@ -1,6 +1,9 @@
-import { CircleStackIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import {
+  CircleStackIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@heroicons/react/24/solid";
 import { AttributeType } from "@prisma/client";
-import { useEffect, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { DatabaseRequiredAttributes } from "../elements/Database";
 import { AttributeProps } from "./utils";
@@ -8,12 +11,6 @@ import { AttributeProps } from "./utils";
 export const DatabaseAttibuteIcon = CircleStackIcon;
 
 const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
-  const [value, setValue] = useState<string>("");
-
-  useEffect(() => {
-    setValue(attribute.value as string);
-  }, [attribute.value]);
-
   const utils = trpc.useContext();
 
   const editAttribute = trpc.attribute.editValue.useMutation();
@@ -38,13 +35,13 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
 
   const handleDelete = () => {
     deleteElement.mutate(
-      { id: value },
+      { id: (attribute?.value as string) || "" },
       {
         onSuccess: (data) => {
           utils.element.getAll.invalidate();
           utils.element.get.invalidate(data.id);
           utils.element.queryAll.invalidate({ type: data.type });
-        }
+        },
       }
     );
   };
@@ -83,12 +80,12 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
   return (
     <div className="flex flex-row justify-between">
       <select
-        className={`select-ghost select select-sm border-0 text-lg font-medium ${!edit ? "pointer-events-none" : ""
-          }`}
-        value={(value as string) || 0}
+        className={`select-ghost select select-sm border-0 text-lg font-medium ${
+          !edit ? "pointer-events-none" : ""
+        }`}
+        value={(attribute?.value as string) || 0}
         placeholder={edit ? "Edit database..." : ""}
         onChange={(e) => {
-          setValue(e.target.value);
           handleEdit(e.target.value);
         }}
       >

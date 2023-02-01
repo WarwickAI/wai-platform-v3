@@ -24,7 +24,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-        {page && page.data ? (
+        {page && page.data && PageElement ? (
           <PageElement element={page.data} page edit={false} />
         ) : page && page.isLoading ? (
           <p>Loading page...</p>

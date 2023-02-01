@@ -4,14 +4,12 @@ import { Element } from "@prisma/client";
 import { useCallback } from "react";
 import { trpc } from "../utils/trpc";
 
-type AddProps = {
+type ModifyProps = {
   parent?: Element;
   element?: Element;
-  open: boolean;
-  setOpen: (open: boolean) => void;
 };
 
-const Modify = ({ parent, element, open, setOpen }: AddProps) => {
+const Modify = ({ parent, element }: ModifyProps) => {
   const utils = trpc.useContext();
 
   const deleteElement = trpc.element.delete.useMutation();

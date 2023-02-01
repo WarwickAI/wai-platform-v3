@@ -7,14 +7,20 @@ import Elements from "./elements";
 type AddProps = {
   parent?: Element;
   index: number;
-  open: boolean;
-  setOpen: (open: boolean) => void;
 };
 
-const Add = ({ parent, index, open, setOpen }: AddProps) => {
+const Add = ({ parent, index }: AddProps) => {
   const utils = trpc.useContext();
 
-  const createElement = trpc.element.create.useMutation();
+  const createElement = trpc.element.create.useMutation({
+    onSuccess: () => {
+      // Refresh the page
+      utils.element.getAll.invalidate();
+      utils.element.getPage.invalidate({
+        route: parent?.route || "",
+      });
+    },
+  });
 
   const handleCreate = (type: ElementType, index: number) => {
     const elementData = Elements[type];
@@ -27,18 +33,7 @@ const Add = ({ parent, index, open, setOpen }: AddProps) => {
       return { ...a, required: true };
     });
 
-    createElement.mutate(
-      { type, index, atts, parentId: parent?.id },
-      {
-        onSuccess: () => {
-          utils.element.getAll.invalidate();
-          utils.element.getPage.invalidate({
-            route: parent?.route || "",
-          });
-          setOpen(false);
-        },
-      }
-    );
+    createElement.mutate({ type, index, atts, parentId: parent?.id });
   };
 
   return (

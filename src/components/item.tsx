@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Attribute, Element, Group, User } from "@prisma/client";
+import { Element } from "@prisma/client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";
@@ -9,27 +9,20 @@ import Permissions from "./permissions";
 import Add from "./add";
 import Modify from "./modify";
 import Elements from "./elements";
+import { ElementWithAttsGroups } from "./elements/utils";
 
 type ItemProps = {
-  element?: Element & {
-    user: User;
-    atts: Attribute[];
-    masterGroups: Group[];
-    editGroups: Group[];
-    interactGroups: Group[];
-    viewGroups: Group[];
-  };
+  element?: ElementWithAttsGroups;
   parent?: Element;
   blur?: boolean;
   editParent: boolean;
 };
 
 const Item = ({ element, parent, blur, editParent }: ItemProps) => {
-  const user = trpc.user.getMe.useQuery();
+  const userData = trpc.user.getMe.useQuery();
+  const user = userData.data;
 
   const [hovered, setHovered] = useState<boolean>(false);
-  const [showAdd, setShowAdd] = useState<boolean>(false);
-  const [showModify, setShowModify] = useState<boolean>(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: element?.id || 0 });
@@ -40,40 +33,36 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
   };
 
   const edit = useMemo(() => {
-    if (!element || !user.data) return false;
+    if (!element || !user) return false;
 
     // Check it the user is an admin
-    for (const userGroup of user.data.groups) {
-      if (userGroup.name === "Admin") return true;
-    }
+    if (user.groups.find((g) => g.name === "Admin")) return true;
 
-    for (const elGroup of element.editGroups) {
-      for (const userGroup of user.data.groups) {
-        if (elGroup.id === userGroup.id) return true;
-      }
-    }
-    return false;
-  }, [element, user.data]);
+    return user.groups.some((g) =>
+      element.editGroups.find((eg) => eg.id === g.id)
+    );
+  }, [element, user]);
 
-  const activeAddMove = (hovered || showAdd || showModify) && editParent;
-  const activePerms = (hovered || showAdd || showModify) && edit;
+  // Should the element be shown as hovered
+  const showHovered = hovered && editParent;
+  const showPerms = hovered && edit;
 
-  const ElementTypeData = element && Elements[element.type];
-  const Element = ElementTypeData?.element;
+  // Extract the element from the elements list
+  const Element = element && Elements[element.type]?.element;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={`relative w-full max-w-4xl rounded-lg border-2 bg-white p-2 transition-colors ${
-        activeAddMove ? "border-slate-300" : "border-white"
+        showHovered ? "border-slate-300" : "border-white"
       } ${blur ? "opacity-20" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
         className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row space-x-1 pr-5 text-neutral transition-opacity ${
-          activeAddMove ? "opacity-100" : "opacity-0"
+          showHovered ? "opacity-100" : "opacity-0"
         }`}
         {...listeners}
         {...attributes}
@@ -101,24 +90,8 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
             />
           </div>
         )}
-        <Add
-          parent={parent}
-          index={element?.index || 0}
-          open={showAdd}
-          setOpen={(v) => {
-            setShowAdd(v);
-            v && setShowModify(false);
-          }}
-        />
-        <Modify
-          parent={parent}
-          element={element}
-          open={showModify}
-          setOpen={(v) => {
-            setShowModify(v);
-            v && setShowAdd(false);
-          }}
-        />
+        <Add parent={parent} index={element?.index || 0} />
+        <Modify parent={parent} element={element} />
       </div>
       {element ? (
         Element ? (
@@ -132,7 +105,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
       {element && (
         <div
           className={`absolute top-0 right-1 z-10 transition-opacity ${
-            activePerms ? "opacity-100" : "opacity-0"
+            showPerms ? "opacity-100" : "opacity-0"
           }`}
         >
           <Permissions element={element} parent={parent} />

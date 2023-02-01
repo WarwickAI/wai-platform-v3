@@ -40,8 +40,6 @@ const PageElement = ({ element, page }: ElementProps) => {
     setItems(element.children.sort((a, b) => a.index - b.index));
   }, [element.children]);
 
-  const [isAddOpen, setIsAddOpen] = useState(false);
-
   const user = trpc.user.getMe.useQuery();
 
   const orderElements = trpc.element.order.useMutation();
@@ -161,14 +159,7 @@ const PageElement = ({ element, page }: ElementProps) => {
                         editParent={edit}
                       />
                     ))
-                  : edit && (
-                      <Add
-                        index={0}
-                        open={isAddOpen}
-                        setOpen={(v) => setIsAddOpen(v)}
-                        parent={element}
-                      />
-                    )}
+                  : edit && <Add index={0} parent={element} />}
                 <DragOverlay>
                   {activeId ? (
                     <Item

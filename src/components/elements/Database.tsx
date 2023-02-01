@@ -154,17 +154,19 @@ const DatabaseElement = ({
         {databaseTitle && (
           <TextAttribute attribute={databaseTitle} edit={edit} size="md" />
         )}
-        <Permissions
-          element={element}
-          open={dbPermsOpen}
-          setOpen={(v) => {
-            setDbPermsOpen(v);
-          }}
-        />
-        {matchingElements.event && (
+        {edit && (
+          <Permissions
+            element={element}
+            open={dbPermsOpen}
+            setOpen={(v) => {
+              setDbPermsOpen(v);
+            }}
+          />
+        )}
+        {edit && matchingElements.event && (
           <div className="badge-primary badge badge-sm">Event</div>
         )}
-        {matchingElements.page && (
+        {edit && matchingElements.page && (
           <div className="badge-primary badge badge-sm">Page</div>
         )}
       </div>
@@ -324,12 +326,12 @@ const DatabaseEvents = ({
           edit={edit}
         />
       ))}
-      <div
-        className="hover:cursor-pointer hover:bg-slate-600"
+      <button
         onClick={handleAddRow}
+        className="h-8 w-8 rounded-full p-1 hover:cursor-pointer hover:bg-slate-300"
       >
-        +
-      </div>
+        <PlusIcon className="h-6 w-6 text-neutral" />
+      </button>
     </div>
   );
 };

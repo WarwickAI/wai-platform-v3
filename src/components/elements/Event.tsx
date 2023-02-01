@@ -32,6 +32,12 @@ const EventElement = ({ element, edit, page }: ElementProps) => {
 
   return (
     <div>
+      {edit && (
+        <div className="flex flex-row space-x-2">
+          <AttendeesPopover element={element} edit={edit} page={page} />
+          <EventQRPopover element={element} edit={edit} page={page} />
+        </div>
+      )}
       {titleAttribute && (
         <TextAttribute
           attribute={titleAttribute}
@@ -74,21 +80,18 @@ const EventElement = ({ element, edit, page }: ElementProps) => {
           placeholder={"*Edit event description...*"}
         />
       )}
-      <div className="flex flex-row flex-wrap items-center">
-        <p className="text-md">📍</p>
-        {locationAttribute && (
+      {locationAttribute && (locationAttribute.value || edit) && (
+        <div className="flex flex-row flex-wrap items-center">
+          <p className="text-md">📍</p>
+
           <TextAttribute
             attribute={locationAttribute}
             edit={edit}
             size="sm"
             placeholder="Edit location..."
           />
-        )}
-      </div>
-      <div className="flex flex-row space-x-2">
-        {edit && <AttendeesPopover element={element} edit={edit} page={page} />}
-        {edit && <EventQRPopover element={element} edit={edit} page={page} />}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

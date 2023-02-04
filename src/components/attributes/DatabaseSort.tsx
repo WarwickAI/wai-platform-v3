@@ -48,7 +48,7 @@ const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
                 !edit ? "pointer-events-none" : ""
               }`}
               value={sort.columnName}
-              placeholder={edit ? "Edit view type..." : ""}
+              placeholder={edit ? "Edit sort..." : ""}
               onChange={(e) => {
                 editAttribute.mutate({
                   id: attribute?.id || "",
@@ -64,7 +64,7 @@ const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
               }}
             >
               <option value={0} disabled>
-                Select a view type
+                Select a sort attribute
               </option>
               {columns?.map((col) => (
                 <option key={col.name} value={col.name}>
@@ -91,7 +91,7 @@ const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
                 sort.direction === "asc" ? "bg-blue-600" : "bg-gray-200"
               } relative inline-flex h-6 w-11 items-center rounded-full`}
             >
-              <span className="sr-only">Enable notifications</span>
+              <span className="sr-only">Ascending</span>
               <span
                 className={`${
                   sort.direction === "asc" ? "translate-x-6" : "translate-x-1"
@@ -118,7 +118,7 @@ const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
             !edit ? "pointer-events-none" : ""
           }`}
           value={0}
-          placeholder={edit ? "Edit view type..." : ""}
+          placeholder={edit ? "Edit sort..." : ""}
           onChange={(e) => {
             editAttribute.mutate({
               id: attribute.id || "",
@@ -130,7 +130,7 @@ const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
           }}
         >
           <option value={0} disabled>
-            Select a view type
+            Select a sort attribute
           </option>
           {columns?.map((col) => (
             <option key={col.name} value={col.name}>

@@ -63,7 +63,9 @@ const TextAttribute = ({
             : ""
         } ${!edit ? "pointer-events-none" : ""} p-0`}
         value={value as string}
-        placeholder={edit && placeholder ? placeholder : "Edit text..."}
+        placeholder={
+          edit && placeholder ? placeholder : edit ? "Edit text..." : ""
+        }
         onChange={(e) => {
           setValue(e.target.value);
           debounced(e.target.value);

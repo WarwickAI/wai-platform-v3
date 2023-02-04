@@ -50,16 +50,18 @@ const DatabaseTable = ({
                   />
                 </th>
               ))}
-            <th className="text-base font-normal normal-case">
-              <div
-                className="tooltip tooltip-left"
-                data-tip="Add Database Column"
-              >
-                <button onClick={handleAddColumn}>
-                  <PlusIcon className="h-6 w-6 text-neutral" />
-                </button>
-              </div>
-            </th>
+            {edit && (
+              <th className="text-base font-normal normal-case">
+                <div
+                  className="tooltip tooltip-left"
+                  data-tip="Add Database Column"
+                >
+                  <button onClick={handleAddColumn}>
+                    <PlusIcon className="h-6 w-6 text-neutral" />
+                  </button>
+                </div>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -86,23 +88,24 @@ const DatabaseTable = ({
                       <MarkdownAttribute attribute={att} edit={edit} />
                     )}
                     {att.type === "Users" && (
-                      <UsersAttribute
-                       attribute={att} edit={edit} />
+                      <UsersAttribute attribute={att} edit={edit} />
                     )}
                   </td>
                 ))}
               <td></td>
             </tr>
           ))}
-          <tr>
-            <td
-              onClick={handleAddRow}
-              className="tooltip tooltip-right p-2"
-              data-tip="Add Row"
-            >
-              <PlusIcon className="h-6 w-6 text-neutral" />
-            </td>
-          </tr>
+          {edit && (
+            <tr>
+              <td
+                onClick={handleAddRow}
+                className="tooltip tooltip-right p-2"
+                data-tip="Add Row"
+              >
+                <PlusIcon className="h-6 w-6 text-neutral" />
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

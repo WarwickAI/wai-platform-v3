@@ -19,12 +19,14 @@ const DatabasePages = ({ pages, handleAddRow, edit }: DatabasePagesProps) => {
           page={false}
         />
       ))}
-      <button
-        onClick={handleAddRow}
-        className="h-8 w-8 rounded-full p-1 hover:cursor-pointer hover:bg-slate-300"
-      >
-        <PlusIcon className="h-6 w-6 text-neutral" />
-      </button>
+      {edit && (
+        <button
+          onClick={handleAddRow}
+          className="h-8 w-8 rounded-full p-1 hover:cursor-pointer hover:bg-slate-300"
+        >
+          <PlusIcon className="h-6 w-6 text-neutral" />
+        </button>
+      )}
     </div>
   );
 };

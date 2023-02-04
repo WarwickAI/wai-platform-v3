@@ -106,6 +106,7 @@ export const ColumnHeader = ({
               className={`flex flex-row items-center space-x-2 rounded-full p-2 font-semibold hover:bg-slate-200 ${
                 open ? "outline-2" : "outline-none"
               }`}
+              disabled={!edit}
             >
               {Icon && (
                 <Icon
@@ -125,9 +126,10 @@ export const ColumnHeader = ({
                   required,
                 });
               }}
+              disabled={!edit}
             />
             <Popover.Panel
-              className={`absolute top-10 z-10 left-0 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
+              className={`absolute top-10 left-0 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 transition-opacity ${
                 open ? "opacity-100" : "invisible opacity-0"
               }`}
             >

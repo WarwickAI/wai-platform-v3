@@ -15,8 +15,6 @@ type ColumnHeaderProps = {
   edit: boolean;
   editColumn: (oldName: string, newValue: DBColumnType) => void;
   deleteColumn: (name: string) => void;
-  open: boolean;
-  setOpen: (open: boolean) => void;
 };
 
 export const ColumnHeader = ({
@@ -24,8 +22,6 @@ export const ColumnHeader = ({
   edit,
   editColumn,
   deleteColumn,
-  open,
-  setOpen,
 }: ColumnHeaderProps) => {
   let Icon:
     | ((

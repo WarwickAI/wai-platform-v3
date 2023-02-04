@@ -1,5 +1,5 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { trpc } from "../../utils/trpc";
 import { ColumnHeader } from "../attributes/Columns";
 import { DatabaseSortType } from "../attributes/DatabaseSort";
@@ -256,8 +256,6 @@ const DatabaseTable = ({
   handleEditColumn,
   handleDeleteColumn,
 }: DatabaseTableProps) => {
-  const [attrHeaderOpen, setAttrHeaderOpen] = useState<string>("");
-
   return (
     <div className="overflow-x-auto">
       <table className="table-compact w-full">
@@ -279,14 +277,6 @@ const DatabaseTable = ({
                     edit={edit}
                     editColumn={handleEditColumn}
                     deleteColumn={handleDeleteColumn}
-                    open={attrHeaderOpen === att.name}
-                    setOpen={(open) => {
-                      if (open) {
-                        setAttrHeaderOpen(att.name);
-                      } else {
-                        setAttrHeaderOpen("");
-                      }
-                    }}
                   />
                 </th>
               ))}

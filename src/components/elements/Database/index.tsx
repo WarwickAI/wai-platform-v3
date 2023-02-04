@@ -1,22 +1,15 @@
-import { PlusIcon } from "@heroicons/react/24/solid";
 import { useMemo } from "react";
-import { trpc } from "../../utils/trpc";
-import { ColumnHeader } from "../attributes/Columns";
-import { DatabaseSortType } from "../attributes/DatabaseSort";
-import DateAttribute from "../attributes/Date";
-import MarkdownAttribute from "../attributes/Markdown";
-import TextAttribute from "../attributes/Text";
-import UsersAttribute from "../attributes/Users";
-import { DBColumnType } from "../attributes/utils";
-import Permissions from "../permissions";
-import EventElement, { EventRequiredAttributes } from "./Event";
-import PageElement, { PageRequiredAttributes } from "./Page";
-import {
-  ElementProps,
-  ElementWithAttsGroups,
-  PreAttributeEditFn,
-  RequiredAttribute,
-} from "./utils";
+import { trpc } from "../../../utils/trpc";
+import { DatabaseSortType } from "../../attributes/DatabaseSort";
+import TextAttribute from "../../attributes/Text";
+import { DBColumnType } from "../../attributes/utils";
+import Permissions from "../../permissions";
+import { EventRequiredAttributes } from "../Event";
+import { PageRequiredAttributes } from "../Page";
+import { ElementProps, PreAttributeEditFn, RequiredAttribute } from "../utils";
+import DatabaseEvents from "./Events";
+import DatabasePages from "./Pages";
+import DatabaseTable from "./Table";
 
 export const DatabaseRequiredAttributes: RequiredAttribute[] = [
   { name: "Title", type: "Text", value: "" },
@@ -236,164 +229,6 @@ const DatabaseElement = ({
 };
 
 export default DatabaseElement;
-
-type DatabaseTableProps = {
-  columns: DBColumnType[];
-  elements: ElementWithAttsGroups[];
-  edit: boolean;
-  handleAddRow: () => void;
-  handleAddColumn: () => void;
-  handleEditColumn: (oldName: string, newValue: DBColumnType) => void;
-  handleDeleteColumn: (name: string) => void;
-};
-
-const DatabaseTable = ({
-  columns,
-  elements,
-  edit,
-  handleAddRow,
-  handleAddColumn,
-  handleEditColumn,
-  handleDeleteColumn,
-}: DatabaseTableProps) => {
-  return (
-    <div className="overflow-x-auto">
-      <table className="table-compact w-full">
-        <thead>
-          <tr className="bg-gray-200">
-            {columns
-              .sort(
-                (a, b) =>
-                  columns.findIndex((c) => a.name === c.name) -
-                  columns.findIndex((c) => b.name === c.name)
-              )
-              .map((att) => (
-                <th
-                  key={att.name}
-                  className="border-r border-r-gray-300 text-base font-normal normal-case"
-                >
-                  <ColumnHeader
-                    column={att}
-                    edit={edit}
-                    editColumn={handleEditColumn}
-                    deleteColumn={handleDeleteColumn}
-                  />
-                </th>
-              ))}
-            <th className="text-base font-normal normal-case">
-              <div
-                className="tooltip tooltip-left"
-                data-tip="Add Database Column"
-              >
-                <button onClick={handleAddColumn}>
-                  <PlusIcon className="h-6 w-6 text-neutral" />
-                </button>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {elements.map((element) => (
-            <tr key={element.id}>
-              {element.atts
-                .sort(
-                  (a, b) =>
-                    columns.findIndex((c) => a.name === c.name) -
-                    columns.findIndex((c) => b.name === c.name)
-                )
-                .map((att) => (
-                  <td
-                    key={element.id + att.name}
-                    className="border-r border-r-gray-300"
-                  >
-                    {att.type === "Text" && (
-                      <TextAttribute attribute={att} edit={edit} size="sm" />
-                    )}
-                    {att.type === "Date" && (
-                      <DateAttribute attribute={att} edit={edit} />
-                    )}
-                    {att.type === "Markdown" && (
-                      <MarkdownAttribute attribute={att} edit={edit} />
-                    )}
-                    {att.type === "Users" && (
-                      <UsersAttribute attribute={att} edit={edit} />
-                    )}
-                  </td>
-                ))}
-              <td></td>
-            </tr>
-          ))}
-          <tr>
-            <td
-              onClick={handleAddRow}
-              className="tooltip tooltip-right p-2"
-              data-tip="Add Row"
-            >
-              <PlusIcon className="h-6 w-6 text-neutral" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-type DatabasePagesProps = {
-  pages: ElementWithAttsGroups[];
-  handleAddRow: () => void;
-  edit: boolean;
-};
-
-const DatabasePages = ({ pages, handleAddRow, edit }: DatabasePagesProps) => {
-  return (
-    <div className="flex flex-row flex-wrap space-x-2">
-      {pages.map((page) => (
-        <PageElement
-          key={page.id}
-          element={{ ...page, children: [] }}
-          edit={edit}
-          page={false}
-        />
-      ))}
-      <button
-        onClick={handleAddRow}
-        className="h-8 w-8 rounded-full p-1 hover:cursor-pointer hover:bg-slate-300"
-      >
-        <PlusIcon className="h-6 w-6 text-neutral" />
-      </button>
-    </div>
-  );
-};
-
-type DatabaseEventsProps = {
-  events: ElementWithAttsGroups[];
-  handleAddRow: () => void;
-  edit: boolean;
-};
-
-const DatabaseEvents = ({
-  events,
-  handleAddRow,
-  edit,
-}: DatabaseEventsProps) => {
-  return (
-    <div className="flex flex-row flex-wrap space-x-2">
-      {events.map((event) => (
-        <EventElement
-          key={event.id}
-          element={{ ...event, children: [] }}
-          edit={edit}
-        />
-      ))}
-      <button
-        onClick={handleAddRow}
-        className="h-8 w-8 rounded-full p-1 hover:cursor-pointer hover:bg-slate-300"
-      >
-        <PlusIcon className="h-6 w-6 text-neutral" />
-      </button>
-    </div>
-  );
-};
 
 export const databasePreAttributeEdit: PreAttributeEditFn = async (
   prisma,

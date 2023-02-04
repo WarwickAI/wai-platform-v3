@@ -90,6 +90,7 @@ const PageElement = ({ element, page }: ElementProps) => {
   }, [element, user]);
 
   if (!page) {
+    // This is the render for a page element on another page
     return (
       <Link
         href={
@@ -103,7 +104,7 @@ const PageElement = ({ element, page }: ElementProps) => {
           element.route
         }
       >
-        <p className="text-xl font-bold hover:cursor-pointer">
+        <p className="inline-flex rounded-xl bg-green-800 py-2 px-4 text-xl font-bold text-white hover:cursor-pointer">
           {titleAttribute?.value as string}
         </p>
       </Link>

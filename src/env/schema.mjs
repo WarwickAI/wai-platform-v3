@@ -37,7 +37,7 @@ export const clientSchema = z.object({
   NEXT_PUBLIC_URL: z.string(),
   NEXT_PUBLIC_DISCORD_CLIENT_ID: z.string(),
   NEXT_PUBLIC_DISCORD_REDIRECT_URI: z.string(),
-  NEXT_PUBLIC_HOME_PAGE_ROUTE: z.string().nullish(),
+  NEXT_PUBLIC_HOME_PAGE_ROUTE: z.string().optional(),
   NEXT_PUBLIC_CDN_URL: z.string(),
 });
 

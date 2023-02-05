@@ -11,10 +11,54 @@ type PermissionsProps = {
     interactGroups: Group[];
     viewGroups: Group[];
   };
-  parent?: Element;
+  parent?: Element & {
+    masterGroups: Group[];
+    editGroups: Group[];
+    interactGroups: Group[];
+    viewGroups: Group[];
+  };
 };
 
 const Permissions = ({ element, parent }: PermissionsProps) => {
+  const utils = trpc.useContext();
+
+  const modifyPerms = trpc.element.modifyPerms.useMutation({
+    onSuccess: () => {
+      utils.element.getAll.invalidate();
+      utils.element.getPage.invalidate({ route: element.route || "" });
+      utils.element.get.invalidate(element.id);
+      parent &&
+        utils.element.getPage.invalidate({
+          route: parent.route,
+        });
+    },
+  });
+
+  const handleInheritFromParent = () => {
+    if (!parent) return;
+
+    modifyPerms.mutate({
+      id: element.id,
+      newGroups: parent.masterGroups.map((g) => g.id),
+      permsKey: "masterGroups",
+    });
+    modifyPerms.mutate({
+      id: element.id,
+      newGroups: parent.editGroups.map((g) => g.id),
+      permsKey: "editGroups",
+    });
+    modifyPerms.mutate({
+      id: element.id,
+      newGroups: parent.interactGroups.map((g) => g.id),
+      permsKey: "interactGroups",
+    });
+    modifyPerms.mutate({
+      id: element.id,
+      newGroups: parent.viewGroups.map((g) => g.id),
+      permsKey: "viewGroups",
+    });
+  };
+
   return (
     <Popover className="relative">
       {({ open }) => (
@@ -28,7 +72,15 @@ const Permissions = ({ element, parent }: PermissionsProps) => {
               className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <Popover.Panel className="absolute top-10 divide-y-2 right-0 z-10 flex flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+          <Popover.Panel className="absolute top-10 right-0 z-10 flex flex-col space-y-1 divide-y-2 rounded-md border-2 bg-white p-2 text-center">
+            {parent && (
+              <button
+                className="rounded-full bg-slate-700 text-sm text-white"
+                onClick={handleInheritFromParent}
+              >
+                Inherit from parent
+              </button>
+            )}
             <PermissionSelect
               permissionName="master"
               groups={element.masterGroups}

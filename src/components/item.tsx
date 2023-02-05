@@ -13,7 +13,7 @@ import { ElementWithAttsGroups } from "./elements/utils";
 
 type ItemProps = {
   element?: ElementWithAttsGroups;
-  parent?: Element;
+  parent?: ElementWithAttsGroups;
   blur?: boolean;
   editParent: boolean;
 };

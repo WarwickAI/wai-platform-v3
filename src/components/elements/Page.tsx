@@ -147,7 +147,7 @@ const PageElement = ({ element, page }: ElementProps) => {
             />
           )}
           <div className="w-full bg-white bg-opacity-90">
-            <div className="mx-auto flex max-w-4xl flex-col p-8">
+            <div className="mx-auto flex max-w-4xl flex-col p-4">
               {coverAttribute && edit && (
                 <ImageAttribute attribute={coverAttribute} edit={edit} />
               )}

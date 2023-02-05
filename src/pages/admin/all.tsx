@@ -41,7 +41,7 @@ const AdminAll: NextPage = () => {
   useEffect(() => {
     if (!elements.data) return;
 
-    setItems(elements.data.sort((a, b) => a.index - b.index));
+    setItems(elements.data.sort((a: any, b: any) => a.index - b.index));
   }, [elements.data]);
 
   const sensors = useSensors(

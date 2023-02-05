@@ -93,9 +93,9 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
           Select a database
         </option>
         {databases.data &&
-          databases.data.map((database) => (
+          databases.data.map((database: any) => (
             <option key={database.id} value={database.id}>
-              {(database.atts.find((attribute) => attribute.name === "Title")
+              {(database.atts.find((attribute: any) => attribute.name === "Title")
                 ?.value as string) || "No database title"}
             </option>
           ))}

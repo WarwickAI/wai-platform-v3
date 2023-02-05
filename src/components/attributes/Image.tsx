@@ -1,9 +1,9 @@
-import { DocumentArrowUpIcon } from "@heroicons/react/24/solid";
+import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useRef, useState } from "react";
-import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
-import CryptoJS from "crypto-js";
 import { File as FileEntity } from "@prisma/client";
+import { trpc } from "../../utils/trpc";
+import CryptoJS from "crypto-js";
 
 export const IMAGE_MIME_TYPES = [
   "image/gif",
@@ -12,9 +12,9 @@ export const IMAGE_MIME_TYPES = [
   "image/png",
 ];
 
-const FileAttributeIcon = DocumentArrowUpIcon;
+const ImageAttributeIcon = PhotoIcon;
 
-const FileAttribute = ({ attribute, edit }: AttributeProps) => {
+const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fileHash, setFileHash] = useState("");
@@ -61,53 +61,25 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
     // Check if the file is an image
     const isImage = IMAGE_MIME_TYPES.includes(file.type);
 
-    // Get width and height if the file is an image
-    if (isImage) {
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      img.onload = async () => {
-        const width = img.naturalWidth;
-        const height = img.naturalHeight;
+    if (!isImage) return;
 
-        const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
-          fileName: file.name,
-          mimeType: file.type,
-          encoding: "None",
-          hash: fileHash,
-          size: file.size,
-          width,
-          height,
-        });
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = async () => {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
 
-        setFileEntity(fileEntity);
-
-        // Only upload if we receive a signed URL
-        if (signedUrl) {
-          const res = await fetch(signedUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-              "x-amz-acl": "public-read",
-            },
-          });
-
-          if (res.status === 200) {
-            editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
-          }
-        } else {
-          // Only change the attribute if we don't receive a signed URL
-          editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
-        }
-      };
-    } else {
       const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
         fileName: file.name,
         mimeType: file.type,
         encoding: "None",
         hash: fileHash,
         size: file.size,
+        width,
+        height,
       });
+
+      setFileEntity(fileEntity);
 
       // Only upload if we receive a signed URL
       if (signedUrl) {
@@ -127,7 +99,7 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
         // Only change the attribute if we don't receive a signed URL
         editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
       }
-    }
+    };
   };
 
   if (edit) {
@@ -140,6 +112,7 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
               ref={fileInputRef}
               className={"hidden"}
               onChange={handleFileChange}
+              accept={IMAGE_MIME_TYPES.join(",")}
             />
             <button
               className="btn-primary btn-sm btn"
@@ -149,7 +122,7 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
                 }
               }}
             >
-              Select file
+              Select image
             </button>
           </div>
           {file && <p className="text-sm">{file?.name}</p>}
@@ -175,4 +148,4 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
   }
 };
 
-export default FileAttribute;
+export default ImageAttribute;

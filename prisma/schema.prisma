@@ -110,6 +110,7 @@ enum AttributeType {
   SurveyQuestions
   DatabaseSort
   File
+  Image
 }
 
 model Element {

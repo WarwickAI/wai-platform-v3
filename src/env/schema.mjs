@@ -22,6 +22,10 @@ export const serverSchema = z.object({
   DISCORD_CLIENT_ID: z.string(),
   DISCORD_CLIENT_SECRET: z.string(),
   DISCORD_REDIRECT_URI: z.string(),
+  DO_SPACES_REGION: z.string(),
+  DO_SPACES_BUCKET: z.string(),
+  DO_SPACES_ACCESS_KEY_ID: z.string(),
+  DO_SPACES_SECRET_KEY: z.string(),
 });
 
 /**
@@ -34,6 +38,7 @@ export const clientSchema = z.object({
   NEXT_PUBLIC_DISCORD_CLIENT_ID: z.string(),
   NEXT_PUBLIC_DISCORD_REDIRECT_URI: z.string(),
   NEXT_PUBLIC_HOME_PAGE_ROUTE: z.string().nullish(),
+  NEXT_PUBLIC_CDN_URL: z.string(),
 });
 
 /**
@@ -49,4 +54,5 @@ export const clientEnv = {
   NEXT_PUBLIC_DISCORD_REDIRECT_URI:
     process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI,
   NEXT_PUBLIC_HOME_PAGE_ROUTE: process.env.NEXT_PUBLIC_HOME_PAGE_ROUTE,
+  NEXT_PUBLIC_CDN_URL: process.env.NEXT_PUBLIC_CDN_URL,
 };

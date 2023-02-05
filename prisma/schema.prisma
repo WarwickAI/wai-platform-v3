@@ -58,6 +58,7 @@ model User {
   elements      Element[]
   groups        Group[]
   discordId     String?   @unique
+  File          File[]
 }
 
 model Group {
@@ -90,6 +91,7 @@ enum ElementType {
   Badge
   Survey
   SurveyResponse
+  Image
 }
 
 enum AttributeType {
@@ -107,6 +109,7 @@ enum AttributeType {
   Users
   SurveyQuestions
   DatabaseSort
+  File
 }
 
 model Element {
@@ -138,4 +141,18 @@ model Attribute {
   required  Boolean
   elementId String
   element   Element       @relation(fields: [elementId], references: [id], onDelete: Cascade)
+}
+
+model File {
+  id        String   @id @default(cuid())
+  uuid      String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  fileName  String
+  mimeType  String
+  encoding  String
+  hash      String
+  size      Int
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

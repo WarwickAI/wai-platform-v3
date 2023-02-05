@@ -4,6 +4,7 @@ import {
   CircleStackIcon,
   DocumentIcon,
   PencilIcon,
+  PhotoIcon,
   PresentationChartBarIcon,
   TableCellsIcon,
 } from "@heroicons/react/24/solid";
@@ -36,6 +37,7 @@ import SurveyResponseElement, {
   surveyResponsePreCreate,
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
+import ImageElement, { ImageRequiredAttributes } from "./Image";
 
 type ElementIcon = (
   props: SVGProps<SVGSVGElement> & {
@@ -124,6 +126,14 @@ const elements: {
     showInPicker: false,
     elementCreatePermsCheck: surveyResponseCreateCheckPerms,
     preElementCreateFn: surveyResponsePreCreate,
+  },
+  [ElementType.Image]: {
+    name: "Image",
+    description: "An image element.",
+    icon: PhotoIcon,
+    element: ImageElement,
+    requiredAtts: ImageRequiredAttributes,
+    showInPicker: true,
   },
 };
 

@@ -1,5 +1,6 @@
 import aws from "aws-sdk";
 import { z } from "zod";
+import { IMAGE_MIME_TYPES } from "../../../components/attributes/File";
 import { env } from "../../../env/server.mjs";
 import { publicProcedure, router, authedProcedure } from "../trpc";
 
@@ -39,6 +40,8 @@ export const fileRouter = router({
         encoding: z.string(),
         hash: z.string(),
         size: z.number(),
+        width: z.number().optional(),
+        height: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -48,10 +51,11 @@ export const fileRouter = router({
         throw new Error("File is too large");
       }
 
-      // Check if a file already exists with the same hash
+      // Check if a file already exists with the same hash and mimeType
       const existingFile = await ctx.prisma.file.findFirst({
         where: {
           hash,
+          mimeType,
         },
       });
 
@@ -76,12 +80,18 @@ export const fileRouter = router({
               id: ctx.session.user.id,
             },
           },
+          ...(IMAGE_MIME_TYPES.includes(mimeType)
+            ? {
+                width: input.width,
+                height: input.height,
+              }
+            : {}),
         },
       });
 
       const params = {
         Bucket: env.DO_SPACES_BUCKET,
-        Key: file.id,
+        Key: file.uuid,
         ContentType: mimeType,
         ACL: "public-read",
       };

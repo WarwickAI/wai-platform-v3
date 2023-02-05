@@ -155,4 +155,6 @@ model File {
   size      Int
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  width     Int?
+  height    Int?
 }

@@ -4,6 +4,13 @@ import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 import CryptoJS from "crypto-js";
 
+export const IMAGE_MIME_TYPES = [
+    "image/gif",
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+  ];
+
 const FileAttributeIcon = DocumentArrowUpIcon;
 
 const FileAttribute = ({ attribute, edit }: AttributeProps) => {
@@ -49,31 +56,73 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
   const handleUpload = async () => {
     if (!file) return;
 
-    const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
-      fileName: file.name,
-      mimeType: file.type,
-      encoding: "None",
-      hash: fileHash,
-      size: file.size,
-    });
+    // Check if the file is an image
+    const isImage = IMAGE_MIME_TYPES.includes(file.type);
 
-    // Only upload if we receive a signed URL
-    if (signedUrl) {
-      const res = await fetch(signedUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type,
-          "x-amz-acl": "public-read",
-        },
+    // Get width and height if the file is an image
+    if (isImage) {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = async () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+
+        const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
+          fileName: file.name,
+          mimeType: file.type,
+          encoding: "None",
+          hash: fileHash,
+          size: file.size,
+          width,
+          height,
+        });
+
+        // Only upload if we receive a signed URL
+        if (signedUrl) {
+          const res = await fetch(signedUrl, {
+            method: "PUT",
+            body: file,
+            headers: {
+              "Content-Type": file.type,
+              "x-amz-acl": "public-read",
+            },
+          });
+
+          if (res.status === 200) {
+            editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
+          }
+        } else {
+          // Only change the attribute if we don't receive a signed URL
+          editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
+        }
+      };
+    } else {
+      const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
+        fileName: file.name,
+        mimeType: file.type,
+        encoding: "None",
+        hash: fileHash,
+        size: file.size,
       });
 
-      if (res.status === 200) {
+      // Only upload if we receive a signed URL
+      if (signedUrl) {
+        const res = await fetch(signedUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+            "x-amz-acl": "public-read",
+          },
+        });
+
+        if (res.status === 200) {
+          editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
+        }
+      } else {
+        // Only change the attribute if we don't receive a signed URL
         editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
       }
-    } else {
-      // Only change the attribute if we don't receive a signed URL
-      editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
     }
   };
 

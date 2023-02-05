@@ -1,4 +1,3 @@
-import { PhotoIcon } from "@heroicons/react/24/solid";
 import { useRef, useState } from "react";
 import { AttributeProps } from "./utils";
 import { File as FileEntity } from "@prisma/client";
@@ -12,7 +11,7 @@ export const IMAGE_MIME_TYPES = [
   "image/png",
 ];
 
-const ImageAttributeIcon = PhotoIcon;
+// const ImageAttributeIcon = PhotoIcon;
 
 const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,14 +36,16 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]!;
+      const file = e.target.files[0];
+
+      if (!file) return;
 
       const reader = new FileReader();
 
       reader.onload = (event) => {
         if (event.target) {
           const binary = event.target.result;
-          const md5 = CryptoJS.MD5(binary as any).toString();
+          const md5 = CryptoJS.MD5(binary as string).toString();
           setFileHash(md5);
         }
       };

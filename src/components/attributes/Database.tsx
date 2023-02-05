@@ -3,9 +3,10 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import { AttributeType } from "@prisma/client";
+import { Attribute, AttributeType } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import { DatabaseRequiredAttributes } from "../elements/Database";
+import { ElementWithAtts } from "../elements/utils";
 import { AttributeProps } from "./utils";
 
 export const DatabaseAttibuteIcon = CircleStackIcon;
@@ -93,10 +94,11 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
           Select a database
         </option>
         {databases.data &&
-          databases.data.map((database: any) => (
+          databases.data.map((database: ElementWithAtts) => (
             <option key={database.id} value={database.id}>
-              {(database.atts.find((attribute: any) => attribute.name === "Title")
-                ?.value as string) || "No database title"}
+              {(database.atts.find(
+                (attribute: Attribute) => attribute.name === "Title"
+              )?.value as string) || "No database title"}
             </option>
           ))}
       </select>

@@ -162,10 +162,12 @@ const DatabaseElement = ({
 
         if (aAtt.value !== bAtt.value) {
           return sort.direction === "asc"
-            ? aAtt.value! > bAtt.value!
+            ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              aAtt.value! > bAtt.value!
               ? 1
               : -1
-            : aAtt.value! < bAtt.value!
+            : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            aAtt.value! < bAtt.value!
             ? 1
             : -1;
         }
@@ -234,8 +236,7 @@ export const databasePreAttributeEdit: PreAttributeEditFn = async (
   prisma,
   element,
   attribute,
-  input,
-  user
+  input
 ) => {
   if (attribute.type === "Columns") {
     const columns = input.value as DBColumnType[];

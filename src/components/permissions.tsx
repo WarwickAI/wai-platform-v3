@@ -136,7 +136,11 @@ const PermissionSelect = ({
       {
         id: element.id,
         newGroups: groups.map((g) => g.id),
-        permsKey: permKey as any,
+        permsKey: permKey as
+          | "masterGroups"
+          | "editGroups"
+          | "interactGroups"
+          | "viewGroups",
       },
       {
         onSuccess: () => {

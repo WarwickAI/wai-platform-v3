@@ -156,7 +156,6 @@ export const surveyPreAttributeEdit: PreAttributeEditFn = async (
   element,
   attribute,
   input,
-  user
 ) => {
   // If we are updating the questions in a survey, make sure that the children
   // (i.e. the survey responses) have all the questions as attributes

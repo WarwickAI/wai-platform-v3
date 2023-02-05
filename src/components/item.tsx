@@ -1,6 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Element } from "@prisma/client";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { trpc } from "../utils/trpc";

@@ -7,7 +7,7 @@ import { trpc } from "../utils/trpc";
 import Elements from "../components/elements";
 import { ElementType } from "@prisma/client";
 
-const PageElement = Elements[ElementType.Page]!.element;
+const PageElement = Elements[ElementType.Page]?.element;
 
 const Route: NextPage = () => {
   const router = useRouter();
@@ -23,7 +23,7 @@ const Route: NextPage = () => {
   // Also try finding a element of type event with the ID of the route
   const event = trpc.element.get.useQuery(route as string);
 
-  return page.data ? (
+  return page.data && PageElement ? (
     <PageElement element={page.data} page edit={false} />
   ) : event.data && event.data.type === "Event" ? (
     <EventClaim element={event.data} edit={false} />

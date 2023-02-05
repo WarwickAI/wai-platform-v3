@@ -60,13 +60,13 @@ const PageElement = ({ element, page }: ElementProps) => {
   );
 
   const titleAttribute = element.atts.find((a) => a.name === "Title");
-  const iconAttribute = element.atts.find((a) => a.name === "Icon");
-  const { data: iconFile } = trpc.file.get.useQuery(
-    { id: (iconAttribute?.value as string) || "" },
-    {
-      enabled: !!iconAttribute?.value,
-    }
-  );
+  // const iconAttribute = element.atts.find((a) => a.name === "Icon");
+  // const { data: iconFile } = trpc.file.get.useQuery(
+  //   { id: (iconAttribute?.value as string) || "" },
+  //   {
+  //     enabled: !!iconAttribute?.value,
+  //   }
+  // );
   const coverAttribute = element.atts.find((a) => a.name === "Cover");
   const { data: coverFile } = trpc.file.get.useQuery(
     { id: (coverAttribute?.value as string) || "" },

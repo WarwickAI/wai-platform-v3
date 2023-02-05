@@ -41,6 +41,7 @@ const AdminAll: NextPage = () => {
   useEffect(() => {
     if (!elements.data) return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setItems(elements.data.sort((a: any, b: any) => a.index - b.index));
   }, [elements.data]);
 

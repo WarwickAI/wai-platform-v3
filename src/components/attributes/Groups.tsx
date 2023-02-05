@@ -1,5 +1,5 @@
 import { Combobox } from "@headlessui/react";
-import { PlusIcon, TrashIcon, UserGroupIcon } from "@heroicons/react/24/solid";
+import { TrashIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 import { Group } from "@prisma/client";
 import { useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";

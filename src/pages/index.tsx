@@ -5,7 +5,7 @@ import Elements from "../components/elements";
 import { env } from "../env/client.mjs";
 import { trpc } from "../utils/trpc";
 
-const PageElement = Elements[ElementType.Page]!.element;
+const PageElement = Elements[ElementType.Page]?.element;
 
 const Home: NextPage = () => {
   const route = env.NEXT_PUBLIC_HOME_PAGE_ROUTE;

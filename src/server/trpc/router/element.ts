@@ -453,6 +453,7 @@ export const elementRouter = router({
 });
 
 export const defaultPermsCheck = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ctx: any,
   element: ElementWithGroups | undefined | null,
   op: ElementOperations
@@ -520,7 +521,9 @@ const checkGroups = (usersGroups: Group[], elementsGroups: Group[]) => {
 };
 
 const asyncFilter = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   arr: any[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   predicate: (e: any) => Promise<boolean>
 ) =>
   arr.reduce(

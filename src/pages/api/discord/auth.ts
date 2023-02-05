@@ -38,7 +38,7 @@ const auth = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (response.status == 200) {
     const accessToken = body?.access_token;
-    const refreshToken = body?.refresh_token;
+    // const refreshToken = body?.refresh_token;
     const token_type = body?.token_type;
 
     // Now fetch the user's discord info

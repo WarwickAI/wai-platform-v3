@@ -111,7 +111,6 @@ export default SurveyQuestionsAttribute;
 
 const SurveyQuestionAttribute = ({
   question,
-  edit,
   onTypeChange,
   onTextChange,
   onDelete,

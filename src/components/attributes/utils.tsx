@@ -1,4 +1,4 @@
-import { Attribute, AttributeType, Prisma } from "@prisma/client";
+import { Attribute, AttributeType } from "@prisma/client";
 
 export type AttributeProps = {
   attribute: Attribute;
@@ -8,6 +8,7 @@ export type AttributeProps = {
 export type DBColumnType = {
   name: string;
   type: AttributeType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   required: boolean;
 };

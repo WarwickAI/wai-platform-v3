@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "yarn cache clean && next build",
     "dev": "next dev",
     "postinstall": "prisma generate && npx prisma migrate deploy",
     "lint": "next lint",

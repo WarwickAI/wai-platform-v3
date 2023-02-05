@@ -1,4 +1,9 @@
-import { router, publicProcedure, authedProcedure } from "../trpc";
+import {
+  router,
+  publicProcedure,
+  authedProcedure,
+  execProcedure,
+} from "../trpc";
 import { z } from "zod";
 import { ElementType, Group } from "@prisma/client";
 import {
@@ -9,7 +14,7 @@ import {
 import { ElementCreateInputSchema } from "./schemas";
 import elements from "../../../components/elements";
 
-const groupsInclude = {
+export const groupsInclude = {
   masterGroups: true,
   editGroups: true,
   interactGroups: true,
@@ -17,6 +22,7 @@ const groupsInclude = {
 };
 
 export const elementRouter = router({
+  // PERMS: view permission on element (and only return children user has view permission on)
   get: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const element = await ctx.prisma.element.findUniqueOrThrow({
       where: {
@@ -50,7 +56,8 @@ export const elementRouter = router({
 
     return element;
   }),
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  // PERMS: view permission on elements (and also exec to reduce scraping)
+  getAll: execProcedure.query(async ({ ctx }) => {
     const elements = await ctx.prisma.element.findMany({
       include: {
         user: true,
@@ -66,6 +73,7 @@ export const elementRouter = router({
 
     return filtered;
   }),
+  // PERMS: view permission on elements
   queryAll: publicProcedure
     .input(z.object({ type: z.nativeEnum(ElementType) }))
     .query(async ({ ctx, input }) => {
@@ -89,6 +97,7 @@ export const elementRouter = router({
 
       return filtered;
     }),
+  // PERMS: view permission on element (and only return children user has view permission on)
   getPage: publicProcedure
     .input(z.object({ route: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -120,10 +129,9 @@ export const elementRouter = router({
         }
       );
 
-      console.log("Num children after: ", page.children.length);
-
       return page;
     }),
+  // PERMS: edit permissions on parent
   create: authedProcedure
     .input(ElementCreateInputSchema)
     .mutation(async ({ ctx, input }) => {
@@ -203,6 +211,7 @@ export const elementRouter = router({
         },
       });
     }),
+  // PERMS: for now, delete (same as edit) permissions on element and its parent
   delete: authedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -214,9 +223,22 @@ export const elementRouter = router({
         },
       });
 
+      const parent = await ctx.prisma.element.findFirst({
+        where: { children: { some: { id: input.id } } },
+        include: {
+          ...groupsInclude,
+          user: true,
+        },
+      });
+
       // Check if user can delete element (i.e. has edit access)
       if (!(await defaultPermsCheck(ctx, element, "ElementDelete"))) {
         throw new Error("No permission to delete element");
+      }
+
+      // Check if the user can edit the parent element
+      if (parent && !(await defaultPermsCheck(ctx, parent, "ElementEdit"))) {
+        throw new Error("No permission to edit parent element");
       }
 
       return ctx.prisma.element.delete({
@@ -224,6 +246,7 @@ export const elementRouter = router({
       });
     }),
 
+  // PERMS: edit permissions on parent
   order: authedProcedure
     .input(
       z
@@ -255,6 +278,7 @@ export const elementRouter = router({
       }
     }),
 
+  // PERMS: master permissions on element
   modifyPerms: authedProcedure
     .input(
       z.object({
@@ -269,6 +293,19 @@ export const elementRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const element = await ctx.prisma.element.findFirstOrThrow({
+        where: { id: input.id },
+        include: {
+          ...groupsInclude,
+          user: true,
+        },
+      });
+
+      // Check if user can edit perms (i.e. has master access)
+      if (!(await defaultPermsCheck(ctx, element, "ElementEditPerms"))) {
+        throw new Error("No permission to edit element permissions");
+      }
+
       // Set the groups to the new groups
       return ctx.prisma.element.update({
         where: { id: input.id },
@@ -284,6 +321,7 @@ export const elementRouter = router({
       });
     }),
 
+  // PERMS: master permissions on element
   addPerms: authedProcedure
     .input(
       z.object({
@@ -295,6 +333,19 @@ export const elementRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const element = await ctx.prisma.element.findFirstOrThrow({
+        where: { id: input.id },
+        include: {
+          ...groupsInclude,
+          user: true,
+        },
+      });
+
+      // Check if user can edit perms (i.e. has master access)
+      if (!(await defaultPermsCheck(ctx, element, "ElementEditPerms"))) {
+        throw new Error("No permission to edit element permissions");
+      }
+
       return ctx.prisma.element.update({
         where: { id: input.id },
         data: {
@@ -308,6 +359,7 @@ export const elementRouter = router({
       });
     }),
 
+  // PERMS: master permissions on element
   removePerms: authedProcedure
     .input(
       z.object({
@@ -400,7 +452,7 @@ export const elementRouter = router({
     }),
 });
 
-const defaultPermsCheck = async (
+export const defaultPermsCheck = async (
   ctx: any,
   element: ElementWithGroups | undefined | null,
   op: ElementOperations

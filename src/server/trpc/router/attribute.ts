@@ -1,12 +1,12 @@
 import { router, authedProcedure } from "../trpc";
 import { z } from "zod";
-import { DBColumnType } from "../../../components/attributes/utils";
 import { AttributeType } from "@prisma/client";
-import { SurveyQuestion } from "../../../components/attributes/SurveyQuestion";
 import elements from "../../../components/elements";
 import { AttributeEditInputSchema } from "./schemas";
+import { defaultPermsCheck, groupsInclude } from "./element";
 
 export const attributeRouter = router({
+  // PERMS: edit permissions on element
   create: authedProcedure
     .input(
       z.object({
@@ -22,25 +22,12 @@ export const attributeRouter = router({
       const element = await ctx.prisma.element.findUniqueOrThrow({
         where: { id: input.elementId },
         include: {
-          editGroups: true,
+          ...groupsInclude,
         },
       });
 
-      // Get the user (with groups)
-      const user = await ctx.prisma.user.findUniqueOrThrow({
-        where: { id: ctx.session.user.id },
-        include: {
-          groups: true,
-        },
-      });
-
-      // Check if the user is allowed to edit the element
-      if (
-        !user.groups.some((group) =>
-          element.editGroups.map((g) => g.id).includes(group.id)
-        )
-      ) {
-        throw new Error("You are not allowed to edit this element");
+      if (!defaultPermsCheck(ctx, element, "ElementEdit")) {
+        throw new Error("You do not have permission to edit this element");
       }
 
       // Create the attribute
@@ -56,6 +43,7 @@ export const attributeRouter = router({
         },
       });
     }),
+  // PERMS: edit permissions on element
   editValue: authedProcedure
     .input(AttributeEditInputSchema)
     .mutation(async ({ ctx, input }) => {
@@ -72,6 +60,7 @@ export const attributeRouter = router({
                   user: true,
                 },
               },
+              ...groupsInclude,
             },
           },
         },
@@ -86,6 +75,10 @@ export const attributeRouter = router({
           },
         }));
 
+      if (!defaultPermsCheck(ctx, attribute.element, "ElementEdit")) {
+        throw new Error("You do not have permission to edit this element");
+      }
+
       const preAttributeEditFn =
         elements[attribute.element.type]?.preAttributeEditFn;
 
@@ -99,8 +92,8 @@ export const attributeRouter = router({
         ));
 
       return ctx.prisma.attribute.update({
-        where: { id: input.id },
-        data: { value: input.value },
+        where: { id: id },
+        data: { value: value },
         include: {
           element: {
             include: {

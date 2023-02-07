@@ -59,75 +59,43 @@ const FileAttribute = ({ attribute, edit }: AttributeProps) => {
   const handleUpload = async () => {
     if (!file) return;
 
-    // Check if the file is an image
-    const isImage = IMAGE_MIME_TYPES.includes(file.type);
+    const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
+      fileName: file.name,
+      mimeType: file.type,
+      encoding: "None",
+      hash: fileHash,
+      size: file.size,
+    });
 
-    // Get width and height if the file is an image
-    if (isImage) {
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      img.onload = async () => {
-        const width = img.naturalWidth;
-        const height = img.naturalHeight;
+    // Only upload if we receive a signed URL
+    if (signedUrl) {
+      // Create a new form data
+      const formData = new FormData();
 
-        const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
-          fileName: file.name,
-          mimeType: file.type,
-          encoding: "None",
-          hash: fileHash,
-          size: file.size,
-          width,
-          height,
-        });
-
-        setFileEntity(fileEntity);
-
-        // Only upload if we receive a signed URL
-        if (signedUrl) {
-          const res = await fetch(signedUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-              "x-amz-acl": "public-read",
-            },
-          });
-
-          if (res.status === 200) {
-            editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
-          }
-        } else {
-          // Only change the attribute if we don't receive a signed URL
-          editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
-        }
-      };
-    } else {
-      const { file: fileEntity, signedUrl } = await getSignedUrl.mutateAsync({
-        fileName: file.name,
-        mimeType: file.type,
-        encoding: "None",
-        hash: fileHash,
-        size: file.size,
+      // Add the signed URL fields to the form data
+      Object.entries(signedUrl.fields).forEach(([key, value]) => {
+        formData.append(key, value);
       });
 
-      // Only upload if we receive a signed URL
-      if (signedUrl) {
-        const res = await fetch(signedUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-            "x-amz-acl": "public-read",
-          },
-        });
+      // Add the file to the form data
+      formData.append("file", file);
 
-        if (res.status === 200) {
-          editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
-        }
-      } else {
-        // Only change the attribute if we don't receive a signed URL
+      // Upload the file
+      const res = await fetch(signedUrl.url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
         editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
       }
+
+      setFileEntity(fileEntity);
+    } else {
+      // Only change the attribute if we don't receive a signed URL
+      editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
+
+      setFileEntity(fileEntity);
     }
   };
 

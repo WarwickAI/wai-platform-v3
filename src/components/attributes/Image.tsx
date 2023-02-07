@@ -3,7 +3,6 @@ import { AttributeProps } from "./utils";
 import { File as FileEntity } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import CryptoJS from "crypto-js";
-import { createReadStream } from "fs";
 
 export const IMAGE_MIME_TYPES = [
   "image/gif",

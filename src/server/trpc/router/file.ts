@@ -3,10 +3,8 @@ import { z } from "zod";
 import { IMAGE_MIME_TYPES } from "../../../components/attributes/File";
 import { env } from "../../../env/server.mjs";
 import { publicProcedure, router, authedProcedure } from "../trpc";
-
-// const SPACES_ENDPOINT = new aws.Endpoint(
-//   `${env.DO_SPACES_REGION}.digitaloceanspaces.com`
-// );
+import { S3Client } from "@aws-sdk/client-s3";
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10MB
 
@@ -16,6 +14,18 @@ const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10MB
 //   secretAccessKey: env.DO_SPACES_SECRET_KEY,
 //   region: env.DO_SPACES_REGION,
 // });
+
+const SPACES_ENDPOINT = `https://${env.DO_SPACES_REGION}.digitaloceanspaces.com`;
+
+const s3Client = new S3Client({
+  forcePathStyle: false,
+  endpoint: SPACES_ENDPOINT,
+  region: "us-east-1", // this can be ignored for DigitalOcean Spaces
+  credentials: {
+    accessKeyId: env.DO_SPACES_ACCESS_KEY_ID,
+    secretAccessKey: env.DO_SPACES_SECRET_KEY,
+  },
+});
 
 export const fileRouter = router({
   get: publicProcedure
@@ -89,15 +99,25 @@ export const fileRouter = router({
         },
       });
 
-      const params = {
-        Bucket: env.DO_SPACES_BUCKET,
-        Key: file.uuid,
-        ContentType: mimeType,
-        ACL: "public-read",
+      // const params = {
+      //   "Bucket": env.DO_SPACES_BUCKET,
+      //   "ContentType": mimeType,
+      //   "ACL": "public-read",
+      //   "Key": file.uuid,
+      // };
+
+      const Bucket = env.DO_SPACES_BUCKET;
+      const Key = file.uuid;
+      const Fields = {
+        acl: "public-read",
       };
 
-      // const signedUrl = S3.getSignedUrl("putObject", params);
-      const signedUrl = null;
+      const signedUrl = await createPresignedPost(s3Client, {
+        Bucket,
+        Key,
+        Fields,
+        Expires: 600, //Seconds before the presigned post expires. 3600 by default.
+      });
 
       return {
         file,

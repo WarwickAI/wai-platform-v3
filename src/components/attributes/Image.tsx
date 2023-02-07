@@ -3,6 +3,7 @@ import { AttributeProps } from "./utils";
 import { File as FileEntity } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import CryptoJS from "crypto-js";
+import { createReadStream } from "fs";
 
 export const IMAGE_MIME_TYPES = [
   "image/gif",
@@ -82,18 +83,26 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
 
       setFileEntity(fileEntity);
 
-      // Only upload if we receive a signed URL
+      // Only upload if we receive a signed URL (signedURL is an AWS PresignedPost)
       if (signedUrl) {
-        const res = await fetch(signedUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-            "x-amz-acl": "public-read",
-          },
+        // Create a new form data
+        const formData = new FormData();
+
+        // Add the signed URL fields to the form data
+        Object.entries(signedUrl.fields).forEach(([key, value]) => {
+          formData.append(key, value);
         });
 
-        if (res.status === 200) {
+        // Add the file to the form data
+        formData.append("file", file);
+
+        // Upload the file
+        const res = await fetch(signedUrl.url, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
           editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
         }
       } else {

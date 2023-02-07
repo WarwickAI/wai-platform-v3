@@ -1,11 +1,8 @@
-import { ElementType } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Elements from "../components/elements";
+import PageElement from "../components/elements/Page";
 import { env } from "../env/client.mjs";
 import { trpc } from "../utils/trpc";
-
-const PageElement = Elements[ElementType.Page]?.element;
 
 const Home: NextPage = () => {
   const route = env.NEXT_PUBLIC_HOME_PAGE_ROUTE;
@@ -17,6 +14,8 @@ const Home: NextPage = () => {
 
   const page = pageRoute && trpc.element.getPage.useQuery({ route: pageRoute });
 
+  console.log(route, pageRoute, page && page.data, PageElement);
+
   return (
     <>
       <Head>
@@ -24,10 +23,10 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-        {page && page.data && PageElement ? (
-          <PageElement element={page.data} page edit={false} />
-        ) : page && page.isLoading ? (
-          <p>Loading page...</p>
+        {route && page && page.data ? (
+          <PageElement element={page.data} page={true} edit={false} />
+        ) : route && page && page.isLoading ? (
+          <p>Loading page..</p>
         ) : (
           <p>No Home Page Set</p>
         )}

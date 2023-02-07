@@ -1,8 +1,8 @@
 -- CreateEnum
-CREATE TYPE "ElementType" AS ENUM ('Text', 'Page');
+CREATE TYPE "ElementType" AS ENUM ('Text', 'Page', 'Event', 'Database', 'DatabaseView', 'Badge', 'Survey', 'SurveyResponse', 'Image');
 
 -- CreateEnum
-CREATE TYPE "AttributeType" AS ENUM ('Text', 'Number', 'Boolean', 'Markdown');
+CREATE TYPE "AttributeType" AS ENUM ('Text', 'Number', 'Boolean', 'Markdown', 'Date', 'Location', 'DatabaseBaseType', 'DatabaseViewType', 'Database', 'Columns', 'User', 'Users', 'SurveyQuestions', 'DatabaseSort', 'File', 'Image');
 
 -- CreateTable
 CREATE TABLE "Example" (
@@ -48,6 +48,7 @@ CREATE TABLE "User" (
     "email" TEXT,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
+    "discordId" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -99,6 +100,24 @@ CREATE TABLE "Attribute" (
 );
 
 -- CreateTable
+CREATE TABLE "File" (
+    "id" TEXT NOT NULL,
+    "uuid" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "mimeType" TEXT NOT NULL,
+    "encoding" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
+    "size" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
+    "width" INTEGER,
+    "height" INTEGER,
+
+    CONSTRAINT "File_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_GroupToUser" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
@@ -138,6 +157,9 @@ CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_discordId_key" ON "User"("discordId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Group_name_key" ON "Group"("name");
 
 -- CreateIndex
@@ -148,6 +170,9 @@ CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationTok
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Element_route_key" ON "Element"("route");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "File_uuid_key" ON "File"("uuid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_GroupToUser_AB_unique" ON "_GroupToUser"("A", "B");
@@ -193,6 +218,9 @@ ALTER TABLE "Element" ADD CONSTRAINT "Element_parentId_fkey" FOREIGN KEY ("paren
 
 -- AddForeignKey
 ALTER TABLE "Attribute" ADD CONSTRAINT "Attribute_elementId_fkey" FOREIGN KEY ("elementId") REFERENCES "Element"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "File" ADD CONSTRAINT "File_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_GroupToUser" ADD CONSTRAINT "_GroupToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Group"("id") ON DELETE CASCADE ON UPDATE CASCADE;

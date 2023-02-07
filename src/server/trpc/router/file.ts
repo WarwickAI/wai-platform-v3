@@ -1,21 +1,21 @@
-import aws from "aws-sdk";
+// import aws from "aws-sdk";
 import { z } from "zod";
 import { IMAGE_MIME_TYPES } from "../../../components/attributes/File";
 import { env } from "../../../env/server.mjs";
 import { publicProcedure, router, authedProcedure } from "../trpc";
 
-const SPACES_ENDPOINT = new aws.Endpoint(
-  `${env.DO_SPACES_REGION}.digitaloceanspaces.com`
-);
+// const SPACES_ENDPOINT = new aws.Endpoint(
+//   `${env.DO_SPACES_REGION}.digitaloceanspaces.com`
+// );
 
 const MAX_FILE_SIZE = 1024 * 1024 * 10; // 10MB
 
-const S3 = new aws.S3({
-  endpoint: SPACES_ENDPOINT,
-  accessKeyId: env.DO_SPACES_ACCESS_KEY_ID,
-  secretAccessKey: env.DO_SPACES_SECRET_KEY,
-  region: env.DO_SPACES_REGION,
-});
+// const S3 = new aws.S3({
+//   endpoint: SPACES_ENDPOINT,
+//   accessKeyId: env.DO_SPACES_ACCESS_KEY_ID,
+//   secretAccessKey: env.DO_SPACES_SECRET_KEY,
+//   region: env.DO_SPACES_REGION,
+// });
 
 export const fileRouter = router({
   get: publicProcedure
@@ -96,7 +96,8 @@ export const fileRouter = router({
         ACL: "public-read",
       };
 
-      const signedUrl = S3.getSignedUrl("putObject", params);
+      // const signedUrl = S3.getSignedUrl("putObject", params);
+      const signedUrl = null;
 
       return {
         file,

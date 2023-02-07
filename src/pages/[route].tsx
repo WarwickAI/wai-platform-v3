@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
-import PageElement from "../components/elements/Page";
+import { PageElementTmp } from "../components/elements/index";
 import { ElementProps } from "../components/elements/utils";
 import { trpc } from "../utils/trpc";
 
@@ -21,7 +21,7 @@ const Route: NextPage = () => {
   const event = trpc.element.get.useQuery(route as string);
 
   return page.data ? (
-    <PageElement element={page.data} page edit={false} />
+    <PageElementTmp element={page.data} page edit={false} />
   ) : event.data && event.data.type === "Event" ? (
     <EventClaim element={event.data} edit={false} />
   ) : (

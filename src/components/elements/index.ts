@@ -46,6 +46,8 @@ type ElementIcon = (
   }
 ) => JSX.Element;
 
+export const PageElementTmp = PageElement;
+
 const elements: {
   [key in ElementType]?: {
     name: string;

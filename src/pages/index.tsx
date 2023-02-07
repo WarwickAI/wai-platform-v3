@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import PageElement from "../components/elements/Page";
+import { PageElementTmp } from "../components/elements";
 import { env } from "../env/client.mjs";
 import { trpc } from "../utils/trpc";
 
@@ -14,8 +14,6 @@ const Home: NextPage = () => {
 
   const page = pageRoute && trpc.element.getPage.useQuery({ route: pageRoute });
 
-  console.log(route, pageRoute, page && page.data, PageElement);
-
   return (
     <>
       <Head>
@@ -24,7 +22,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
         {route && page && page.data ? (
-          <PageElement element={page.data} page={true} edit={false} />
+          <PageElementTmp element={page.data} page={true} edit={false} />
         ) : route && page && page.isLoading ? (
           <p>Loading page..</p>
         ) : (

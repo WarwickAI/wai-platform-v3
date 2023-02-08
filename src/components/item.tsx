@@ -60,39 +60,39 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
       onMouseLeave={() => setHovered(false)}
     >
       <div
-        className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row space-x-1 pr-5 text-neutral transition-opacity ${
+        className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row items-center space-x-1 pr-5 text-neutral transition-opacity ${
           showHovered ? "opacity-100" : "opacity-0"
         }`}
         {...listeners}
         {...attributes}
       >
         {element && (
-          <>
-            <div
-              className="tooltip"
-              data-tip={
-                "Created by " +
-                element?.user.email +
-                " at " +
-                element?.createdAt.toLocaleString()
+          <div
+            className="tooltip"
+            data-tip={
+              "Created by " +
+              element?.user.email +
+              " at " +
+              element?.createdAt.toLocaleString()
+            }
+          >
+            <Image
+              alt={element?.user.email + "profile picture"}
+              width={24}
+              height={24}
+              className={"rounded-full"}
+              src={
+                "https://www.gravatar.com/avatar/" +
+                MD5(element?.user.email || "") +
+                "?s=24"
               }
-            >
-              <Image
-                alt={element?.user.email + "profile picture"}
-                width={24}
-                height={24}
-                className={"rounded-full"}
-                src={
-                  "https://www.gravatar.com/avatar/" +
-                  MD5(element?.user.email || "") +
-                  "?s=24"
-                }
-              />
-            </div>
-            <Permissions element={element} parent={parent} />
-            <Modify parent={parent} element={element} />
-          </>
+            />
+          </div>
         )}
+        {showPerms && element && (
+          <Permissions element={element} parent={parent} />
+        )}
+        {showHovered && <Modify parent={parent} element={element} />}
       </div>
       {element ? (
         Element ? (

@@ -102,7 +102,7 @@ export const elementRouter = router({
     .input(z.object({ route: z.string() }))
     .query(async ({ ctx, input }) => {
       const page = await ctx.prisma.element.findFirstOrThrow({
-        where: { route: input.route, type: "Page" },
+        where: { route: input.route },
         include: {
           user: true,
           atts: true,
@@ -116,6 +116,22 @@ export const elementRouter = router({
           ...groupsInclude,
         },
       });
+
+      // Make sure that it has all the required attributes of a page
+      const pageInfo = elements[ElementType.Page];
+      if (!pageInfo) throw new Error("Page element type info not found");
+      const requiredAtts = pageInfo.requiredAtts;
+
+      if (
+        !requiredAtts.every((att) => {
+          if (att.optional) return true;
+          return page.atts.some(
+            (a) => a.name === att.name && a.type === att.type
+          );
+        })
+      ) {
+        throw new Error("Page does not have all required attributes");
+      }
 
       if (!(await defaultPermsCheck(ctx, page, "ElementView"))) {
         throw new Error("No permission to view page");

@@ -1,21 +1,25 @@
+import { ElementType } from "@prisma/client";
 import { useMemo } from "react";
 import { z } from "zod";
+import elements from "..";
 import { trpc } from "../../../utils/trpc";
 import attributes from "../../attributes";
 import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
 import { DatabaseSortType } from "../../attributes/DatabaseSort";
 import TextAttribute from "../../attributes/Text";
 import Permissions from "../../permissions";
-import { EventRequiredAttributes } from "../Event";
-import { PageRequiredAttributes } from "../Page";
-import { ElementProps, PreAttributeEditFn, ElementAttributeDescription } from "../utils";
+import {
+  ElementProps,
+  PreAttributeEditFn,
+  ElementAttributeDescription,
+} from "../utils";
 import DatabaseEvents from "./Events";
 import DatabasePages from "./Pages";
 import DatabaseTable from "./Table";
 
 export const DatabaseRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
-  { name: "Columns", type: "Columns"},
+  { name: "Columns", type: "Columns" },
 ];
 
 const DatabaseElement = ({
@@ -123,36 +127,32 @@ const DatabaseElement = ({
 
   // Check if the database has columns/attributes that match exisitng elements
   const matchingElements = useMemo(() => {
-    const matching = {
-      event: true,
-      page: true,
-    };
+    const matchingElements: ElementType[] = [];
 
-    for (const attribute of EventRequiredAttributes) {
-      if (
-        !columns ||
-        columns.find(
-          (a) => a.name === attribute.name && a.type === attribute.type
-        ) === undefined
-      ) {
-        matching.event = false;
-        break;
-      }
-    }
+    if (!columns) return matchingElements;
 
-    for (const attribute of PageRequiredAttributes) {
-      if (
-        !columns ||
-        columns.find(
-          (a) => a.name === attribute.name && a.type === attribute.type
-        ) === undefined
-      ) {
-        matching.page = false;
-        break;
-      }
-    }
+    Object.keys(elements).forEach((key) => {
+      const elementInfo = elements[key as ElementType];
+      if (!elementInfo || !elementInfo.showInPicker) return;
 
-    return matching;
+      let requiredAttributes = elementInfo.requiredAtts;
+      if (!requiredAttributes) return;
+
+      // Filter out attributes that are optional
+      requiredAttributes = requiredAttributes.filter((a) => !a.optional);
+
+      const matching = requiredAttributes.every((a) => {
+        // Check if the required attribute is a column (both name and type)
+        const matchingColumn = columns.find(
+          (c) => c.name === a.name && c.type === a.type
+        );
+        return !!matchingColumn;
+      });
+
+      if (matching) matchingElements.push(key as ElementType);
+    });
+
+    return matchingElements;
   }, [columns]);
 
   const sortedChildren = useMemo(() => {
@@ -206,12 +206,13 @@ const DatabaseElement = ({
           />
         )}
         {edit && <Permissions element={element} />}
-        {edit && matchingElements.event && (
-          <div className="badge-primary badge badge-sm">Event</div>
-        )}
-        {edit && matchingElements.page && (
-          <div className="badge-primary badge badge-sm">Page</div>
-        )}
+        {edit &&
+          matchingElements.map((type) => {
+            const elementInfo = elements[type];
+            if (!elementInfo) return null;
+
+            return <p key={type}>{elementInfo.name}</p>;
+          })}
       </div>
       {!viewAs ||
         (viewAs === "table" && (

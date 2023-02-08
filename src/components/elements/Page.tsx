@@ -35,8 +35,8 @@ import { useDebouncedCallback } from "use-debounce";
 
 export const PageRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
-  { name: "Icon", type: "Image" },
-  { name: "Cover", type: "Image" },
+  { name: "Icon", type: "Image", optional: true },
+  { name: "Cover", type: "Image", optional: true },
 ];
 
 const PageElement = ({ element, page }: ElementProps) => {

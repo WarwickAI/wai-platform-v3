@@ -24,17 +24,17 @@ import Link from "next/link";
 import {
   ElementProps,
   ElementWithAttsGroups,
-  RequiredAttribute,
+  ElementAttributeDescription,
 } from "./utils";
 import Add from "../add";
 import Permissions from "../permissions";
 import { env } from "../../env/client.mjs";
 import ImageAttribute from "../attributes/Image";
 
-export const PageRequiredAttributes: RequiredAttribute[] = [
-  { name: "Title", type: "Text", value: "Page Title" },
-  { name: "Icon", type: "Image", value: "Icon" },
-  { name: "Cover", type: "Image", value: "Cover" },
+export const PageRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "Title", type: "Text" },
+  { name: "Icon", type: "Image" },
+  { name: "Cover", type: "Image" },
 ];
 
 const PageElement = ({ element, page }: ElementProps) => {

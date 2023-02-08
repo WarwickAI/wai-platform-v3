@@ -37,10 +37,10 @@ export type ElementWithAttsGroupsChildren = ElementWithAttsGroups & {
   children: ElementWithAttsGroups[];
 };
 
-export type RequiredAttribute = {
+export type ElementAttributeDescription = {
   name: string;
   type: AttributeType;
-  value: string | string[];
+  optional?: boolean;
 };
 
 export type ElementProps = {

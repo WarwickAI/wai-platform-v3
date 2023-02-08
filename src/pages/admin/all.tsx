@@ -66,7 +66,6 @@ const AdminAll: NextPage = () => {
             name: "Title",
             type: "Text",
             value: "Untitled",
-            required: true,
           },
         ],
       },

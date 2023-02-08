@@ -2,6 +2,7 @@ import { Popover } from "@headlessui/react";
 import { AttributeType } from "@prisma/client";
 import { useMemo } from "react";
 import { trpc } from "../../utils/trpc";
+import attributes from "../attributes";
 import SurveyQuestionsAttribute, {
   SurveyQuestion,
 } from "../attributes/SurveyQuestion";
@@ -9,11 +10,15 @@ import TextAttribute from "../attributes/Text";
 import SurveyResponseElement, {
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
-import { ElementProps, PreAttributeEditFn, RequiredAttribute } from "./utils";
+import {
+  ElementProps,
+  PreAttributeEditFn,
+  ElementAttributeDescription,
+} from "./utils";
 
-export const SurveyRequiredAttributes: RequiredAttribute[] = [
-  { name: "Title", type: "Text", value: "" },
-  { name: "Questions", type: "SurveyQuestions", value: [] },
+export const SurveyRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "Title", type: "Text" },
+  { name: "Questions", type: "SurveyQuestions" },
 ];
 
 const SurveyElement = ({ element, edit }: ElementProps) => {
@@ -49,12 +54,19 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
     let atts: {
       name: string;
       type: AttributeType;
-      value: string | string[];
-      required: boolean;
+      value: any;
     }[] = [];
 
     atts = SurveyResponseRequiredAttributes.map((a) => {
-      return { ...a, required: true };
+      // Find attribute
+      const attInfo = attributes[a.type];
+      if (!attInfo) throw new Error("Invalid attribute type");
+      return {
+        name: a.name,
+        type: a.type,
+        // For the value, use the default value of the attribute's zod schema
+        value: attInfo.valueSchema.parse(undefined),
+      };
     });
 
     // Also add all the questions from the parent survey as attributes
@@ -155,7 +167,7 @@ export const surveyPreAttributeEdit: PreAttributeEditFn = async (
   prisma,
   element,
   attribute,
-  input,
+  input
 ) => {
   // If we are updating the questions in a survey, make sure that the children
   // (i.e. the survey responses) have all the questions as attributes

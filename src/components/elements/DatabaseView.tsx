@@ -14,16 +14,16 @@ import { useMemo } from "react";
 import { trpc } from "../../utils/trpc";
 import DatabaseAttribute from "../attributes/Database";
 import DatabaseElement from "./Database";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, ElementAttributeDescription } from "./utils";
 import DatabaseViewTypeAttribute from "../attributes/DatabaseViewType";
 import DatabaseSortAttribute, {
   DatabaseSortType,
 } from "../attributes/DatabaseSort";
 
-export const DatabaseViewRequiredAttributes: RequiredAttribute[] = [
-  { name: "View Type", type: "DatabaseViewType", value: "table" },
-  { name: "Sort", type: "DatabaseSort", value: [] },
-  { name: "Database", type: "Database", value: "" },
+export const DatabaseViewRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "View Type", type: "DatabaseViewType" },
+  { name: "Sort", type: "DatabaseSort" },
+  { name: "Database", type: "Database" },
 ];
 
 const DatabaseViewElement = ({ element, edit }: ElementProps) => {

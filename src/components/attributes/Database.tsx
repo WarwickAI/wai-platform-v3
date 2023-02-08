@@ -5,6 +5,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Attribute, AttributeType } from "@prisma/client";
 import { z } from "zod";
+import attributes from ".";
 import { trpc } from "../../utils/trpc";
 import { DatabaseRequiredAttributes } from "../elements/Database";
 import { ElementWithAtts } from "../elements/utils";
@@ -60,12 +61,19 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
     let atts: {
       name: string;
       type: AttributeType;
-      value: string | string[];
-      required: boolean;
+      value: any;
     }[] = [];
 
     atts = DatabaseRequiredAttributes.map((a) => {
-      return { ...a, required: true };
+      // Find attribute
+      const attInfo = attributes[a.type];
+      if (!attInfo) throw new Error("Invalid attribute type");
+      return {
+        name: a.name,
+        type: a.type,
+        // For the value, use the default value of the attribute's zod schema
+        value: attInfo.valueSchema.parse(undefined),
+      };
     });
 
     createElement.mutate(

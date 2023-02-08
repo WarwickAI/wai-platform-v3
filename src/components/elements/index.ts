@@ -13,7 +13,7 @@ import TextElement, { TextRequiredAttributes } from "./Text";
 import PageElement, { PageRequiredAttributes } from "./Page";
 import {
   ElementProps,
-  RequiredAttribute,
+  ElementAttributeDescription,
   PreAttributeEditFn,
   ElementCreateCheckPermsFn,
   PreElementCreationFn,
@@ -48,7 +48,7 @@ const elements: {
     icon: CustomIcon;
     element: ({ element, edit }: ElementProps) => JSX.Element;
     showInPicker: boolean;
-    requiredAtts: RequiredAttribute[];
+    requiredAtts: ElementAttributeDescription[];
     elementCreatePermsCheck?: ElementCreateCheckPermsFn;
     preAttributeEditFn?: PreAttributeEditFn;
     preElementCreateFn?: PreElementCreationFn;

@@ -5,13 +5,14 @@ import {
   ElementCreateCheckPermsFn,
   ElementProps,
   PreElementCreationFn,
-  RequiredAttribute,
+  ElementAttributeDescription,
 } from "./utils";
 import { SurveyQuestion } from "../attributes/SurveyQuestion";
 import TextAttribute from "../attributes/Text";
 import DateAttribute from "../attributes/Date";
 
-export const SurveyResponseRequiredAttributes: RequiredAttribute[] = [];
+export const SurveyResponseRequiredAttributes: ElementAttributeDescription[] =
+  [];
 
 export const SurveyResponseDescription = "A user's survey response.";
 

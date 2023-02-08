@@ -1,21 +1,21 @@
 import { useMemo } from "react";
 import { z } from "zod";
 import { trpc } from "../../../utils/trpc";
+import attributes from "../../attributes";
 import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
 import { DatabaseSortType } from "../../attributes/DatabaseSort";
 import TextAttribute from "../../attributes/Text";
 import Permissions from "../../permissions";
 import { EventRequiredAttributes } from "../Event";
 import { PageRequiredAttributes } from "../Page";
-import { ElementProps, PreAttributeEditFn, RequiredAttribute } from "../utils";
+import { ElementProps, PreAttributeEditFn, ElementAttributeDescription } from "../utils";
 import DatabaseEvents from "./Events";
 import DatabasePages from "./Pages";
 import DatabaseTable from "./Table";
 
-export const DatabaseRequiredAttributes: RequiredAttribute[] = [
-  { name: "Title", type: "Text", value: "" },
-  { name: "Base Type", type: "DatabaseBaseType", value: "" },
-  { name: "Columns", type: "Columns", value: [] },
+export const DatabaseRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "Title", type: "Text" },
+  { name: "Columns", type: "Columns"},
 ];
 
 const DatabaseElement = ({
@@ -41,7 +41,15 @@ const DatabaseElement = ({
 
   const handleAddRow = () => {
     const newElementAtts = columns.map((a) => {
-      return { ...a, required: true, value: a.value || "" };
+      // Find attribute
+      const attInfo = attributes[a.type];
+      if (!attInfo) throw new Error("Invalid attribute type");
+      return {
+        name: a.name,
+        type: a.type,
+        // For the value, use the default value of the attribute's zod schema
+        value: attInfo.valueSchema.parse(undefined),
+      };
     });
 
     addElement.mutate(

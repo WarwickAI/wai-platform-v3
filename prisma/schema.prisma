@@ -101,7 +101,6 @@ enum AttributeType {
   Markdown
   Date
   Location
-  DatabaseBaseType
   DatabaseViewType
   Database
   Columns

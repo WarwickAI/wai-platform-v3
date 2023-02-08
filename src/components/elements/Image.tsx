@@ -1,13 +1,13 @@
 import { env } from "../../env/client.mjs";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, ElementAttributeDescription } from "./utils";
 import Image from "next/image";
 import { trpc } from "../../utils/trpc";
 import ImageAttribute from "../attributes/Image";
 import NumberAttribute from "../attributes/Number";
 
-export const ImageRequiredAttributes: RequiredAttribute[] = [
-  { name: "URL", type: "Image", value: "" },
-  { name: "Scale", type: "Number", value: "1" },
+export const ImageRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "URL", type: "Image" },
+  { name: "Scale", type: "Number" },
 ];
 
 const ImageElement = ({ element, edit }: ElementProps) => {
@@ -39,20 +39,20 @@ const ImageElement = ({ element, edit }: ElementProps) => {
       </div>
       {file && file.width && file.height && scaleAttribute?.value && url && (
         <div className="flex flex-col items-center">
-        <Image
-          src={url}
-          alt={"Something..."}
-          width={
-            isNaN(file.width * Number(scaleAttribute.value))
-              ? 0
-              : file.width * Number(scaleAttribute.value)
-          }
-          height={
-            isNaN(file.height * Number(scaleAttribute.value))
-              ? 0
-              : file.height * Number(scaleAttribute.value)
-          }
-        />
+          <Image
+            src={url}
+            alt={"Something..."}
+            width={
+              isNaN(file.width * Number(scaleAttribute.value))
+                ? 0
+                : file.width * Number(scaleAttribute.value)
+            }
+            height={
+              isNaN(file.height * Number(scaleAttribute.value))
+                ? 0
+                : file.height * Number(scaleAttribute.value)
+            }
+          />
         </div>
       )}
     </div>

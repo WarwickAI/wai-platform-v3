@@ -10,15 +10,15 @@ import DateAttribute from "../attributes/Date";
 import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
 import UsersAttribute from "../attributes/Users";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, ElementAttributeDescription } from "./utils";
 
-export const EventRequiredAttributes: RequiredAttribute[] = [
-  { name: "Title", type: "Text", value: "" },
-  { name: "Description", type: "Markdown", value: "" },
-  { name: "Start Date", type: "Date", value: "" },
-  { name: "End Date", type: "Date", value: "" },
-  { name: "Location", type: "Text", value: "" },
-  { name: "Attendees", type: "Users", value: [] },
+export const EventRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "Title", type: "Text" },
+  { name: "Description", type: "Markdown" },
+  { name: "Start Date", type: "Date" },
+  { name: "End Date", type: "Date" },
+  { name: "Location", type: "Text" },
+  { name: "Attendees", type: "Users", optional: true },
 ];
 
 const EventElement = ({ element, edit, page }: ElementProps) => {

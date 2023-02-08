@@ -1,7 +1,8 @@
 import { Popover } from "@headlessui/react";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { Element, ElementType } from "@prisma/client";
+import { AttributeType, Element, ElementType } from "@prisma/client";
 import { trpc } from "../utils/trpc";
+import attributes from "./attributes";
 import Elements from "./elements";
 
 type AddProps = {
@@ -30,7 +31,15 @@ const Add = ({ parent, index }: AddProps) => {
     }
 
     const atts = elementData.requiredAtts.map((a) => {
-      return { ...a, required: true };
+      // Find attribute
+      const attInfo = attributes[a.type as AttributeType];
+      if (!attInfo) throw new Error("Invalid attribute type");
+      return {
+        name: a.name,
+        type: a.type,
+        // For the value, use the default value of the attribute's zod schema
+        value: attInfo.valueSchema.parse(undefined),
+      };
     });
 
     createElement.mutate({ type, index, atts, parentId: parent?.id });

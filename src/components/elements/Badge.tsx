@@ -2,11 +2,11 @@ import { UsersIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
 import TextAttribute from "../attributes/Text";
 import UsersAttribute from "../attributes/Users";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, ElementAttributeDescription } from "./utils";
 
-export const BadgeRequiredAttributes: RequiredAttribute[] = [
-  { name: "Name", type: "Text", value: "" },
-  { name: "Users", type: "Users", value: [] },
+export const BadgeRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "Name", type: "Text" },
+  { name: "Users", type: "Users" },
 ];
 
 const BadgeElement = ({ element, edit }: ElementProps) => {

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import MarkdownAttribute from "../attributes/Markdown";
-import { ElementProps, RequiredAttribute } from "./utils";
+import { ElementProps, ElementAttributeDescription } from "./utils";
 
-export const TextRequiredAttributes: RequiredAttribute[] = [
-  { name: "Markdown", type: "Markdown", value: "**Some Test Markdown**" },
+export const TextRequiredAttributes: ElementAttributeDescription[] = [
+  { name: "Markdown", type: "Markdown" },
 ];
 
 const TextElement = ({ element, edit }: ElementProps) => {

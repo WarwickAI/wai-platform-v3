@@ -245,6 +245,30 @@ export const elementRouter = router({
         where: { id: input.id },
       });
     }),
+  editRoute: authedProcedure
+    .input(z.object({ id: z.string(), route: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const element = await ctx.prisma.element.findFirst({
+        where: { id: input.id },
+        include: {
+          ...groupsInclude,
+          user: true,
+        },
+      });
+
+      // Check if user can edit element (i.e. has edit access)
+      if (!(await defaultPermsCheck(ctx, element, "ElementEdit"))) {
+        throw new Error("No permission to edit element");
+      }
+
+      return ctx.prisma.element.update({
+        where: { id: input.id },
+        data: { route: input.route },
+        include: {
+          parent: true,
+        },
+      });
+    }),
 
   // PERMS: edit permissions on parent
   order: authedProcedure

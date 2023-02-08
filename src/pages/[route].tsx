@@ -11,11 +11,30 @@ const Route: NextPage = () => {
   const { route } = router.query;
 
   // route is something like PageName-50fe8538-37b8-4dea-a435-63a9ae35553e
-  // therefore, get the uuid only
-  const pageRoute =
-    route && (route as string).slice((route as string).indexOf("-") + 1);
+  // or is a custom route.
+  // Therefore, we first check if the route is a UUID (should contain a dash followed by uuid4)
+  // otherwise, we assume it's a custom route
+  const pageRoute = useMemo(() => {
+    if (route && typeof route === "string") {
+      const split = route.split("-");
+      console.log(split);
+      if (split.length === 6) {
+        // Last 4 parts are uuid4
+        return route.slice(route.indexOf("-") + 1);
+      }
 
-  const page = trpc.element.getPage.useQuery({ route: pageRoute as string });
+      return route;
+    }
+  }, [route]);
+
+  console.log(pageRoute)
+
+  const page = trpc.element.getPage.useQuery(
+    { route: pageRoute as string },
+    {
+      enabled: !!pageRoute,
+    }
+  );
 
   // Also try finding a element of type event with the ID of the route
   const event = trpc.element.get.useQuery(route as string);

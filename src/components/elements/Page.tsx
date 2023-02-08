@@ -30,6 +30,8 @@ import Add from "../add";
 import Permissions from "../permissions";
 import { env } from "../../env/client.mjs";
 import ImageAttribute from "../attributes/Image";
+import { useRouter } from "next/router";
+import { useDebouncedCallback } from "use-debounce";
 
 export const PageRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
@@ -45,8 +47,53 @@ const PageElement = ({ element, page }: ElementProps) => {
   }, [element.children]);
 
   const user = trpc.user.getMe.useQuery();
+  const utils = trpc.useContext();
+
+  const router = useRouter();
 
   const orderElements = trpc.element.order.useMutation();
+  const editRoute = trpc.element.editRoute.useMutation({
+    onSuccess: (data) => {
+      utils.element.getAll.invalidate();
+      utils.element.get.invalidate(data.id);
+      utils.element.queryAll.invalidate({ type: data.type });
+      data.parent &&
+        utils.element.getPage.invalidate({
+          route: data.parent.route,
+        });
+
+      // Redirect the user to the new route
+      // If the new route is still a uuid4, redirect to the page
+      if (
+        data.route.match(
+          /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
+        )
+      ) {
+        const newRoute =
+          "/" +
+          generateUUIDRoute(
+            data.route,
+            titleAttribute ? (titleAttribute.value as string) : undefined
+          );
+        router.push(newRoute);
+      } else {
+        router.push("/" + data.route);
+      }
+    },
+  });
+
+  const [routeValue, setRouteValue] = useState<string>("");
+
+  useEffect(() => {
+    setRouteValue(element.route);
+  }, [element.route]);
+
+  const debounced = useDebouncedCallback((v: string) => {
+    editRoute.mutate({
+      id: element.id,
+      route: v,
+    });
+  }, 1000);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -113,13 +160,10 @@ const PageElement = ({ element, page }: ElementProps) => {
       <Link
         href={
           "/" +
-          (titleAttribute
-            ? (titleAttribute.value as string)
-                .replaceAll("-", "_")
-                .replaceAll(" ", "_")
-            : "No_Title") +
-          "-" +
-          element.route
+          generateUUIDRoute(
+            element.route,
+            titleAttribute ? (titleAttribute.value as string) : undefined
+          )
         }
       >
         <p className="inline-flex rounded-xl bg-green-800 py-2 px-4 text-xl font-bold text-white hover:cursor-pointer">
@@ -148,9 +192,20 @@ const PageElement = ({ element, page }: ElementProps) => {
           )}
           <div className="w-full bg-white bg-opacity-90">
             <div className="mx-auto flex max-w-4xl flex-col p-4">
-              {coverAttribute && edit && (
-                <ImageAttribute attribute={coverAttribute} edit={edit} />
-              )}
+              <div className="flex flex-row space-x-2">
+                {coverAttribute && edit && (
+                  <ImageAttribute attribute={coverAttribute} edit={edit} />
+                )}
+                {edit && (
+                  <input
+                    value={routeValue}
+                    onChange={(e) => {
+                      setRouteValue(e.target.value);
+                      debounced(e.target.value);
+                    }}
+                  />
+                )}
+              </div>
               <div className="flex flex-row space-x-2">
                 {titleAttribute && (
                   <TextAttribute
@@ -241,3 +296,11 @@ const PageElement = ({ element, page }: ElementProps) => {
 };
 
 export default PageElement;
+
+const generateUUIDRoute = (uuid: string, title?: string) => {
+  return (
+    (title ? title.replaceAll("-", "_").replaceAll(" ", "_") : "No_Title") +
+    "-" +
+    uuid
+  );
+};

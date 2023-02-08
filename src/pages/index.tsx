@@ -1,18 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { PageElementTmp } from "../components/elements";
-import { env } from "../env/client.mjs";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
-  const route = env.NEXT_PUBLIC_HOME_PAGE_ROUTE;
-
-  // route is something like PageName-50fe8538-37b8-4dea-a435-63a9ae35553e
-  // therefore, get the uuid only
-  const pageRoute =
-    route && (route as string).slice((route as string).indexOf("-") + 1);
-
-  const page = pageRoute && trpc.element.getPage.useQuery({ route: pageRoute });
+  const page = trpc.element.getPage.useQuery({ route: "" });
 
   return (
     <>
@@ -21,9 +13,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-        {route && page && page.data ? (
+        {page && page.data ? (
           <PageElementTmp element={page.data} page={true} edit={false} />
-        ) : route && page && page.isLoading ? (
+        ) : page && page.isLoading ? (
           <p>Loading page..</p>
         ) : (
           <p>No Home Page Set</p>

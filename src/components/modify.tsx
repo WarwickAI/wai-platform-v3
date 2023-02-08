@@ -35,12 +35,12 @@ const Modify = ({ parent, element }: ModifyProps) => {
       {({ open }) => (
         <>
           <Popover.Button
-            className={`rounded-full transition-colors ${
+            className={`rounded-full p-1 transition-colors ${
               open ? "bg-neutral" : "bg-white"
             }`}
           >
             <Bars4Icon
-              className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
+              className={`h-5 w-5 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
           <Popover.Panel className="absolute left-0 top-10 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">

@@ -46,7 +46,7 @@ const Add = ({ parent, index }: AddProps) => {
   };
 
   return (
-    <Popover className="relative">
+    <Popover className="relative w-full flex flex-row justify-center">
       {({ open, close }) => (
         <>
           <Popover.Button
@@ -58,20 +58,22 @@ const Add = ({ parent, index }: AddProps) => {
               className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <Popover.Panel className="absolute top-10 left-0 z-10 flex max-h-52 w-72 flex-col space-y-1 overflow-x-scroll rounded-md border-2 bg-white p-1 text-center">
-            {Object.keys(Elements)
-              .filter((type) => Elements[type as ElementType]?.showInPicker)
-              .map((type) => (
-                <AddElementType
-                  key={type}
-                  type={type as ElementType}
-                  create={(type) => {
-                    handleCreate(type, index);
-                    close();
-                  }}
-                />
-              ))}
-          </Popover.Panel>
+          <div className="absolute top-8 left-0 z-10 flex w-full flex-row justify-center">
+            <Popover.Panel className="flex max-h-52 w-72 flex-col space-y-1 overflow-x-scroll rounded-md border-2 bg-white p-1 text-center">
+              {Object.keys(Elements)
+                .filter((type) => Elements[type as ElementType]?.showInPicker)
+                .map((type) => (
+                  <AddElementType
+                    key={type}
+                    type={type as ElementType}
+                    create={(type) => {
+                      handleCreate(type, index);
+                      close();
+                    }}
+                  />
+                ))}
+            </Popover.Panel>
+          </div>
         </>
       )}
     </Popover>

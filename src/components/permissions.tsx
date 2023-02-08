@@ -69,13 +69,13 @@ const Permissions = ({ element, parent }: PermissionsProps) => {
             }`}
           >
             <LockClosedIcon
-              className={`h-4 w-4 ${open ? "text-white" : "text-neutral"}`}
+              className={`h-5 w-5 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <Popover.Panel className="absolute top-10 right-0 z-10 flex flex-col space-y-1 divide-y-2 rounded-md border-2 bg-white p-2 text-center">
+          <Popover.Panel className="absolute top-10 left-0 z-10 flex flex-col space-y-1 divide-y-2 rounded-md border-2 bg-white p-2 text-center">
             {parent && (
               <button
-                className="rounded-full bg-slate-700 text-sm text-white"
+                className="rounded-full bg-primary text-sm text-white"
                 onClick={handleInheritFromParent}
               >
                 Inherit from parent

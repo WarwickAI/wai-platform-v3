@@ -67,30 +67,32 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
         {...attributes}
       >
         {element && (
-          <div
-            className="tooltip"
-            data-tip={
-              "Created by " +
-              element?.user.email +
-              " at " +
-              element?.createdAt.toLocaleString()
-            }
-          >
-            <Image
-              alt={element?.user.email + "profile picture"}
-              width={24}
-              height={24}
-              className={"rounded-full"}
-              src={
-                "https://www.gravatar.com/avatar/" +
-                MD5(element?.user.email || "") +
-                "?s=24"
+          <>
+            <div
+              className="tooltip"
+              data-tip={
+                "Created by " +
+                element?.user.email +
+                " at " +
+                element?.createdAt.toLocaleString()
               }
-            />
-          </div>
+            >
+              <Image
+                alt={element?.user.email + "profile picture"}
+                width={24}
+                height={24}
+                className={"rounded-full"}
+                src={
+                  "https://www.gravatar.com/avatar/" +
+                  MD5(element?.user.email || "") +
+                  "?s=24"
+                }
+              />
+            </div>
+            <Permissions element={element} parent={parent} />
+            <Modify parent={parent} element={element} />
+          </>
         )}
-        <Add parent={parent} index={element?.index ? element.index + 0.5 : 0} />
-        <Modify parent={parent} element={element} />
       </div>
       {element ? (
         Element ? (
@@ -101,13 +103,16 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
       ) : (
         <></>
       )}
-      {element && (
+      {editParent && (
         <div
-          className={`absolute top-0 right-1 z-10 transition-opacity ${
-            showPerms ? "opacity-100" : "opacity-0"
+          className={`absolute -bottom-3 left-0 z-10 w-full transition-opacity ${
+            showHovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Permissions element={element} parent={parent} />
+          <Add
+            parent={parent}
+            index={element?.index ? element.index + 0.5 : 0}
+          />
         </div>
       )}
     </div>

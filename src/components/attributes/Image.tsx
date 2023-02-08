@@ -12,7 +12,7 @@ export const IMAGE_MIME_TYPES = [
   "image/png",
 ];
 
-export const FileAttributeSchema = z.string().default("");
+export const ImageAttributeSchema = z.string().default("");
 
 // const ImageAttributeIcon = PhotoIcon;
 

@@ -37,7 +37,7 @@ import SurveyResponseElement, {
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
 import ImageElement, { ImageRequiredAttributes } from "./Image";
-import { CustomIcon } from "../attributes/utils";
+import { CustomIcon } from "../utils";
 
 export const PageElementTmp = PageElement;
 

@@ -1,19 +1,23 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { ColumnHeader } from "../../attributes/Columns";
+import { z } from "zod";
+import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
+import { ColumnHeader } from "../../attributes/Columns/ColumnHeader";
 import DateAttribute from "../../attributes/Date";
 import MarkdownAttribute from "../../attributes/Markdown";
 import TextAttribute from "../../attributes/Text";
 import UsersAttribute from "../../attributes/Users";
-import { DBColumnType } from "../../attributes/utils";
 import { ElementWithAttsGroups } from "../utils";
 
 type DatabaseTableProps = {
-  columns: DBColumnType[];
+  columns: z.infer<typeof ColumnAttributeSchema>;
   elements: ElementWithAttsGroups[];
   edit: boolean;
   handleAddRow: () => void;
   handleAddColumn: () => void;
-  handleEditColumn: (oldName: string, newValue: DBColumnType) => void;
+  handleEditColumn: (
+    oldName: string,
+    newValue: z.infer<typeof ColumnSchema>
+  ) => void;
   handleDeleteColumn: (name: string) => void;
 };
 

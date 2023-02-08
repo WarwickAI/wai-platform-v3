@@ -13,7 +13,7 @@ export const SurveyQuestionTypes = [
   AttributeType.Date,
 ] as const;
 
-export const SurveyQuestionsSchema = z.array(
+export const SurveyQuestionsAttributeSchema = z.array(
   z.object({
     id: z.string(),
     text: z.string(),

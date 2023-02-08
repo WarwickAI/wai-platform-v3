@@ -139,7 +139,6 @@ model Attribute {
   name      String
   type      AttributeType
   value     Json
-  required  Boolean
   elementId String
   element   Element       @relation(fields: [elementId], references: [id], onDelete: Cascade)
 }

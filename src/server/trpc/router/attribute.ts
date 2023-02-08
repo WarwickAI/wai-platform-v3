@@ -36,7 +36,6 @@ export const attributeRouter = router({
           name: input.name,
           type: input.type,
           value: input.value,
-          required: input.required,
           element: {
             connect: { id: input.elementId },
           },

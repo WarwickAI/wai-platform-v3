@@ -190,7 +190,6 @@ export const surveyPreAttributeEdit: PreAttributeEditFn = async (
               name: question.id,
               type: question.type,
               value: "",
-              required: false,
               element: {
                 connect: {
                   id: child.id,

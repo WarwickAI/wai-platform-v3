@@ -2,7 +2,8 @@ import { Switch } from "@headlessui/react";
 import { Bars3BottomRightIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { z } from "zod";
 import { trpc } from "../../utils/trpc";
-import { AttributeProps, DBColumnType } from "./utils";
+import { ColumnAttributeSchema } from "./Columns";
+import { AttributeProps } from "./utils";
 
 export type DatabaseSortType = {
   columnName: string;
@@ -11,7 +12,7 @@ export type DatabaseSortType = {
 
 export const DatabaseSortIcon = Bars3BottomRightIcon;
 
-export const DatabaseSortSchema = z
+export const DatabaseSortAttributeSchema = z
   .array(
     z.object({
       columnName: z.string(),
@@ -33,8 +34,9 @@ const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
     databaseAttribute?.value as string
   );
 
-  const columns = databaseData.data?.atts.find((att) => att.name === "Columns")
-    ?.value as DBColumnType[] | undefined;
+  const columns = ColumnAttributeSchema.parse(
+    databaseData.data?.atts.find((att) => att.name === "Columns")?.value
+  );
 
   const editAttribute = trpc.attribute.editValue.useMutation({
     onSuccess: (data) => {

@@ -1,8 +1,9 @@
 import { useMemo } from "react";
+import { z } from "zod";
 import { trpc } from "../../../utils/trpc";
+import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
 import { DatabaseSortType } from "../../attributes/DatabaseSort";
 import TextAttribute from "../../attributes/Text";
-import { DBColumnType } from "../../attributes/utils";
 import Permissions from "../../permissions";
 import { EventRequiredAttributes } from "../Event";
 import { PageRequiredAttributes } from "../Page";
@@ -33,7 +34,7 @@ const DatabaseElement = ({
   );
 
   const columns = useMemo(() => {
-    return attributesAtt?.value as DBColumnType[];
+    return ColumnAttributeSchema.parse(attributesAtt?.value);
   }, [attributesAtt]);
 
   const databaseTitle = element.atts.find((a) => a.name === "Title");
@@ -65,12 +66,14 @@ const DatabaseElement = ({
       name: "New Attribute" + Math.floor(Math.random() * 1000),
       type: "Text",
       value: "",
-      required: false,
     });
     handleEditColumnsAttribute(newAtts);
   };
 
-  const handleEditColumn = (oldName: string, newValue: DBColumnType) => {
+  const handleEditColumn = (
+    oldName: string,
+    newValue: z.infer<typeof ColumnSchema>
+  ) => {
     const newAtts = [...columns];
 
     const index = newAtts.findIndex((a) => a.name === oldName);
@@ -90,7 +93,9 @@ const DatabaseElement = ({
     handleEditColumnsAttribute(newAtts);
   };
 
-  const handleEditColumnsAttribute = (newValue: DBColumnType[]) => {
+  const handleEditColumnsAttribute = (
+    newValue: z.infer<typeof ColumnAttributeSchema>
+  ) => {
     if (!attributesAtt) return;
     editAttribute.mutate(
       { id: attributesAtt.id, value: newValue },
@@ -239,7 +244,7 @@ export const databasePreAttributeEdit: PreAttributeEditFn = async (
   input
 ) => {
   if (attribute.type === "Columns") {
-    const columns = input.value as DBColumnType[];
+    const columns = ColumnAttributeSchema.parse(input.value);
 
     // Get all the children of the element
     const children = element.children;
@@ -269,7 +274,6 @@ export const databasePreAttributeEdit: PreAttributeEditFn = async (
               name: column.name,
               type: column.type,
               value: column.value || "",
-              required: column.required,
               element: {
                 connect: {
                   id: child.id,

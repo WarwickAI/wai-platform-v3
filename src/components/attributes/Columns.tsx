@@ -1,19 +1,24 @@
 import { Popover } from "@headlessui/react";
 import { TrashIcon } from "@heroicons/react/24/solid";
 import { AttributeType } from "@prisma/client";
-import React, { SVGProps, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { DatabaseAttibuteIcon } from "./Database";
-import { DateAttibuteIcon } from "./Date";
-import { MarkdownAttributeIcon } from "./Markdown";
-import { TextAttibuteIcon } from "./Text";
-import { UsersAttibuteIcon } from "./Users";
+import { z } from "zod";
+import attributes from ".";
 import { DBColumnType } from "./utils";
+
+const ColumnSchema = z.object({
+  name: z.string(),
+  type: z.nativeEnum(AttributeType),
+  value: z.any().optional(),
+});
+
+export const ColumnAttributeSchema = z.array(ColumnSchema).default([]);
 
 type ColumnHeaderProps = {
   column: DBColumnType;
   edit: boolean;
-  editColumn: (oldName: string, newValue: DBColumnType) => void;
+  editColumn: (oldName: string, newValue: z.infer<typeof ColumnSchema>) => void;
   deleteColumn: (name: string) => void;
 };
 
@@ -23,79 +28,21 @@ export const ColumnHeader = ({
   editColumn,
   deleteColumn,
 }: ColumnHeaderProps) => {
-  let Icon:
-    | ((
-        props: SVGProps<SVGSVGElement> & {
-          title?: string | undefined;
-          titleId?: string | undefined;
-        }
-      ) => JSX.Element)
-    | null = null;
-
-  switch (column.type) {
-    case "Database":
-      Icon = DatabaseAttibuteIcon;
-      break;
-    case "Date":
-      Icon = DateAttibuteIcon;
-      break;
-    // case "Group":
-    //   icon = GroupAttibuteIcon;
-    //   break;
-    // case "Groups":
-    //   icon = GroupsAttibuteIcon;
-    //   break;
-    case "Markdown":
-      Icon = MarkdownAttributeIcon;
-      break;
-    case "Text":
-      Icon = TextAttibuteIcon;
-      break;
-    case "Users":
-      Icon = UsersAttibuteIcon;
-  }
-
   const [name, setName] = useState(column.name);
   const [value, setValue] = useState(column.value);
-  const [required, setRequired] = useState(column.required);
 
   const debounced = useDebouncedCallback(
-    (newAttribute: DBColumnType) => editColumn(column.name, newAttribute),
+    (newAttribute: z.infer<typeof ColumnSchema>) =>
+      editColumn(column.name, newAttribute),
     1000
   );
 
   useEffect(() => {
     setName(column.name);
     setValue(column.value);
-    setRequired(column.required);
   }, [column]);
 
-  const columnTypes: {
-    name: AttributeType;
-    icon: (
-      props: SVGProps<SVGSVGElement> & {
-        title?: string | undefined;
-        titleId?: string | undefined;
-      }
-    ) => JSX.Element;
-  }[] = [
-    {
-      name: "Text",
-      icon: TextAttibuteIcon,
-    },
-    {
-      name: "Markdown",
-      icon: MarkdownAttributeIcon,
-    },
-    {
-      name: "Date",
-      icon: DateAttibuteIcon,
-    },
-    {
-      name: "Users",
-      icon: UsersAttibuteIcon,
-    },
-  ];
+  const CurIcon = attributes[column.type]?.icon;
 
   return (
     <>
@@ -108,8 +55,8 @@ export const ColumnHeader = ({
               }`}
               disabled={!edit}
             >
-              {Icon && (
-                <Icon
+              {CurIcon && (
+                <CurIcon
                   className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
                 />
               )}
@@ -123,7 +70,6 @@ export const ColumnHeader = ({
                   name: e.target.value,
                   type: column.type,
                   value,
-                  required,
                 });
               }}
               disabled={!edit}
@@ -135,31 +81,37 @@ export const ColumnHeader = ({
             >
               <div className="flex flex-col space-y-2">
                 <div className="flex flex-row items-center space-x-2 rounded-md p-2">
-                  {columnTypes.map((col) => (
-                    <div key={col.name} className="tooltip" data-tip={col.name}>
-                      <button
-                        className={`rounded-full p-1 transition-colors ${
-                          column.type === col.name ? "bg-neutral" : "bg-white"
-                        }`}
-                        onClick={() => {
-                          editColumn(column.name, {
-                            name: column.name,
-                            type: col.name,
-                            value,
-                            required,
-                          });
-                        }}
-                      >
-                        <col.icon
-                          className={`h-6 w-6 ${
-                            column.type === col.name
-                              ? "text-white"
-                              : "text-neutral"
+                  {Object.keys(attributes).map((type) => {
+                    const typeInfo = attributes[type as AttributeType];
+                    if (!typeInfo) return <></>;
+
+                    const TypeIcon = typeInfo.icon;
+
+                    return (
+                      <div key={type} className="tooltip" data-tip={type}>
+                        <button
+                          className={`rounded-full p-1 transition-colors ${
+                            column.type === type ? "bg-neutral" : "bg-white"
                           }`}
-                        />
-                      </button>
-                    </div>
-                  ))}
+                          onClick={() => {
+                            editColumn(column.name, {
+                              name: column.name,
+                              type: type as AttributeType,
+                              value,
+                            });
+                          }}
+                        >
+                          <TypeIcon
+                            className={`h-6 w-6 ${
+                              column.type === type
+                                ? "text-white"
+                                : "text-neutral"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
                 <button
                   onClick={() => deleteColumn(column.name)}

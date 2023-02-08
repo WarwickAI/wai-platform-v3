@@ -1,10 +1,13 @@
 import { Bars2Icon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
 export const TextAttibuteIcon = Bars2Icon;
+
+export const TextAttributeSchema = z.string().default("");
 
 type TextAttributeProps = AttributeProps & {
   size?: "sm" | "md" | "lg" | "xl";

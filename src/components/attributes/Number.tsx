@@ -1,10 +1,13 @@
 import { Bars2Icon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
 export const NumberAttibuteIcon = Bars2Icon;
+
+export const NumberAttributeSchema = z.number().default(0);
 
 type NumberAttributeProps = AttributeProps & {
   size?: "sm" | "md" | "lg" | "xl";

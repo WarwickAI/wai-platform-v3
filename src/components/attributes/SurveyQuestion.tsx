@@ -4,6 +4,7 @@ import cuid2 from "@paralleldrive/cuid2";
 import { AttributeType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
@@ -11,6 +12,14 @@ export const SurveyQuestionTypes = [
   AttributeType.Text,
   AttributeType.Date,
 ] as const;
+
+export const SurveyQuestionsSchema = z.array(
+  z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum(SurveyQuestionTypes),
+  })
+).default([]);
 
 export type SurveyQuestionType = typeof SurveyQuestionTypes[number];
 

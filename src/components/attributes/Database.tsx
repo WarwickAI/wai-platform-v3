@@ -4,12 +4,15 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/solid";
 import { Attribute, AttributeType } from "@prisma/client";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { DatabaseRequiredAttributes } from "../elements/Database";
 import { ElementWithAtts } from "../elements/utils";
 import { AttributeProps } from "./utils";
 
 export const DatabaseAttibuteIcon = CircleStackIcon;
+
+export const DatabaseAttributeSchema = z.string().default("");
 
 const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();

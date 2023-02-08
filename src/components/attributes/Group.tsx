@@ -1,9 +1,12 @@
 import { UserGroupIcon } from "@heroicons/react/24/solid";
 import { Group } from "@prisma/client";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
 export const GroupAttibuteIcon = UserGroupIcon;
+
+export const GroupAttributeSchema = z.string().default("");
 
 const GroupAttribute = ({ attribute }: AttributeProps) => {
   const group = trpc.group.get.useQuery(attribute.value as string);

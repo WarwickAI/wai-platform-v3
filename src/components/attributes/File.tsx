@@ -3,6 +3,7 @@ import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 import CryptoJS from "crypto-js";
 import { File as FileEntity } from "@prisma/client";
+import { z } from "zod";
 
 export const IMAGE_MIME_TYPES = [
   "image/gif",
@@ -10,6 +11,8 @@ export const IMAGE_MIME_TYPES = [
   "image/jpg",
   "image/png",
 ];
+
+export const FileAttributeSchema = z.string().default("");
 
 // const FileAttributeIcon = DocumentArrowUpIcon;
 

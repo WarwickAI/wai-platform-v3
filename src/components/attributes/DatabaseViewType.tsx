@@ -1,8 +1,13 @@
 import { ViewColumnsIcon } from "@heroicons/react/24/solid";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
 export const DatabaseViewTypeIcon = ViewColumnsIcon;
+
+export const ViewTypes = ["table", "events", "pages"] as const;
+
+export const DatabaseViewTypeSchema = z.enum(ViewTypes).default("table");
 
 const DatabaseViewTypeAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();

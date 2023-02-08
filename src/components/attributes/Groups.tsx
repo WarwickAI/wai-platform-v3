@@ -2,11 +2,14 @@ import { Combobox } from "@headlessui/react";
 import { TrashIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 import { Group } from "@prisma/client";
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { GroupBadge } from "./Group";
 import { AttributeProps } from "./utils";
 
 export const GroupsAttibuteIcon = UserGroupIcon;
+
+export const GroupsAttributeSchema = z.array(z.string()).default([]);
 
 const GroupsAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();

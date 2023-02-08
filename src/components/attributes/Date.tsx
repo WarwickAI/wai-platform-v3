@@ -1,5 +1,6 @@
 import { CalendarDaysIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
@@ -8,6 +9,8 @@ export const DateAttibuteIcon = CalendarDaysIcon;
 type DateAttributeProps = AttributeProps & {
   placeholder?: string;
 };
+
+export const DateAttributeSchema = z.string().default("");
 
 const DateAttribute = ({
   attribute,

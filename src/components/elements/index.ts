@@ -9,7 +9,6 @@ import {
   TableCellsIcon,
 } from "@heroicons/react/24/solid";
 import { ElementType } from "@prisma/client";
-import { SVGProps } from "react";
 import TextElement, { TextRequiredAttributes } from "./Text";
 import PageElement, { PageRequiredAttributes } from "./Page";
 import {
@@ -38,13 +37,7 @@ import SurveyResponseElement, {
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
 import ImageElement, { ImageRequiredAttributes } from "./Image";
-
-type ElementIcon = (
-  props: SVGProps<SVGSVGElement> & {
-    title?: string | undefined;
-    titleId?: string | undefined;
-  }
-) => JSX.Element;
+import { CustomIcon } from "../attributes/utils";
 
 export const PageElementTmp = PageElement;
 
@@ -52,7 +45,7 @@ const elements: {
   [key in ElementType]?: {
     name: string;
     description: string;
-    icon: ElementIcon;
+    icon: CustomIcon;
     element: ({ element, edit }: ElementProps) => JSX.Element;
     showInPicker: boolean;
     requiredAtts: RequiredAttribute[];

@@ -12,8 +12,11 @@ import ReactDOMServer from "react-dom/server";
 import remarkGfm from "remark-gfm";
 import { DocumentTextIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { AttributeProps } from "./utils";
+import { z } from "zod";
 
 export const MarkdownAttributeIcon = DocumentTextIcon;
+
+export const MarkdownAttributeSchema = z.string().default("");
 
 type MarkdownAttributeProps = AttributeProps & {
   placeholder?: string;

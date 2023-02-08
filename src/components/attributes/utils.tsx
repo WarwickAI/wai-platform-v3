@@ -1,4 +1,5 @@
 import { Attribute, AttributeType } from "@prisma/client";
+import { SVGProps } from "react";
 
 export type AttributeProps = {
   attribute: Attribute;
@@ -12,3 +13,10 @@ export type DBColumnType = {
   value: any;
   required: boolean;
 };
+
+export type CustomIcon = (
+  props: SVGProps<SVGSVGElement> & {
+    title?: string | undefined;
+    titleId?: string | undefined;
+  }
+) => JSX.Element;

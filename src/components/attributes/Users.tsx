@@ -1,11 +1,14 @@
 import { PlusIcon, TrashIcon, UsersIcon } from "@heroicons/react/24/solid";
 import { User } from "@prisma/client";
 import { useMemo, useState } from "react";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { UserBadge } from "./User";
 import { AttributeProps } from "./utils";
 
 export const UsersAttibuteIcon = UsersIcon;
+
+export const UsersAttributeSchema = z.array(z.string()).default([]);
 
 const UsersAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();

@@ -1,5 +1,6 @@
 import { Switch } from "@headlessui/react";
 import { Bars3BottomRightIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps, DBColumnType } from "./utils";
 
@@ -9,6 +10,15 @@ export type DatabaseSortType = {
 }[];
 
 export const DatabaseSortIcon = Bars3BottomRightIcon;
+
+export const DatabaseSortSchema = z
+  .array(
+    z.object({
+      columnName: z.string(),
+      direction: z.enum(["asc", "desc"]),
+    })
+  )
+  .default([]);
 
 const DatabaseSortAttribute = ({ attribute, edit }: AttributeProps) => {
   const utils = trpc.useContext();

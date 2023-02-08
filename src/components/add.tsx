@@ -58,7 +58,7 @@ const Add = ({ parent, index }: AddProps) => {
               className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <Popover.Panel className="absolute top-10 left-0 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+          <Popover.Panel className="absolute top-10 left-0 z-10 flex max-h-52 w-72 flex-col space-y-1 overflow-x-scroll rounded-md border-2 bg-white p-1 text-center">
             {Object.keys(Elements)
               .filter((type) => Elements[type as ElementType]?.showInPicker)
               .map((type) => (
@@ -92,7 +92,7 @@ const AddElementType = ({ type, create }: AddElementTypeProps) => {
   return description && Icon ? (
     <button
       onClick={() => create(type)}
-      className="flex flex-row items-center space-x-2 rounded-md p-2 hover:bg-slate-100"
+      className="flex flex-row items-center space-x-2 rounded-md p-1 hover:bg-slate-100"
     >
       <div>
         <Icon className="h-6 w-6 text-neutral" />

@@ -89,7 +89,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
             />
           </div>
         )}
-        <Add parent={parent} index={element?.index || 0} />
+        <Add parent={parent} index={element?.index ? element.index + 0.5 : 0} />
         <Modify parent={parent} element={element} />
       </div>
       {element ? (

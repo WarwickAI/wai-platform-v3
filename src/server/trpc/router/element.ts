@@ -157,6 +157,7 @@ export const elementRouter = router({
             include: {
               ...groupsInclude,
               user: true,
+              children: true,
             },
           })
         : null;
@@ -213,19 +214,48 @@ export const elementRouter = router({
         perms = preRes.perms;
       }
 
-      return ctx.prisma.element.create({
-        data: {
-          ...input,
-          atts: { create: input.atts },
-          userId: ctx.session.user.id,
-          masterGroups: { connect: perms.master.map((g) => ({ id: g.id })) },
-          editGroups: { connect: perms.edit.map((g) => ({ id: g.id })) },
-          interactGroups: {
-            connect: perms.interact.map((g) => ({ id: g.id })),
-          },
-          viewGroups: { connect: perms.view.map((g) => ({ id: g.id })) },
-        },
-      });
+      // Sort out indices so that they are all integers
+      const indices =
+        parent?.children.map((c) => {
+          return { id: c.id, index: c.index };
+        }) ?? [];
+
+      // Add new element to indices
+      indices.push({ id: "-1", index: input.index });
+
+      // Sort indices
+      indices.sort((a, b) => a.index - b.index);
+
+      let newElement = undefined;
+
+      // Update indices to be integers (in order) starting from 0
+      for (let i = 0; i < indices.length; i++) {
+        if (indices[i]?.id === "-1") {
+          newElement = await ctx.prisma.element.create({
+            data: {
+              ...input,
+              index: i,
+              atts: { create: input.atts },
+              userId: ctx.session.user.id,
+              masterGroups: {
+                connect: perms.master.map((g) => ({ id: g.id })),
+              },
+              editGroups: { connect: perms.edit.map((g) => ({ id: g.id })) },
+              interactGroups: {
+                connect: perms.interact.map((g) => ({ id: g.id })),
+              },
+              viewGroups: { connect: perms.view.map((g) => ({ id: g.id })) },
+            },
+          });
+        } else {
+          await ctx.prisma.element.update({
+            where: { id: indices[i]!.id },
+            data: { index: i },
+          });
+        }
+      }
+
+      return newElement;
     }),
   // PERMS: for now, delete (same as edit) permissions on element and its parent
   delete: authedProcedure

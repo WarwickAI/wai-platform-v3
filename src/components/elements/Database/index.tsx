@@ -62,7 +62,7 @@ const DatabaseElement = ({
         onSuccess: (data) => {
           utils.element.getAll.invalidate();
           utils.element.get.invalidate(element.id);
-          utils.element.queryAll.invalidate({ type: data.type });
+          data && utils.element.queryAll.invalidate({ type: data.type });
           utils.element.getPage.invalidate({
             route: element.route,
           });

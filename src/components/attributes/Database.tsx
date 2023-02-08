@@ -82,8 +82,8 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
         onSuccess: (data) => {
           utils.element.getAll.invalidate();
           utils.element.queryAll.invalidate({ type: "Database" });
-          utils.element.get.invalidate(data.id);
-          handleEdit(data.id);
+          data && utils.element.get.invalidate(data.id);
+          data && handleEdit(data.id);
         },
       }
     );

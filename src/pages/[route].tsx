@@ -17,7 +17,6 @@ const Route: NextPage = () => {
   const pageRoute = useMemo(() => {
     if (route && typeof route === "string") {
       const split = route.split("-");
-      console.log(split);
       if (split.length === 6) {
         // Last 4 parts are uuid4
         return route.slice(route.indexOf("-") + 1);
@@ -26,8 +25,6 @@ const Route: NextPage = () => {
       return route;
     }
   }, [route]);
-
-  console.log(pageRoute)
 
   const page = trpc.element.getPage.useQuery(
     { route: pageRoute as string },

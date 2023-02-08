@@ -121,15 +121,6 @@ const AdminAll: NextPage = () => {
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
 
-      console.log("Moving from", oldIndex, "to", newIndex);
-
-      console.log(
-        "Before",
-        items,
-        "after",
-        arrayMove(items, oldIndex, newIndex)
-      );
-
       return arrayMove(items, oldIndex, newIndex);
     });
   }

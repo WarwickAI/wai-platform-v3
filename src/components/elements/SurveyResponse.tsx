@@ -71,12 +71,10 @@ const SurveyResponseElement = ({ element, parent }: ElementProps) => {
           );
 
           if (!questionAttribute) {
-            console.log("Question attribute does not exist");
             return null;
           }
 
           if (q.type !== questionAttribute.type) {
-            console.log("Question type does not match attribute type");
             return null;
           }
 

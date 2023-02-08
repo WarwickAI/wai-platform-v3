@@ -125,35 +125,35 @@ const DatabaseElement = ({
     );
   };
 
-  // Check if the database has columns/attributes that match exisitng elements
-  const matchingElements = useMemo(() => {
-    const matchingElements: ElementType[] = [];
+  // // Check if the database has columns/attributes that match exisitng elements
+  // const matchingElements = useMemo(() => {
+  //   const matchingElements: ElementType[] = [];
 
-    if (!columns) return matchingElements;
+  //   if (!columns) return matchingElements;
 
-    Object.keys(elements).forEach((key) => {
-      const elementInfo = elements[key as ElementType];
-      if (!elementInfo || !elementInfo.showInPicker) return;
+  //   Object.keys(elements).forEach((key) => {
+  //     const elementInfo = elements[key as ElementType];
+  //     if (!elementInfo || !elementInfo.showInPicker) return;
 
-      let requiredAttributes = elementInfo.requiredAtts;
-      if (!requiredAttributes) return;
+  //     let requiredAttributes = elementInfo.requiredAtts;
+  //     if (!requiredAttributes) return;
 
-      // Filter out attributes that are optional
-      requiredAttributes = requiredAttributes.filter((a) => !a.optional);
+  //     // Filter out attributes that are optional
+  //     requiredAttributes = requiredAttributes.filter((a) => !a.optional);
 
-      const matching = requiredAttributes.every((a) => {
-        // Check if the required attribute is a column (both name and type)
-        const matchingColumn = columns.find(
-          (c) => c.name === a.name && c.type === a.type
-        );
-        return !!matchingColumn;
-      });
+  //     const matching = requiredAttributes.every((a) => {
+  //       // Check if the required attribute is a column (both name and type)
+  //       const matchingColumn = columns.find(
+  //         (c) => c.name === a.name && c.type === a.type
+  //       );
+  //       return !!matchingColumn;
+  //     });
 
-      if (matching) matchingElements.push(key as ElementType);
-    });
+  //     if (matching) matchingElements.push(key as ElementType);
+  //   });
 
-    return matchingElements;
-  }, [columns]);
+  //   return matchingElements;
+  // }, [columns]);
 
   const sortedChildren = useMemo(() => {
     const children = element.children;
@@ -206,13 +206,13 @@ const DatabaseElement = ({
           />
         )}
         {edit && <Permissions element={element} />}
-        {edit &&
+        {/* {edit &&
           matchingElements.map((type) => {
             const elementInfo = elements[type];
             if (!elementInfo) return null;
 
             return <p key={type}>{elementInfo.name}</p>;
-          })}
+          })} */}
       </div>
       {!viewAs ||
         (viewAs === "table" && (

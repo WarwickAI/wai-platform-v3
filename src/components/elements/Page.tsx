@@ -160,11 +160,15 @@ const PageElement = ({ element, page }: ElementProps) => {
     return (
       <Link
         href={
-          "/" +
-          generateUUIDRoute(
-            element.route,
-            titleAttribute ? (titleAttribute.value as string) : undefined
+          element.route.match(
+            /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
           )
+            ? "/" +
+              generateUUIDRoute(
+                element.route,
+                titleAttribute ? (titleAttribute.value as string) : undefined
+              )
+            : "/" + element.route
         }
       >
         <p className="inline-flex rounded-xl bg-green-800 py-2 px-4 text-xl font-bold text-white hover:cursor-pointer">

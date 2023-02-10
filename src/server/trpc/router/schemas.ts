@@ -18,7 +18,7 @@ export type ElementCreateInputType = z.infer<typeof ElementCreateInputSchema>;
 
 export const AttributeEditInputSchema = z.object({
   id: z.string(),
-  value: z.string().or(z.any().array()),
+  value: z.string().or(z.number()).or(z.boolean()).or(z.any().array()),
 });
 
 export type AttributeEditInputType = z.infer<typeof AttributeEditInputSchema>;

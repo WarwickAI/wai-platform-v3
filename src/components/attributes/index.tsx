@@ -1,6 +1,7 @@
 import {
   CalculatorIcon,
   CalendarDaysIcon,
+  CheckIcon,
   CircleStackIcon,
   DocumentTextIcon,
   InboxStackIcon,
@@ -35,6 +36,7 @@ import SurveyQuestionsAttribute, {
   SurveyQuestionsAttributeSchema,
 } from "./SurveyQuestion";
 import { CustomIcon } from "../utils";
+import BooleanAttribute, { BooleanAttributeSchema } from "./Boolean";
 
 const attributes: {
   [key in AttributeType]?: {
@@ -149,6 +151,14 @@ const attributes: {
     valueSchema: SurveyQuestionsAttributeSchema,
     element: SurveyQuestionsAttribute,
     showInPicker: false,
+  },
+  [AttributeType.Boolean]: {
+    name: "Boolean",
+    description: "A boolean value",
+    icon: CheckIcon,
+    valueSchema: BooleanAttributeSchema,
+    element: BooleanAttribute,
+    showInPicker: true,
   },
 };
 

@@ -171,57 +171,59 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
 
   return titleAttribute && surveyElement ? (
     <div>
-      <div className="flex flex-row flex-wrap space-x-2">
-        {/* Popup for creating the survey questions */}
-        {questionsAttribute && (
+      {edit && (
+        <div className="flex flex-row flex-wrap space-x-2">
+          {/* Popup for creating the survey questions */}
+          {questionsAttribute && (
+            <Popover className="relative">
+              {({ open }) => (
+                <>
+                  <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
+                    <span className="text-sm">Questions</span>
+                  </Popover.Button>
+                  <Popover.Panel className="absolute top-8 left-0 z-10 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+                    <SurveyQuestionsAttribute
+                      attribute={questionsAttribute}
+                      edit={edit}
+                    />
+                  </Popover.Panel>
+                </>
+              )}
+            </Popover>
+          )}
+          {/* Popup for other general settings */}
           <Popover className="relative">
             {({ open }) => (
               <>
                 <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
-                  <span className="text-sm">Questions</span>
+                  <span className="text-sm">Settings</span>
                 </Popover.Button>
-                <Popover.Panel className="absolute top-8 left-0 z-10 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
-                  <SurveyQuestionsAttribute
-                    attribute={questionsAttribute}
-                    edit={edit}
-                  />
+                <Popover.Panel className="absolute top-8 left-0 z-10 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+                  {deadlineAttribute && (
+                    <div className="flex flex-row items-center space-x-2">
+                      <span className="text-base">Deadline:</span>
+                      <DateAttribute
+                        attribute={deadlineAttribute}
+                        edit={edit}
+                        placeholder="Edit survey deadline..."
+                      />
+                    </div>
+                  )}
+                  {anonymousAttribute && (
+                    <div className="flex flex-row items-center space-x-2">
+                      <span className="text-base">Anonymous:</span>
+                      <BooleanAttribute
+                        attribute={anonymousAttribute}
+                        edit={edit}
+                      />
+                    </div>
+                  )}
                 </Popover.Panel>
               </>
             )}
           </Popover>
-        )}
-        {/* Popup for other general settings */}
-        <Popover className="relative">
-          {({ open }) => (
-            <>
-              <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
-                <span className="text-sm">Settings</span>
-              </Popover.Button>
-              <Popover.Panel className="absolute top-8 left-0 z-10 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
-                {deadlineAttribute && (
-                  <div className="flex flex-row items-center space-x-2">
-                    <span className="text-base">Deadline:</span>
-                    <DateAttribute
-                      attribute={deadlineAttribute}
-                      edit={edit}
-                      placeholder="Edit survey deadline..."
-                    />
-                  </div>
-                )}
-                {anonymousAttribute && (
-                  <div className="flex flex-row items-center space-x-2">
-                    <span className="text-base">Anonymous:</span>
-                    <BooleanAttribute
-                      attribute={anonymousAttribute}
-                      edit={edit}
-                    />
-                  </div>
-                )}
-              </Popover.Panel>
-            </>
-          )}
-        </Popover>
-      </div>
+        </div>
+      )}
       <TextAttribute
         attribute={titleAttribute}
         size="lg"

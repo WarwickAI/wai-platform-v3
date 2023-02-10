@@ -105,7 +105,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
       )}
       {editParent && (
         <div
-          className={`absolute -bottom-3 left-0 z-10 w-full transition-opacity ${
+          className={`absolute -bottom-3 left-0 w-full transition-opacity ${
             showHovered ? "opacity-100" : "opacity-0"
           }`}
         >

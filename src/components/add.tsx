@@ -46,7 +46,7 @@ const Add = ({ parent, index }: AddProps) => {
   };
 
   return (
-    <Popover className="relative w-full flex flex-row justify-center">
+    <Popover className="relative flex w-full flex-row justify-center">
       {({ open, close }) => (
         <>
           <Popover.Button

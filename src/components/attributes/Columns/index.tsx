@@ -11,7 +11,7 @@ export const ColumnSchema = z.object({
 
 export const ColumnAttributeSchema = z.array(ColumnSchema).default([]);
 
-const ColumnAttribute = ({ attribute, edit }: AttributeProps) => {
+const ColumnAttribute = ({}: AttributeProps) => {
   return <>Header not implemented</>;
 };
 

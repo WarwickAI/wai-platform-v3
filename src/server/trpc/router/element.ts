@@ -248,8 +248,11 @@ export const elementRouter = router({
             },
           });
         } else {
+          const indexElementId = indices[i]?.id;
+          if (!indexElementId) throw new Error("Index element id not found");
+
           await ctx.prisma.element.update({
-            where: { id: indices[i]!.id },
+            where: { id: indexElementId },
             data: { index: i },
           });
         }

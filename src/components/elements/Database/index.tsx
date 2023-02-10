@@ -1,7 +1,5 @@
-import { ElementType } from "@prisma/client";
 import { useMemo } from "react";
 import { z } from "zod";
-import elements from "..";
 import { trpc } from "../../../utils/trpc";
 import attributes from "../../attributes";
 import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";

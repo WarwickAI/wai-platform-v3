@@ -142,21 +142,21 @@ const PageElement = ({ element, page }: ElementProps) => {
     return false;
   }, [element, user]);
 
-  const permsEdit = useMemo(() => {
-    if (!element || !user.data) return false;
+  // const permsEdit = useMemo(() => {
+  //   if (!element || !user.data) return false;
 
-    // Check it the user is an admin
-    for (const userGroup of user.data.groups) {
-      if (userGroup.name === "Admin") return true;
-    }
+  //   // Check it the user is an admin
+  //   for (const userGroup of user.data.groups) {
+  //     if (userGroup.name === "Admin") return true;
+  //   }
 
-    for (const elGroup of element.masterGroups) {
-      for (const userGroup of user.data.groups) {
-        if (elGroup.id === userGroup.id) return true;
-      }
-    }
-    return false;
-  }, [element, user]);
+  //   for (const elGroup of element.masterGroups) {
+  //     for (const userGroup of user.data.groups) {
+  //       if (elGroup.id === userGroup.id) return true;
+  //     }
+  //   }
+  //   return false;
+  // }, [element, user]);
 
   if (!page) {
     // This is the render for a page element on another page

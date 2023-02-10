@@ -33,6 +33,9 @@ import ImageAttribute from "../attributes/Image";
 import { useRouter } from "next/router";
 import { useDebouncedCallback } from "use-debounce";
 import NavBar from "../nav";
+import Image from "next/image";
+import { MD5 } from "crypto-js";
+import Modify from "../modify";
 
 export const PageRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
@@ -212,7 +215,7 @@ const PageElement = ({ element, page }: ElementProps) => {
                   />
                 )}
               </div>
-              <div className="flex flex-row space-x-2">
+              <div className="relative flex flex-row space-x-2">
                 {titleAttribute && (
                   <TextAttribute
                     attribute={titleAttribute}
@@ -221,15 +224,33 @@ const PageElement = ({ element, page }: ElementProps) => {
                     placeholder="Edit page title..."
                   />
                 )}
-                {element && (
-                  <div
-                    className={`absolute top-2 right-2 z-10 transition-opacity ${
-                      permsEdit ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <Permissions element={element} />
-                  </div>
-                )}
+                <div className="xs:-left-10 xs:flex-col absolute -left-28 top-4 flex flex-row items-center space-x-1 pr-5 text-neutral">
+                  {element && (
+                    <div
+                      className="tooltip"
+                      data-tip={
+                        "Created by " +
+                        element?.user.email +
+                        " at " +
+                        element?.createdAt.toLocaleString()
+                      }
+                    >
+                      <Image
+                        alt={element?.user.email + "profile picture"}
+                        width={24}
+                        height={24}
+                        className={"rounded-full"}
+                        src={
+                          "https://www.gravatar.com/avatar/" +
+                          MD5(element?.user.email || "") +
+                          "?s=24"
+                        }
+                      />
+                    </div>
+                  )}
+                  {edit && element && <Permissions element={element} />}
+                  {edit && <Modify element={element} />}
+                </div>
               </div>
 
               <div className="flex w-full flex-col space-y-2 pt-6 text-2xl">

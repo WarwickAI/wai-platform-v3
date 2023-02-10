@@ -8,8 +8,7 @@ import {
   ElementAttributeDescription,
 } from "./utils";
 import { SurveyQuestion } from "../attributes/SurveyQuestion";
-import TextAttribute from "../attributes/Text";
-import DateAttribute from "../attributes/Date";
+import attributes from "../attributes";
 
 export const SurveyResponseRequiredAttributes: ElementAttributeDescription[] =
   [];
@@ -60,40 +59,48 @@ const SurveyResponseElement = ({ element, parent }: ElementProps) => {
 
   return (
     <div>
-      <p>Some Response</p>
-      <div onClick={() => deleteElement.mutate({ id: element.id })}>Delete</div>
-      {edit &&
-        surveyQuestionsAttribute &&
-        (surveyQuestionsAttribute.value as SurveyQuestion[]).map((q) => {
-          // Check if the question exists as an attribute
-          const questionAttribute = element.atts.find(
-            (att) => att.name === q.id
-          );
+      <div className="flex w-full flex-col divide-y-2">
+        {edit &&
+          surveyQuestionsAttribute &&
+          (surveyQuestionsAttribute.value as SurveyQuestion[]).map((q, i) => {
+            // Check if the question exists as an attribute
+            const questionAttribute = element.atts.find(
+              (att) => att.name === q.id
+            );
 
-          if (!questionAttribute) {
-            return null;
-          }
+            if (!questionAttribute) {
+              return null;
+            }
 
-          if (q.type !== questionAttribute.type) {
-            return null;
-          }
+            if (q.type !== questionAttribute.type) {
+              return null;
+            }
 
-          return (
-            <div key={q.id}>
-              <p>{q.text}</p>
-              {q.type === "Text" && (
-                <TextAttribute
-                  attribute={questionAttribute}
-                  edit={edit}
-                  size="sm"
-                />
-              )}
-              {q.type === "Date" && (
-                <DateAttribute attribute={questionAttribute} edit={edit} />
-              )}
-            </div>
-          );
-        })}
+            const EditElement = attributes[q.type]?.element;
+
+            if (!EditElement) {
+              return null;
+            }
+
+            return (
+              <div key={q.id} className="pt-2">
+                <p className="text-md font-semibold">
+                  {i + 1}: {q.text}
+                </p>
+                <EditElement attribute={questionAttribute} edit={edit} />
+              </div>
+            );
+          })}
+      </div>
+      <div className="mt-4 flex w-full flex-row items-center justify-between">
+        <p className="text-sm italic">Auto-saved</p>
+        <button
+          className="rounded-full bg-warning px-2 py-1 text-sm text-warning-content"
+          onClick={() => deleteElement.mutate({ id: element.id })}
+        >
+          Delete response
+        </button>
+      </div>
     </div>
   );
 };

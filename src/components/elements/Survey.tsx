@@ -3,6 +3,7 @@ import { AttributeType } from "@prisma/client";
 import { useMemo } from "react";
 import { trpc } from "../../utils/trpc";
 import attributes from "../attributes";
+import DateAttribute from "../attributes/Date";
 import SurveyQuestionsAttribute, {
   SurveyQuestion,
 } from "../attributes/SurveyQuestion";
@@ -19,6 +20,7 @@ import {
 export const SurveyRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
   { name: "Questions", type: "SurveyQuestions" },
+  { name: "Deadline", type: "Date" },
 ];
 
 const SurveyElement = ({ element, edit }: ElementProps) => {
@@ -44,6 +46,12 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
   const questionsAttribute = useMemo(() => {
     return surveyElement?.atts.find(
       (attribute) => attribute.name === "Questions"
+    );
+  }, [surveyElement]);
+
+  const deadlineAttribute = useMemo(() => {
+    return surveyElement?.atts.find(
+      (attribute) => attribute.name === "Deadline"
     );
   }, [surveyElement]);
 
@@ -116,45 +124,109 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
     return userSurveyResponseData.data;
   }, [userSurveyResponseData]);
 
-  return titleAttribute && questionsAttribute && surveyElement ? (
+  const interact = useMemo(() => {
+    if (!element || !user) return false;
+
+    // Check it the user is an admin
+    for (const userGroup of user.groups) {
+      if (userGroup.name === "Admin") return true;
+    }
+
+    for (const elGroup of element.interactGroups) {
+      for (const userGroup of user.groups) {
+        if (elGroup.id === userGroup.id) return true;
+      }
+    }
+    return false;
+  }, [element, user]);
+
+  const deadlineValid = useMemo(
+    () =>
+      deadlineAttribute?.value &&
+      new Date(deadlineAttribute.value as string) > new Date(),
+    [deadlineAttribute]
+  );
+
+  const canRespond = useMemo(() => {
+    // Both the deadline must not have passed, the user must exist,
+    // and must also have interact permissions on the survey
+    return surveyElement && user && interact && deadlineValid;
+  }, [surveyElement, user, interact, deadlineValid]);
+
+  return titleAttribute && surveyElement ? (
     <div>
+      <div className="flex flex-row flex-wrap space-x-2">
+        {/* Popup for creating the survey questions */}
+        {questionsAttribute && (
+          <Popover className="relative">
+            {({ open }) => (
+              <>
+                <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
+                  <span className="text-sm">Questions</span>
+                </Popover.Button>
+                <Popover.Panel className="absolute top-8 left-0 z-10 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+                  <SurveyQuestionsAttribute
+                    attribute={questionsAttribute}
+                    edit={edit}
+                  />
+                </Popover.Panel>
+              </>
+            )}
+          </Popover>
+        )}
+        {/* Popup for modifying the date the survey is active until */}
+        {deadlineAttribute && (
+          <Popover className="relative">
+            {({ open }) => (
+              <>
+                <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
+                  <span className="text-sm">Deadline</span>
+                </Popover.Button>
+                <Popover.Panel className="absolute top-8 left-0 z-10 flex w-60 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+                  <DateAttribute
+                    attribute={deadlineAttribute}
+                    edit={edit}
+                    placeholder="Edit survey deadline..."
+                  />
+                </Popover.Panel>
+              </>
+            )}
+          </Popover>
+        )}
+      </div>
       <TextAttribute
         attribute={titleAttribute}
-        size="md"
+        size="lg"
         edit={edit}
         placeholder="Edit survey title..."
       />
-      {userSurveyResponse && (
+      {userSurveyResponse && deadlineValid && canRespond && (
         <SurveyResponseElement
           element={userSurveyResponse}
           parent={surveyElement}
           edit={edit}
         />
       )}
-      {!user && <p>Log in to respond to this survey.</p>}
-      {!userSurveyResponse && user && (
-        <div onClick={handleCreateResponse}>Create Response</div>
-      )}
-      {/* Popup for creating the survey questions */}
-      <Popover className="relative">
-        {({ open }) => (
-          <>
-            <Popover.Button
-              className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
-                open ? "outline-2" : "outline-none"
-              }`}
-            >
-              <span className="text-sm">Questions</span>
-            </Popover.Button>
-            <Popover.Panel className="absolute top-10 left-0 z-10 flex flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
-              <SurveyQuestionsAttribute
-                attribute={questionsAttribute}
-                edit={edit}
-              />
-            </Popover.Panel>
-          </>
+      <div className="flex w-full flex-row justify-center">
+        {!user && deadlineValid && (
+          <button className="rounded-full bg-primary px-2 py-1 text-sm font-semibold text-primary-content">
+            Login to respond
+          </button>
         )}
-      </Popover>
+        {canRespond && !userSurveyResponse && (
+          <button
+            className="rounded-full bg-primary px-2 py-1 text-sm font-semibold text-primary-content"
+            onClick={handleCreateResponse}
+          >
+            Respond
+          </button>
+        )}
+        {!deadlineValid && (
+          <p className="text-sm font-semibold text-warning">
+            No longer recieving responses
+          </p>
+        )}
+      </div>
     </div>
   ) : (
     <p>loading survey...</p>

@@ -1,25 +1,36 @@
-import { Listbox } from "@headlessui/react";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PlusIcon,
+  QuestionMarkCircleIcon,
+  TrashIcon,
+} from "@heroicons/react/24/solid";
 import cuid2 from "@paralleldrive/cuid2";
 import { AttributeType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
+import attributes from ".";
 import { trpc } from "../../utils/trpc";
 import { AttributeProps } from "./utils";
 
 export const SurveyQuestionTypes = [
   AttributeType.Text,
+  AttributeType.Markdown,
   AttributeType.Date,
+  AttributeType.Number,
+  AttributeType.File,
 ] as const;
 
-export const SurveyQuestionsAttributeSchema = z.array(
-  z.object({
-    id: z.string(),
-    text: z.string(),
-    type: z.enum(SurveyQuestionTypes),
-  })
-).default([]);
+export const SurveyQuestionsAttributeSchema = z
+  .array(
+    z.object({
+      id: z.string(),
+      text: z.string(),
+      type: z.enum(SurveyQuestionTypes),
+    })
+  )
+  .default([]);
 
 export type SurveyQuestionType = typeof SurveyQuestionTypes[number];
 
@@ -80,6 +91,32 @@ const SurveyQuestionsAttribute = ({ attribute, edit }: AttributeProps) => {
     handleValueUpdate(newValue);
   };
 
+  const handleMoveUp = (id: string) => {
+    const curValue = attribute.value as SurveyQuestion[];
+
+    const index = curValue.findIndex((q) => q.id === id);
+    if (index === 0 || curValue.length < 2) return;
+
+    const newValue = [...curValue];
+    newValue[index] = newValue[index - 1]!;
+    newValue[index - 1] = curValue[index]!;
+
+    handleValueUpdate(newValue);
+  };
+
+  const handleMoveDown = (id: string) => {
+    const curValue = attribute.value as SurveyQuestion[];
+
+    const index = curValue.findIndex((q) => q.id === id);
+    if (index === curValue.length - 1 || curValue.length < 2) return;
+
+    const newValue = [...curValue];
+    newValue[index] = newValue[index + 1]!;
+    newValue[index + 1] = curValue[index]!;
+
+    handleValueUpdate(newValue);
+  };
+
   const handleValueUpdate = (newValue: SurveyQuestion[]) => {
     editAttribute.mutate(
       { id: attribute.id, value: newValue },
@@ -99,19 +136,27 @@ const SurveyQuestionsAttribute = ({ attribute, edit }: AttributeProps) => {
 
   return (
     <div>
-      {(attribute.value as SurveyQuestion[]).map((q) => {
-        return (
-          <SurveyQuestionAttribute
-            key={q.id}
-            question={q}
-            edit={edit}
-            onTypeChange={(v) => handleQuestionTypeChange(q.id, v)}
-            onTextChange={(v) => handleQuestionTextChange(q.id, v)}
-            onDelete={() => handleDeleteQuestion(q.id)}
-          />
-        );
-      })}
-      <div onClick={handleAddQuestion}>Add</div>
+      <div className="flex flex-col divide-y-2">
+        {(attribute.value as SurveyQuestion[]).map((q) => {
+          return (
+            <SurveyQuestionAttribute
+              key={q.id}
+              question={q}
+              edit={edit}
+              onTypeChange={(v) => handleQuestionTypeChange(q.id, v)}
+              onTextChange={(v) => handleQuestionTextChange(q.id, v)}
+              onMoveUp={() => handleMoveUp(q.id)}
+              onMoveDown={() => handleMoveDown(q.id)}
+              onDelete={() => handleDeleteQuestion(q.id)}
+            />
+          );
+        })}
+      </div>
+      <div className="flex w-full flex-row justify-center">
+        <button onClick={handleAddQuestion}>
+          <PlusIcon className="h-6 w-6" />
+        </button>
+      </div>
     </div>
   );
 };
@@ -122,12 +167,16 @@ const SurveyQuestionAttribute = ({
   question,
   onTypeChange,
   onTextChange,
+  onMoveUp,
+  onMoveDown,
   onDelete,
 }: {
   question: SurveyQuestion;
   edit: boolean;
   onTypeChange: (type: SurveyQuestionType) => void;
   onTextChange: (text: string) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   onDelete: () => void;
 }) => {
   const debounced = useDebouncedCallback((v: string) => {
@@ -147,26 +196,55 @@ const SurveyQuestionAttribute = ({
   }, [question.text]);
 
   return (
-    <div>
-      <input
-        type="text"
-        value={textValue}
-        onChange={(e) => {
-          debounced(e.target.value);
-          setTextValue(e.target.value);
-        }}
-      />
-      <Listbox value={question.type} onChange={(v) => onTypeChange(v)}>
-        <Listbox.Button>{question.type}</Listbox.Button>
-        <Listbox.Options>
-          {SurveyQuestionTypes.map((type) => (
-            <Listbox.Option key={type} value={type}>
-              {type}
-            </Listbox.Option>
-          ))}
-        </Listbox.Options>
-      </Listbox>
-      <div onClick={onDelete}>Delete</div>
+    <div className="pt-2">
+      <div className="flex flex-row items-center space-x-1">
+        <input
+          type="text"
+          value={textValue}
+          onChange={(e) => {
+            debounced(e.target.value);
+            setTextValue(e.target.value);
+          }}
+          className="w-64 rounded-md border border-gray-300"
+          placeholder="Question text"
+        />
+        <button onClick={onMoveUp}>
+          <ChevronUpIcon className="h-6 w-6" />
+        </button>
+        <button onClick={onMoveDown}>
+          <ChevronDownIcon className="h-6 w-6" />
+        </button>
+        <button onClick={onDelete}>
+          <TrashIcon className="h-6 w-6 text-warning" />
+        </button>
+      </div>
+      <div className="flex flex-row flex-wrap items-center space-x-2 rounded-md p-2">
+        {SurveyQuestionTypes.map((type) => {
+          const typeInfo = attributes[type as AttributeType];
+          if (!typeInfo) return <></>;
+
+          const TypeIcon = typeInfo.icon;
+
+          return (
+            <div key={type} className="tooltip" data-tip={type}>
+              <button
+                className={`rounded-full p-1 transition-colors ${
+                  question.type === type ? "bg-neutral" : "bg-white"
+                }`}
+                onClick={() => {
+                  onTypeChange(type as SurveyQuestionType);
+                }}
+              >
+                <TypeIcon
+                  className={`h-6 w-6 ${
+                    question.type === type ? "text-white" : "text-neutral"
+                  }`}
+                />
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

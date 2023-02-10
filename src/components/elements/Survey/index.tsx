@@ -1,5 +1,6 @@
 import { Popover, RadioGroup } from "@headlessui/react";
 import { AttributeType } from "@prisma/client";
+import { signIn } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { trpc } from "../../../utils/trpc";
@@ -236,7 +237,10 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
       )}
       <div className="flex w-full flex-row justify-center">
         {!user && deadlineValid && (
-          <button className="rounded-full bg-primary px-2 py-1 text-sm font-semibold text-primary-content">
+          <button
+            className="rounded-full bg-primary px-2 py-1 text-sm font-semibold text-primary-content"
+            onClick={() => signIn()}
+          >
             Login to respond
           </button>
         )}

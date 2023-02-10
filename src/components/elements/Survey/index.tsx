@@ -1,22 +1,25 @@
-import { Popover } from "@headlessui/react";
+import { Popover, RadioGroup } from "@headlessui/react";
 import { AttributeType } from "@prisma/client";
-import { useMemo } from "react";
-import { trpc } from "../../utils/trpc";
-import attributes from "../attributes";
-import BooleanAttribute from "../attributes/Boolean";
-import DateAttribute from "../attributes/Date";
+import { useMemo, useState } from "react";
+import { z } from "zod";
+import { trpc } from "../../../utils/trpc";
+import attributes from "../../attributes";
+import BooleanAttribute from "../../attributes/Boolean";
+import DateAttribute from "../../attributes/Date";
 import SurveyQuestionsAttribute, {
   SurveyQuestion,
-} from "../attributes/SurveyQuestion";
-import TextAttribute from "../attributes/Text";
+  SurveyQuestionsAttributeSchema,
+} from "../../attributes/SurveyQuestion";
+import TextAttribute from "../../attributes/Text";
 import SurveyResponseElement, {
   SurveyResponseRequiredAttributes,
-} from "./SurveyResponse";
+} from "../SurveyResponse";
 import {
   ElementProps,
   PreAttributeEditFn,
   ElementAttributeDescription,
-} from "./utils";
+} from "../utils";
+import SurveyResponseTable from "./Table";
 
 export const SurveyRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
@@ -28,6 +31,10 @@ export const SurveyRequiredAttributes: ElementAttributeDescription[] = [
 const SurveyElement = ({ element, edit }: ElementProps) => {
   const userData = trpc.user.getMe.useQuery();
   const utils = trpc.useContext();
+
+  const [viewMode, setViewMode] = useState<"responses" | "questions">(
+    "responses"
+  );
 
   const surveyData = trpc.element.get.useQuery(element.id);
 
@@ -247,6 +254,67 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
           </p>
         )}
       </div>
+
+      {/* Results are shown below */}
+      {edit && (
+        <div className="mt-2">
+          <div className="flex w-full flex-row items-center justify-between border-t-2 py-2">
+            <p className="text-xl font-semibold">Responses</p>
+            <div className="flex flex-row items-center space-x-2">
+              <span className="text-base font-semibold">View mode:</span>
+              <RadioGroup value={viewMode} onChange={setViewMode}>
+                <RadioGroup.Label className="sr-only">
+                  View mode
+                </RadioGroup.Label>
+                <div className="flex flex-row space-x-2">
+                  <RadioGroup.Option value="responses">
+                    {({ checked }) => (
+                      <span
+                        className={`focus:ring-primary-500 relative inline-flex cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                          checked
+                            ? "bg-primary text-primary-content"
+                            : "bg-primary-100 text-primary"
+                        }`}
+                      >
+                        Responses
+                      </span>
+                    )}
+                  </RadioGroup.Option>
+                  <RadioGroup.Option value="questions">
+                    {({ checked }) => (
+                      <span
+                        className={`
+                        focus:ring-primary-500 relative inline-flex cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                          checked
+                            ? "bg-primary text-primary-content"
+                            : "bg-primary-100 text-primary"
+                        }`}
+                      >
+                        Questions
+                      </span>
+                    )}
+                  </RadioGroup.Option>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+
+          {/* View by response */}
+          {viewMode === "responses" && questionsAttribute && (
+            <div className="flex flex-col space-y-2">
+              <SurveyResponseTable
+                surveyQuestions={
+                  questionsAttribute.value as z.infer<
+                    typeof SurveyQuestionsAttributeSchema
+                  >
+                }
+                anonymous={anonymousAttribute?.value as boolean}
+                elements={surveyElement.children}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   ) : (
     <p>loading survey...</p>

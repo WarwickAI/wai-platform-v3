@@ -199,7 +199,7 @@ const PageElement = ({ element, page }: ElementProps) => {
             />
           )}
           <div className="z-0 w-full bg-white bg-opacity-90">
-            <div className="mx-auto flex max-w-4xl flex-col py-4 px-8 md:px-12">
+            <div className="mx-auto flex max-w-4xl flex-col py-4 px-8 md:px-12 lg:px-24">
               <div className="flex flex-row space-x-2">
                 {coverAttribute && edit && (
                   <ImageAttribute attribute={coverAttribute} edit={edit} />
@@ -223,10 +223,10 @@ const PageElement = ({ element, page }: ElementProps) => {
                     placeholder="Edit page title..."
                   />
                 )}
-                <div className="xs:-left-10 xs:flex-col absolute -left-28 top-4 flex flex-row items-center space-x-1 pr-5 text-neutral">
+                <div className="absolute -left-12 mt-4 flex flex-col items-center justify-end space-x-1 space-y-0 pr-2 text-neutral transition-opacity lg:-left-24 lg:mt-0 lg:flex-row lg:pr-5">
                   {element && (
                     <div
-                      className="tooltip"
+                      className="tooltip hidden lg:block"
                       data-tip={
                         "Created by " +
                         element?.user.email +
@@ -248,7 +248,6 @@ const PageElement = ({ element, page }: ElementProps) => {
                     </div>
                   )}
                   {edit && element && <Permissions element={element} />}
-                  {edit && <Modify element={element} />}
                 </div>
               </div>
 

@@ -53,14 +53,14 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative max-w-4xl rounded-lg border-2 bg-white p-2 transition-colors ${
+      className={`relative max-w-4xl rounded-lg border-2 bg-white transition-colors ${
         showHovered ? "border-slate-300" : "border-white"
       } ${blur ? "opacity-20" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <div
-        className={`xs:-left-8 xs:flex-col absolute -left-24 flex flex-row items-center space-x-1 pr-5 text-neutral transition-opacity ${
+        className={`lg:-left-24 absolute -left-9 flex flex-col items-center space-x-1 space-y-0 pr-2 text-neutral transition-opacity lg:mt-0 lg:flex-row lg:pr-5 ${
           showHovered ? "opacity-100" : "opacity-0"
         }`}
         {...listeners}
@@ -68,7 +68,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
       >
         {element && (
           <div
-            className="tooltip"
+            className="tooltip hidden lg:block"
             data-tip={
               "Created by " +
               element?.user.email +
@@ -94,15 +94,17 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
         )}
         {showHovered && <Modify parent={parent} element={element} />}
       </div>
-      {element ? (
-        Element ? (
-          <Element element={{ ...element, children: [] }} edit={edit} />
+      <div className="p-2">
+        {element ? (
+          Element ? (
+            <Element element={{ ...element, children: [] }} edit={edit} />
+          ) : (
+            <p>No element found...</p>
+          )
         ) : (
-          <p>No element found...</p>
-        )
-      ) : (
-        <></>
-      )}
+          <></>
+        )}
+      </div>
       {editParent && (
         <div
           className={`absolute -bottom-3 left-0 w-full transition-opacity ${

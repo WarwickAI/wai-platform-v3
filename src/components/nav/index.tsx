@@ -30,7 +30,7 @@ const NavBar = () => {
   return (
     <div>
       {(!size.width || size.width <= 1100) && (
-        <div className="absolute top-3 left-3">
+        <div className="fixed top-3 left-3">
           <button
             className="rounded-lg bg-primary hover:bg-primary-focus"
             onClick={() => setMobileOpen(!mobileOpen)}

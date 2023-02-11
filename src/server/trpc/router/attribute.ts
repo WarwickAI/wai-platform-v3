@@ -60,6 +60,8 @@ export const attributeRouter = router({
                 },
               },
               ...groupsInclude,
+              atts: true,
+              user: true,
             },
           },
         },
@@ -74,8 +76,29 @@ export const attributeRouter = router({
           },
         }));
 
-      if (!defaultPermsCheck(ctx, attribute.element, "ElementEdit")) {
-        throw new Error("You do not have permission to edit this element");
+      const attributeEditPermsCheck =
+        elements[attribute.element.type]?.attributeEditPermsCheck;
+
+      const specialPermsCheck =
+        attributeEditPermsCheck &&
+        (await attributeEditPermsCheck(
+          ctx.prisma,
+          user || undefined,
+          input,
+          attribute,
+          attribute.element
+        ));
+
+      const defaultCheck = await defaultPermsCheck(
+        ctx,
+        attribute.element,
+        "ElementEdit"
+      );
+
+      // Check if user can create element in parent (i.e. has edit access)
+      // By default, no parent means the user cannot create the element (unless Admin)
+      if (!specialPermsCheck && !defaultCheck) {
+        throw new Error("No permission to edit attribute");
       }
 
       const preAttributeEditFn =

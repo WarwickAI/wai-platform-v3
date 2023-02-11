@@ -6,11 +6,15 @@ import {
 } from "@heroicons/react/24/outline";
 import { QRCode } from "react-qrcode-logo";
 import { clientEnv } from "../../env/schema.mjs";
-import DateAttribute from "../attributes/Date";
+import DateAttribute, { DateAttributeSchema } from "../attributes/Date";
 import MarkdownAttribute from "../attributes/Markdown";
 import TextAttribute from "../attributes/Text";
-import UsersAttribute from "../attributes/Users";
-import { ElementProps, ElementAttributeDescription } from "./utils";
+import UsersAttribute, { UsersAttributeSchema } from "../attributes/Users";
+import {
+  ElementProps,
+  ElementAttributeDescription,
+  AttributeEditCheckPermsFn,
+} from "./utils";
 
 export const EventRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
@@ -131,7 +135,7 @@ const AttendeesPopover = ({ element, edit }: ElementProps) => {
 };
 
 const EventQRPopover = ({ element }: ElementProps) => {
-  const url = `${clientEnv.NEXT_PUBLIC_URL}/${element.id}`;
+  const url = `${clientEnv.NEXT_PUBLIC_URL}/claim/${element.id}`;
 
   return (
     <Popover className="relative">
@@ -166,4 +170,88 @@ const EventQRPopover = ({ element }: ElementProps) => {
       )}
     </Popover>
   );
+};
+
+export const eventAttributeEditCheckPerms: AttributeEditCheckPermsFn = async (
+  prisma,
+  user,
+  input,
+  attribute,
+  element
+) => {
+  // Allow the user to add themselves to the attendees list (attribute)
+  // if they have edit permissions on the element
+
+  if (!user) return;
+
+  // Make sure user has interact permissions on the element
+  if (
+    !user.groups.some((g) =>
+      element.interactGroups.map((g2) => g2.id).includes(g.id)
+    ) &&
+    !element.interactGroups.find((g) => g.name === "All")
+  ) {
+    return;
+  }
+
+  // Also, make sure that the current date is between the start and end dates
+  const startDateAttribute = element.atts.find((a) => a.name === "Start Date");
+
+  let startDateValue: Date | undefined;
+  if (startDateAttribute) {
+    const startDate = DateAttributeSchema.safeParse(startDateAttribute.value);
+
+    if (!startDate.success) {
+      console.error("Error parsing start date attribute");
+      return;
+    }
+
+    startDateValue = new Date(startDate.data);
+  }
+
+  const endDateAttribute = element.atts.find((a) => a.name === "End Date");
+
+  let endDateValue: Date | undefined;
+  if (endDateAttribute) {
+    const endDate = DateAttributeSchema.safeParse(endDateAttribute.value);
+
+    if (!endDate.success) {
+      console.error("Error parsing end date attribute");
+      return;
+    }
+
+    endDateValue = new Date(endDate.data);
+  }
+
+  const now = new Date();
+
+  if (
+    (startDateValue && now < startDateValue) ||
+    (endDateValue && now > endDateValue)
+  ) {
+    return;
+  }
+
+  if (attribute.name === "Attendees" && attribute.type === "Users") {
+    // Get the current list of users
+    const users = UsersAttributeSchema.safeParse(attribute.value);
+    const newUsers = UsersAttributeSchema.safeParse(input.value);
+
+    if (!users.success || !newUsers.success) {
+      console.error("Error parsing users attribute");
+      return;
+    }
+
+    // Check that the users and newUsers only differ by the current user ID
+    if (
+      (users.data.length !== newUsers.data.length - 1 || // One less user
+        users.data.length === newUsers.data.length - 1) && // Same number of users (might already be in the list)
+      newUsers.data.every((u) => users.data.includes(u) || u === user.id) && // All users in the new list are in the old list, or are the current user
+      users.data.every((u) => newUsers.data.includes(u) || u === user.id) // All users in the old list are in the new list, or are the current user
+    ) {
+      return true;
+    }
+  }
+
+  return;
 };

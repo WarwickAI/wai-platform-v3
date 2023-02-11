@@ -18,8 +18,12 @@ import {
   ElementCreateCheckPermsFn,
   PreElementCreationFn,
   ElementDeleteCheckPermsFn,
+  AttributeEditCheckPermsFn,
 } from "./utils";
-import EventElement, { EventRequiredAttributes } from "./Event";
+import EventElement, {
+  eventAttributeEditCheckPerms,
+  EventRequiredAttributes,
+} from "./Event";
 import DatabaseElement, {
   DatabaseRequiredAttributes,
   databasePreAttributeEdit,
@@ -53,6 +57,7 @@ const elements: {
     requiredAtts: ElementAttributeDescription[];
     elementCreatePermsCheck?: ElementCreateCheckPermsFn;
     elementDeletePermsCheck?: ElementDeleteCheckPermsFn;
+    attributeEditPermsCheck?: AttributeEditCheckPermsFn;
     preAttributeEditFn?: PreAttributeEditFn;
     preElementCreateFn?: PreElementCreationFn;
   };
@@ -80,6 +85,7 @@ const elements: {
     element: EventElement,
     showInPicker: true,
     requiredAtts: EventRequiredAttributes,
+    attributeEditPermsCheck: eventAttributeEditCheckPerms,
   },
   [ElementType.Badge]: {
     name: "Badge",

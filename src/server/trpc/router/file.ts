@@ -1,6 +1,6 @@
 // import aws from "aws-sdk";
 import { z } from "zod";
-import { IMAGE_MIME_TYPES } from "../../../components/attributes/File";
+import { IMAGE_MIME_TYPES } from "../../../components/attributes/Image";
 import { env } from "../../../env/server.mjs";
 import { publicProcedure, router, authedProcedure } from "../trpc";
 import { S3Client } from "@aws-sdk/client-s3";

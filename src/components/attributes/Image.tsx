@@ -21,7 +21,16 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
 
   const [fileHash, setFileHash] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [fileEntity, setFileEntity] = useState<FileEntity | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<
+    "none" | "uploading" | "done" | "error"
+  >("none");
+
+  const fileEntity = trpc.file.get.useQuery(
+    { id: attribute.value as string },
+    {
+      enabled: !!attribute.value,
+    }
+  );
 
   const utils = trpc.useContext();
   const getSignedUrl = trpc.file.upload.useMutation();
@@ -34,6 +43,9 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
         utils.element.getPage.invalidate({
           route: data.element.parent.route,
         });
+
+      // Refetch the file entity
+      fileEntity.refetch();
     },
   });
 
@@ -83,8 +95,6 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
         height,
       });
 
-      setFileEntity(fileEntity);
-
       // Only upload if we receive a signed URL (signedURL is an AWS PresignedPost)
       if (signedUrl) {
         // Create a new form data
@@ -98,6 +108,8 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
         // Add the file to the form data
         formData.append("file", file);
 
+        setUploadStatus("uploading");
+
         // Upload the file
         const res = await fetch(signedUrl.url, {
           method: "POST",
@@ -105,7 +117,11 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
         });
 
         if (res.ok) {
+          setUploadStatus("done");
+
           editAttribute.mutate({ id: attribute.id, value: fileEntity.id });
+        } else {
+          setUploadStatus("error");
         }
       } else {
         // Only change the attribute if we don't receive a signed URL
@@ -116,45 +132,68 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
 
   if (edit) {
     return (
-      <div className="flex flex-row items-center space-x-2">
-        <div>
-          <div className="flex flex-row space-x-1">
-            <input
-              type="file"
-              ref={fileInputRef}
-              className={"hidden"}
-              onChange={handleFileChange}
-              accept={IMAGE_MIME_TYPES.join(",")}
-            />
-            <button
-              className="btn-primary btn-sm btn"
-              onClick={() => {
-                if (fileInputRef.current) {
-                  fileInputRef.current.click();
-                }
-              }}
-            >
-              Select image
-            </button>
-          </div>
-          {file && <p className="text-sm">{file?.name}</p>}
-        </div>
-        <div>
+      <div className="flex w-80 flex-row items-center space-x-1 overflow-clip rounded-lg border-2">
+        <div className="flex w-1/3 flex-col">
           <button
-            className="btn-primary btn-sm btn"
+            className="bg-secondary p-1 text-base text-secondary-content hover:bg-secondary-focus"
+            onClick={() => {
+              if (fileInputRef.current) {
+                fileInputRef.current.click();
+              }
+            }}
+          >
+            <div>Select Image</div>
+          </button>
+          {file ? (
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm">
+              {file?.name}
+            </p>
+          ) : (
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm italic">
+              No file selected
+            </p>
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            className={"hidden"}
+            onChange={handleFileChange}
+          />
+        </div>
+        <div className="flex w-2/3 flex-col">
+          <button
+            className="bg-secondary p-1 text-base text-secondary-content hover:bg-secondary-focus"
             onClick={handleUpload}
             disabled={!file}
           >
-            Upload
+            {fileEntity.data && uploadStatus === "none"
+              ? "Update"
+              : !fileEntity.data && uploadStatus === "none"
+              ? "Upload"
+              : uploadStatus === "uploading"
+              ? "Uploading..."
+              : uploadStatus === "done"
+              ? "Uploaded"
+              : uploadStatus === "error"
+              ? "Error"
+              : ""}
           </button>
-          {fileEntity && <p className="text-base">{fileEntity?.fileName}</p>}
+          {fileEntity.data ? (
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm">
+              Uploaded: {fileEntity.data?.fileName}
+            </p>
+          ) : (
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm italic">
+              No image uploaded
+            </p>
+          )}
         </div>
       </div>
     );
   } else {
     return (
       <div className="flex flex-row items-center space-x-2">
-        <p className="text-base">{fileEntity?.fileName}</p>
+        <p className="text-base">{fileEntity.data?.fileName}</p>
       </div>
     );
   }

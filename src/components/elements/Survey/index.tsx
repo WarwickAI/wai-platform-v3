@@ -148,11 +148,15 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
       if (userGroup.name === "Admin") return true;
     }
 
+    // Check if the all group is in the interact groups
+    if (element.interactGroups.find((group) => group.name === "All")) return true;
+
     for (const elGroup of element.interactGroups) {
       for (const userGroup of user.groups) {
         if (elGroup.id === userGroup.id) return true;
       }
     }
+    
     return false;
   }, [element, user]);
 

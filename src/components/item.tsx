@@ -37,6 +37,9 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
     // Check it the user is an admin
     if (user.groups.find((g) => g.name === "Admin")) return true;
 
+    // Check if the all group is in the edit groups
+    if (element.editGroups.find((group) => group.name === "All")) return true;
+
     return user.groups.some((g) =>
       element.editGroups.find((eg) => eg.id === g.id)
     );

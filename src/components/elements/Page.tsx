@@ -35,7 +35,6 @@ import { useDebouncedCallback } from "use-debounce";
 import NavBar from "../nav";
 import Image from "next/image";
 import { MD5 } from "crypto-js";
-import Modify from "../modify";
 
 export const PageRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
@@ -133,6 +132,9 @@ const PageElement = ({ element, page }: ElementProps) => {
     for (const userGroup of user.data.groups) {
       if (userGroup.name === "Admin") return true;
     }
+
+    // Check if the all group is in the edit groups
+    if (element.editGroups.find((group) => group.name === "All")) return true;
 
     for (const elGroup of element.editGroups) {
       for (const userGroup of user.data.groups) {

@@ -190,7 +190,6 @@ const PageElement = ({ element, page }: ElementProps) => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <main className="relative min-h-screen w-full">
-          <NavBar />
           {coverFile && (
             <div
               className="sticky top-0 -z-10 h-60 w-full bg-cover bg-center bg-no-repeat"
@@ -199,8 +198,8 @@ const PageElement = ({ element, page }: ElementProps) => {
               }}
             />
           )}
-          <div className="w-full bg-white bg-opacity-90">
-            <div className="mx-auto flex max-w-4xl flex-col p-4">
+          <div className="z-0 w-full bg-white bg-opacity-90">
+            <div className="mx-auto flex max-w-4xl flex-col py-4 px-8 md:px-12">
               <div className="flex flex-row space-x-2">
                 {coverAttribute && edit && (
                   <ImageAttribute attribute={coverAttribute} edit={edit} />
@@ -288,6 +287,7 @@ const PageElement = ({ element, page }: ElementProps) => {
               </div>
             </div>
           </div>
+          <NavBar />
         </main>
       </>
     );

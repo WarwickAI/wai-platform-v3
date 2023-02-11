@@ -17,6 +17,7 @@ import {
   PreAttributeEditFn,
   ElementCreateCheckPermsFn,
   PreElementCreationFn,
+  ElementDeleteCheckPermsFn,
 } from "./utils";
 import EventElement, { EventRequiredAttributes } from "./Event";
 import DatabaseElement, {
@@ -33,6 +34,7 @@ import SurveyElement, {
 import BadgeElement, { BadgeRequiredAttributes } from "./Badge";
 import SurveyResponseElement, {
   surveyResponseCreateCheckPerms,
+  surveyResponseDeleteCheckPerms,
   surveyResponsePreCreate,
   SurveyResponseRequiredAttributes,
 } from "./SurveyResponse";
@@ -50,6 +52,7 @@ const elements: {
     showInPicker: boolean;
     requiredAtts: ElementAttributeDescription[];
     elementCreatePermsCheck?: ElementCreateCheckPermsFn;
+    elementDeletePermsCheck?: ElementDeleteCheckPermsFn;
     preAttributeEditFn?: PreAttributeEditFn;
     preElementCreateFn?: PreElementCreationFn;
   };
@@ -120,6 +123,7 @@ const elements: {
     requiredAtts: SurveyResponseRequiredAttributes,
     showInPicker: false,
     elementCreatePermsCheck: surveyResponseCreateCheckPerms,
+    elementDeletePermsCheck: surveyResponseDeleteCheckPerms,
     preElementCreateFn: surveyResponsePreCreate,
   },
   [ElementType.Image]: {

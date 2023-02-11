@@ -76,6 +76,13 @@ export type ElementCreateCheckPermsFn = (
   parent?: ElementWithGroups
 ) => Promise<boolean | void>;
 
+export type ElementDeleteCheckPermsFn = (
+  prisma: SmpPrismaClient,
+  user: (User & { groups: Group[] }) | undefined,
+  element: ElementWithGroups,
+  parent?: ElementWithGroups
+) => Promise<boolean | void>;
+
 // Run before an element is created
 export type PreElementCreationFn = (
   prisma: SmpPrismaClient,

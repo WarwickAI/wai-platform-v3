@@ -6,6 +6,7 @@ import {
   ElementProps,
   PreElementCreationFn,
   ElementAttributeDescription,
+  ElementDeleteCheckPermsFn,
 } from "./utils";
 import { SurveyQuestion } from "../attributes/SurveyQuestion";
 import attributes from "../attributes";
@@ -125,6 +126,38 @@ export const surveyResponseCreateCheckPerms: ElementCreateCheckPermsFn = async (
     parent.interactGroups.find((g) => g.name === "All")
   ) {
     return true;
+  }
+
+  return;
+};
+
+export const surveyResponseDeleteCheckPerms: ElementDeleteCheckPermsFn = async (
+  primsa,
+  user,
+  element,
+  parent
+) => {
+  // Only care about adding a new survey.
+  // This should be allowed if the user can interact with the parent element,
+  // and has edit perms on the element.
+  if (element.type !== "SurveyResponse" || !user || !parent) return;
+
+  // Check if the user can interact with the parent element
+  if (
+    user.groups.some((g) =>
+      parent.interactGroups.map((g2) => g2.id).includes(g.id)
+    ) ||
+    parent.interactGroups.find((g) => g.name === "All")
+  ) {
+    // Check that the user has edit perms on the element
+    if (
+      user.groups.some((g) =>
+        element.editGroups.map((g2) => g2.id).includes(g.id)
+      ) ||
+      element.editGroups.find((g) => g.name === "All")
+    ) {
+      return true;
+    }
   }
 
   return;

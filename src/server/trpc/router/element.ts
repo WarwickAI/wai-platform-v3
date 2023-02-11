@@ -264,7 +264,7 @@ export const elementRouter = router({
   delete: authedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const element = await ctx.prisma.element.findFirst({
+      const element = await ctx.prisma.element.findFirstOrThrow({
         where: { id: input.id },
         include: {
           ...groupsInclude,
@@ -280,14 +280,31 @@ export const elementRouter = router({
         },
       });
 
-      // Check if user can delete element (i.e. has edit access)
-      if (!(await defaultPermsCheck(ctx, element, "ElementDelete"))) {
-        throw new Error("No permission to delete element");
-      }
+      const user = await ctx.prisma.user.findFirst({
+        where: { id: ctx.session.user.id },
+        include: {
+          groups: true,
+        },
+      });
 
-      // Check if the user can edit the parent element
-      if (parent && !(await defaultPermsCheck(ctx, parent, "ElementEdit"))) {
-        throw new Error("No permission to edit parent element");
+      const elementDeletePermsCheck =
+        elements[element.type]?.elementDeletePermsCheck;
+
+      const specialPermsCheck =
+        elementDeletePermsCheck &&
+        (await elementDeletePermsCheck(
+          ctx.prisma,
+          user || undefined,
+          element,
+          parent || undefined
+        ));
+
+      const defaultCheck = await defaultPermsCheck(ctx, parent, "ElementEdit");
+
+      // Check if user can create element in parent (i.e. has edit access)
+      // By default, no parent means the user cannot create the element (unless Admin)
+      if (!specialPermsCheck && !defaultCheck) {
+        throw new Error("No permission to delete element");
       }
 
       return ctx.prisma.element.delete({

@@ -92,6 +92,7 @@ enum ElementType {
   Survey
   SurveyResponse
   Image
+  Collection
 }
 
 enum AttributeType {
@@ -110,6 +111,7 @@ enum AttributeType {
   DatabaseSort
   File
   Image
+  ElementType
 }
 
 model Element {

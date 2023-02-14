@@ -84,6 +84,14 @@ export const elementRouter = router({
         include: {
           atts: true,
           ...groupsInclude,
+          user: true,
+          children: {
+            include: {
+              atts: true,
+              user: true,
+              ...groupsInclude,
+            },
+          },
         },
       });
 
@@ -94,6 +102,13 @@ export const elementRouter = router({
           return defaultPermsCheck(ctx, e, "ElementView");
         }
       );
+
+      // Filter out children user doesn't have permission to view
+      filtered.forEach((e: any) => {
+        e.children = e.children.filter((c: any) => {
+          return defaultPermsCheck(ctx, c, "ElementView");
+        });
+      });
 
       return filtered;
     }),

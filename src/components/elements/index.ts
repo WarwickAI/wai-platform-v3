@@ -3,6 +3,7 @@ import {
   CheckBadgeIcon,
   CircleStackIcon,
   DocumentIcon,
+  ListBulletIcon,
   PencilIcon,
   PhotoIcon,
   PresentationChartBarIcon,
@@ -44,6 +45,7 @@ import SurveyResponseElement, {
 } from "./SurveyResponse";
 import ImageElement, { ImageRequiredAttributes } from "./Image";
 import { CustomIcon } from "../utils";
+import CollectionElement, { CollectionRequiredAttributes } from "./Collection";
 
 export const PageElementTmp = PageElement;
 
@@ -138,6 +140,14 @@ const elements: {
     icon: PhotoIcon,
     element: ImageElement,
     requiredAtts: ImageRequiredAttributes,
+    showInPicker: true,
+  },
+  [ElementType.Collection]: {
+    name: "Collection",
+    description: "A collection of elements.",
+    icon: ListBulletIcon,
+    element: CollectionElement,
+    requiredAtts: CollectionRequiredAttributes,
     showInPicker: true,
   },
 };

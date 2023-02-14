@@ -3,6 +3,7 @@ import {
   CalendarDaysIcon,
   CheckIcon,
   CircleStackIcon,
+  Cog6ToothIcon,
   DocumentTextIcon,
   InboxStackIcon,
   PaperClipIcon,
@@ -37,6 +38,9 @@ import SurveyQuestionsAttribute, {
 } from "./SurveyQuestion";
 import { CustomIcon } from "../utils";
 import BooleanAttribute, { BooleanAttributeSchema } from "./Boolean";
+import ElementTypeAttribute, {
+  ElementTypeAttributeSchema,
+} from "./ElementType";
 
 const attributes: {
   [key in AttributeType]?: {
@@ -159,6 +163,14 @@ const attributes: {
     valueSchema: BooleanAttributeSchema,
     element: BooleanAttribute,
     showInPicker: true,
+  },
+  [AttributeType.ElementType]: {
+    name: "Element Type",
+    description: "The type of element",
+    icon: Cog6ToothIcon,
+    valueSchema: ElementTypeAttributeSchema,
+    element: ElementTypeAttribute,
+    showInPicker: false,
   },
 };
 

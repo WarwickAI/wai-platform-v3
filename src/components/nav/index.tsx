@@ -39,10 +39,10 @@ const NavBar = () => {
       )}
       <nav
         className={
-          size.width && size.width > 1000
+          !size.width || size.width > 1000
             ? "fixed top-0 flex h-screen w-14 flex-col justify-between overflow-clip bg-gray-200 p-1 shadow-lg transition-width ease-in-out hover:w-36"
             : `fixed top-0 -left-36 flex h-screen w-36 flex-col justify-between overflow-clip bg-gray-200 p-1 shadow-lg transition-transform ease-in-out ${
-                mobileOpen ? "translate-x-36" : ""
+                mobileOpen ? "translate-x-36" : "translate-x-0"
               }`
         }
       >

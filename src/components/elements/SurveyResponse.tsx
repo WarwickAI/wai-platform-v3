@@ -7,8 +7,12 @@ import {
   PreElementCreationFn,
   ElementAttributeDescription,
   ElementDeleteCheckPermsFn,
+  ElementWithAttsGroupsChildren,
 } from "./utils";
-import { SurveyQuestion } from "../attributes/SurveyQuestion";
+import {
+  QuestionTypesRequiringDBRef,
+  SurveyQuestion,
+} from "../attributes/SurveyQuestion";
 import attributes from "../attributes";
 
 export const SurveyResponseRequiredAttributes: ElementAttributeDescription[] =
@@ -63,35 +67,15 @@ const SurveyResponseElement = ({ element, parent }: ElementProps) => {
       <div className="flex w-full flex-col divide-y-2">
         {edit &&
           surveyQuestionsAttribute &&
-          (surveyQuestionsAttribute.value as SurveyQuestion[]).map((q, i) => {
-            // Check if the question exists as an attribute
-            const questionAttribute = element.atts.find(
-              (att) => att.name === q.id
-            );
-
-            if (!questionAttribute) {
-              return null;
-            }
-
-            if (q.type !== questionAttribute.type) {
-              return null;
-            }
-
-            const EditElement = attributes[q.type]?.element;
-
-            if (!EditElement) {
-              return null;
-            }
-
-            return (
-              <div key={q.id} className="pt-2">
-                <p className="text-md font-semibold">
-                  {i + 1}: {q.text}
-                </p>
-                <EditElement attribute={questionAttribute} edit={edit} />
-              </div>
-            );
-          })}
+          (surveyQuestionsAttribute.value as SurveyQuestion[]).map((q, i) => (
+            <EditQuestionResponse
+              key={q.id}
+              i={i}
+              question={q}
+              element={element}
+              edit={edit}
+            />
+          ))}
       </div>
       <div className="mt-4 flex w-full flex-row items-center justify-between">
         <p className="text-sm italic">Auto-saved</p>
@@ -107,6 +91,78 @@ const SurveyResponseElement = ({ element, parent }: ElementProps) => {
 };
 
 export default SurveyResponseElement;
+
+type EditQuestionResponseProps = {
+  i: number;
+  question: SurveyQuestion;
+  element: ElementWithAttsGroupsChildren;
+  edit?: boolean;
+};
+
+const EditQuestionResponse = ({
+  i,
+  question,
+  element,
+  edit,
+}: EditQuestionResponseProps) => {
+  const utils = trpc.useContext();
+
+  // Check if the question exists as an attribute
+  const questionAttribute = element.atts.find(
+    (att) => att.name === question.id
+  );
+
+  if (!questionAttribute) {
+    return null;
+  }
+
+  if (question.type !== questionAttribute.type) {
+    return null;
+  }
+
+  // Check if the element requires ref
+  const reqsDBRef = QuestionTypesRequiringDBRef.includes(question.type);
+
+  // If it does, but not provided in question, then return warning
+  if (reqsDBRef && !question.ref) {
+    return (
+      <p>
+        Question {i + 1} requires a database reference, but none was provided.
+      </p>
+    );
+  }
+
+  const refDB = trpc.element.get.useQuery(question.ref!, {
+    enabled: reqsDBRef,
+  });
+
+  if (reqsDBRef && !refDB.data) {
+    return <p>Loading ref...</p>;
+  }
+
+  const EditElement = attributes[question.type]?.element;
+
+  if (!EditElement) {
+    return null;
+  }
+
+  return (
+    <div key={question.id} className="pt-2">
+      <p className="text-md font-semibold">
+        {i + 1}: {question.text}
+      </p>
+      {reqsDBRef && refDB.data ? (
+        <EditElement
+          attribute={questionAttribute}
+          edit={!!edit}
+          database={refDB.data}
+        />
+      ) : (
+        <EditElement attribute={questionAttribute} edit={!!edit} />
+      )}
+    </div>
+  );
+};
 
 export const surveyResponseCreateCheckPerms: ElementCreateCheckPermsFn = async (
   primsa,

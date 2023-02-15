@@ -10,6 +10,7 @@ import {
   PhotoIcon,
   QuestionMarkCircleIcon,
   Square3Stack3DIcon,
+  StarIcon,
   UserIcon,
   UsersIcon,
   ViewColumnsIcon,
@@ -41,6 +42,7 @@ import BooleanAttribute, { BooleanAttributeSchema } from "./Boolean";
 import ElementTypeAttribute, {
   ElementTypeAttributeSchema,
 } from "./ElementType";
+import STVAttribute, { STVAttributeSchema } from "./STV";
 
 const attributes: {
   [key in AttributeType]?: {
@@ -170,6 +172,14 @@ const attributes: {
     icon: Cog6ToothIcon,
     valueSchema: ElementTypeAttributeSchema,
     element: ElementTypeAttribute,
+    showInPicker: false,
+  },
+  [AttributeType.STV]: {
+    name: "STV",
+    description: "Single transferable vote",
+    icon: StarIcon,
+    valueSchema: STVAttributeSchema,
+    element: STVAttribute,
     showInPicker: false,
   },
 };

@@ -6,12 +6,13 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/solid";
 import cuid2 from "@paralleldrive/cuid2";
-import { AttributeType } from "@prisma/client";
+import { Attribute, AttributeType } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { z } from "zod";
 import attributes from ".";
 import { trpc } from "../../utils/trpc";
+import { ElementWithAttsGroupsChildren } from "../elements/utils";
 import { AttributeProps } from "./utils";
 
 export const SurveyQuestionTypes = [
@@ -20,7 +21,12 @@ export const SurveyQuestionTypes = [
   AttributeType.Date,
   AttributeType.Number,
   AttributeType.File,
+  AttributeType.STV,
 ] as const;
+
+export const QuestionTypesRequiringDBRef = [
+  AttributeType.STV,
+] as AttributeType[];
 
 export const SurveyQuestionsAttributeSchema = z
   .array(
@@ -28,6 +34,7 @@ export const SurveyQuestionsAttributeSchema = z
       id: z.string(),
       text: z.string(),
       type: z.enum(SurveyQuestionTypes),
+      ref: z.string().optional(),
     })
   )
   .default([]);
@@ -38,6 +45,7 @@ export type SurveyQuestion = {
   id: string;
   text: string;
   type: typeof SurveyQuestionTypes[number];
+  ref?: string;
 };
 
 export const SurveyQuestionsAttributeIcon = QuestionMarkCircleIcon;
@@ -84,6 +92,19 @@ const SurveyQuestionsAttribute = ({ attribute, edit }: AttributeProps) => {
         return {
           ...q,
           type,
+        };
+      }
+      return q;
+    });
+    handleValueUpdate(newValue);
+  };
+
+  const handleQuestionRefChange = (id: string, ref: string) => {
+    const newValue = (attribute.value as SurveyQuestion[]).map((q) => {
+      if (q.id === id) {
+        return {
+          ...q,
+          ref,
         };
       }
       return q;
@@ -145,6 +166,7 @@ const SurveyQuestionsAttribute = ({ attribute, edit }: AttributeProps) => {
               edit={edit}
               onTypeChange={(v) => handleQuestionTypeChange(q.id, v)}
               onTextChange={(v) => handleQuestionTextChange(q.id, v)}
+              onRefChange={(v) => handleQuestionRefChange(q.id, v)}
               onMoveUp={() => handleMoveUp(q.id)}
               onMoveDown={() => handleMoveDown(q.id)}
               onDelete={() => handleDeleteQuestion(q.id)}
@@ -167,6 +189,7 @@ const SurveyQuestionAttribute = ({
   question,
   onTypeChange,
   onTextChange,
+  onRefChange,
   onMoveUp,
   onMoveDown,
   onDelete,
@@ -175,6 +198,7 @@ const SurveyQuestionAttribute = ({
   edit: boolean;
   onTypeChange: (type: SurveyQuestionType) => void;
   onTextChange: (text: string) => void;
+  onRefChange: (ref: string) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDelete: () => void;
@@ -194,6 +218,13 @@ const SurveyQuestionAttribute = ({
   useEffect(() => {
     setTextValue(question.text);
   }, [question.text]);
+
+  const reqsDBRef = QuestionTypesRequiringDBRef.includes(question.type);
+
+  const refs = trpc.element.queryAll.useQuery(
+    { type: "Database" },
+    { enabled: reqsDBRef }
+  );
 
   return (
     <div className="pt-2">
@@ -218,6 +249,26 @@ const SurveyQuestionAttribute = ({
           <TrashIcon className="h-6 w-6 text-warning" />
         </button>
       </div>
+      {reqsDBRef && (
+        <select onChange={(e) => onRefChange(e.target.value)}>
+          <option value="" disabled selected>
+            Select a reference
+          </option>
+          {refs.data?.map((db: ElementWithAttsGroupsChildren) => {
+            // Get database name
+            const dbTitleAttribute = db.atts.find((a) => a.name === "Title") as
+              | Attribute
+              | undefined;
+
+            return (
+              <option key={db.id} value={db.id}>
+                {dbTitleAttribute?.value as string}
+              </option>
+            );
+          })}
+        </select>
+      )}
+
       <div className="flex flex-row flex-wrap items-center space-x-2 rounded-md p-2">
         {SurveyQuestionTypes.map((type) => {
           const typeInfo = attributes[type as AttributeType];

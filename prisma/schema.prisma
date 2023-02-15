@@ -112,6 +112,7 @@ enum AttributeType {
   File
   Image
   ElementType
+  STV
 }
 
 model Element {

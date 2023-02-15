@@ -93,14 +93,15 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
       };
     });
 
-    // Also add all the questions from the parent survey as attributes
+    // Also add all the questions from the parent survey as attributes,
+    // using their schemas to parse the default value
     atts = atts.concat(
       (questionsAttribute.value as SurveyQuestion[]).map((q) => {
+        if (!attributes[q.type]) throw new Error("Invalid attribute type");
         return {
           name: q.id,
           type: q.type,
-          value: "",
-          required: false,
+          value: attributes[q.type]!.valueSchema.parse(undefined),
         };
       })
     );
@@ -149,14 +150,15 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
     }
 
     // Check if the all group is in the interact groups
-    if (element.interactGroups.find((group) => group.name === "All")) return true;
+    if (element.interactGroups.find((group) => group.name === "All"))
+      return true;
 
     for (const elGroup of element.interactGroups) {
       for (const userGroup of user.groups) {
         if (elGroup.id === userGroup.id) return true;
       }
     }
-    
+
     return false;
   }, [element, user]);
 

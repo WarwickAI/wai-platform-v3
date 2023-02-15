@@ -25,8 +25,6 @@ const NavBar = () => {
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  console.log(mobileOpen);
-
   return (
     <div>
       {(!size.width || size.width <= 1100) && (

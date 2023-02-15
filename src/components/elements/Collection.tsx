@@ -6,7 +6,6 @@ import EventElement from "./Event";
 import {
   ElementAttributeDescription,
   ElementProps,
-  ElementWithAttsGroups,
   ElementWithAttsGroupsChildren,
 } from "./utils";
 

@@ -36,14 +36,14 @@ const Modify = ({ parent, element }: ModifyProps) => {
         <>
           <Popover.Button
             className={`rounded-full p-1 transition-colors ${
-              open ? "bg-neutral" : "bg-white"
+              open ? "z-10 bg-neutral" : "bg-white"
             }`}
           >
             <Bars4Icon
               className={`h-5 w-5 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <Popover.Panel className="absolute left-0 top-10 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
+          <Popover.Panel className="absolute left-0 top-8 z-10 flex w-72 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
             <button
               onClick={handleDelete}
               className="flex flex-row items-center space-x-2 rounded-md p-2 hover:bg-slate-100"

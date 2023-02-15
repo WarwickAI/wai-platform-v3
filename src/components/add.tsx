@@ -51,14 +51,14 @@ const Add = ({ parent, index }: AddProps) => {
         <>
           <Popover.Button
             className={`rounded-full transition-colors ${
-              open ? "bg-neutral" : "bg-white"
+              open ? "z-10 bg-neutral" : "bg-white"
             }`}
           >
             <PlusIcon
               className={`h-6 w-6 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <div className="absolute top-8 left-0 z-10 flex w-full flex-row justify-center">
+          <div className="absolute top-6 left-0 z-10 flex w-full flex-row justify-center">
             <Popover.Panel className="flex max-h-52 w-72 flex-col space-y-1 overflow-x-scroll rounded-md border-2 bg-white p-1 text-center">
               {Object.keys(Elements)
                 .filter((type) => Elements[type as ElementType]?.showInPicker)

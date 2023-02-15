@@ -65,14 +65,14 @@ const Permissions = ({ element, parent }: PermissionsProps) => {
         <>
           <Popover.Button
             className={`rounded-full p-1 transition-colors ${
-              open ? "bg-neutral" : "bg-white"
+              open ? "z-10 bg-neutral" : "bg-white"
             }`}
           >
             <LockClosedIcon
               className={`h-5 w-5 ${open ? "text-white" : "text-neutral"}`}
             />
           </Popover.Button>
-          <Popover.Panel className="absolute top-10 left-0 z-10 flex flex-col space-y-1 divide-y-2 rounded-md border-2 bg-white p-2 text-center">
+          <Popover.Panel className="absolute top-8 left-0 z-10 flex flex-col space-y-1 divide-y-2 rounded-md border-2 bg-white p-2 text-center">
             {parent && (
               <button
                 className="rounded-full bg-primary text-sm text-white"

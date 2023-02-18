@@ -105,8 +105,6 @@ export const adminRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { tableCopy, fromDate } = input;
 
-      const now = new Date();
-
       // Get the Eligible to Vote group
       const eligibleToVoteGroup = await ctx.prisma.group.findUniqueOrThrow({
         where: {

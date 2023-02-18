@@ -21,8 +21,7 @@ if (env.NODE_ENV !== "production") {
 // make sure admin and exec roles are added to the database
 // on startup, adding user edward.upton@warwick.ac.uk to both
 const setUpGroups = async () => {
-  console.log("Adding admin and exec roles to database");
-
+  console.log("Adding admin group to database");
   let adminGroup = await prisma.group.findFirst({
     where: {
       name: "Admin",
@@ -37,6 +36,7 @@ const setUpGroups = async () => {
     });
   }
 
+  console.log("Adding exec group to database");
   let execGroup = await prisma.group.findFirst({
     where: {
       name: "Exec",
@@ -51,6 +51,7 @@ const setUpGroups = async () => {
     });
   }
 
+  console.log("Adding all group to database");
   let allGroup = await prisma.group.findFirst({
     where: {
       name: "All",
@@ -65,11 +66,41 @@ const setUpGroups = async () => {
     });
   }
 
+  console.log("Adding member group to database");
+  let memberGroup = await prisma.group.findFirst({
+    where: {
+      name: "Member",
+    },
+  });
+
+  if (!memberGroup) {
+    memberGroup = await prisma.group.create({
+      data: {
+        name: "Member",
+      },
+    });
+  }
+
+  console.log("Adding eligible to vote group to database");
+  let eligibleToVoteGroup = await prisma.group.findFirst({
+    where: {
+      name: "Eligible to Vote",
+    },
+  });
+
+  if (!eligibleToVoteGroup) {
+    eligibleToVoteGroup = await prisma.group.create({
+      data: {
+        name: "Eligible to Vote",
+      },
+    });
+  }
+
   // Loop through all Admin User Emails
   const adminUserEmails = env.ADMIN_USERS_EMAILS.split(",");
 
-  console.log("Adding admin users to admin group")
-  console.log(adminUserEmails)
+  console.log("Adding admin users to admin group");
+  console.log(adminUserEmails);
 
   for (const email of adminUserEmails) {
     const user = await prisma.user.findFirst({

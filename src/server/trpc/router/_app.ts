@@ -7,6 +7,7 @@ import { groupRouter } from "./group";
 import { userRouter } from "./user";
 import { attributeRouter } from "./attribute";
 import { fileRouter } from "./file";
+import { adminRouter } from "./admin";
 
 export const appRouter = router({
   example: exampleRouter,
@@ -16,6 +17,7 @@ export const appRouter = router({
   auth: authRouter,
   user: userRouter,
   file: fileRouter,
+  admin: adminRouter,
 });
 
 // export type definition of API

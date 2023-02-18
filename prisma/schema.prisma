@@ -59,6 +59,7 @@ model User {
   groups        Group[]
   discordId     String?   @unique
   File          File[]
+  UniID         String?   @unique
 }
 
 model Group {

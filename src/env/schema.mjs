@@ -27,6 +27,7 @@ export const serverSchema = z.object({
   DO_SPACES_ACCESS_KEY_ID: z.string(),
   DO_SPACES_SECRET_KEY: z.string(),
   ADMIN_USERS_EMAILS: z.string(),
+  WARWICK_SU_API_KEY: z.string(),
 });
 
 /**

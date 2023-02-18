@@ -1,5 +1,6 @@
 import {
   Bars3Icon,
+  BuildingLibraryIcon,
   HomeIcon,
   UserIcon,
   XMarkIcon,
@@ -8,7 +9,7 @@ import { signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { CustomIcon } from "../utils";
 
@@ -24,6 +25,15 @@ const NavBar = () => {
   const router = useRouter();
 
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isAdmin = useMemo(() => {
+    // Check if user has admin group
+    if (user.data) {
+      return user.data.groups.some((group) => group.name === "Admin");
+    }
+
+    return false;
+  }, [user.data]);
 
   return (
     <div>
@@ -79,12 +89,22 @@ const NavBar = () => {
           })}
         </ul>
         <div></div>
-        <div
-          className="mb-5 -ml-2 flex w-36 flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white"
-          onClick={() => (user?.data ? signOut() : signIn())}
-        >
-          <UserIcon className=" h-8 w-8 p-2 text-black" />
-          <p>{user?.data ? "Logout" : "Login"}</p>
+        <div>
+          <div
+            className="mb-5 -ml-2 flex w-36 flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white"
+            onClick={() => (user?.data ? signOut() : signIn())}
+          >
+            <UserIcon className=" h-8 w-8 p-2 text-black" />
+            <p>{user?.data ? "Logout" : "Login"}</p>
+          </div>
+          {isAdmin && (
+            <Link href="/admin">
+              <div className="mb-5 -ml-2 flex w-36 flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white">
+                <BuildingLibraryIcon className=" h-8 w-8 p-2 text-black" />
+                <p>Admin</p>
+              </div>
+            </Link>
+          )}
         </div>
       </nav>
     </div>

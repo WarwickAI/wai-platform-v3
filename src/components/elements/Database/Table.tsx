@@ -1,5 +1,6 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { z } from "zod";
+import attributes from "../../attributes";
 import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
 import { ColumnHeader } from "../../attributes/Columns/ColumnHeader";
 import DateAttribute from "../../attributes/Date";
@@ -77,25 +78,20 @@ const DatabaseTable = ({
                     columns.findIndex((c) => a.name === c.name) -
                     columns.findIndex((c) => b.name === c.name)
                 )
-                .map((att) => (
-                  <td
-                    key={element.id + att.name}
-                    className="border-r border-r-gray-300"
-                  >
-                    {att.type === "Text" && (
-                      <TextAttribute attribute={att} edit={edit} size="sm" />
-                    )}
-                    {att.type === "Date" && (
-                      <DateAttribute attribute={att} edit={edit} />
-                    )}
-                    {att.type === "Markdown" && (
-                      <MarkdownAttribute attribute={att} edit={edit} />
-                    )}
-                    {att.type === "Users" && (
-                      <UsersAttribute attribute={att} edit={edit} />
-                    )}
-                  </td>
-                ))}
+                .map((att) => {
+                  const AttributeEdit = attributes[att.type]?.element;
+
+                  if (!AttributeEdit) return null;
+
+                  return (
+                    <td
+                      key={element.id + att.name}
+                      className="border-r border-r-gray-300"
+                    >
+                      <AttributeEdit attribute={att} edit={edit} />
+                    </td>
+                  );
+                })}
               <td></td>
             </tr>
           ))}

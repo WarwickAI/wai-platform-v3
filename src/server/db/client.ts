@@ -65,39 +65,35 @@ const setUpGroups = async () => {
     });
   }
 
-  const edward = await prisma.user.findFirst({
-    where: {
-      email: "edward.upton@warwick.ac.uk",
-    },
-  });
+  // Loop through all Admin User Emails
+  const adminUserEmails = env.ADMIN_USERS_EMAILS.split(",");
 
-  if (!edward) {
-    console.log("Could not find user edward");
-  } else {
-    await prisma.group.update({
+  console.log("Adding admin users to admin group")
+  console.log(adminUserEmails)
+
+  for (const email of adminUserEmails) {
+    const user = await prisma.user.findFirst({
       where: {
-        id: adminGroup.id,
-      },
-      data: {
-        users: {
-          connect: {
-            id: edward.id,
-          },
-        },
+        email,
       },
     });
-    await prisma.group.update({
-      where: {
-        id: execGroup.id,
-      },
-      data: {
-        users: {
-          connect: {
-            id: edward.id,
+
+    if (!user) {
+      console.log(`Could not find user ${email}`);
+    } else {
+      await prisma.group.update({
+        where: {
+          id: adminGroup.id,
+        },
+        data: {
+          users: {
+            connect: {
+              id: user.id,
+            },
           },
         },
-      },
-    });
+      });
+    }
   }
 };
 

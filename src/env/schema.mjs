@@ -26,6 +26,7 @@ export const serverSchema = z.object({
   DO_SPACES_BUCKET: z.string(),
   DO_SPACES_ACCESS_KEY_ID: z.string(),
   DO_SPACES_SECRET_KEY: z.string(),
+  ADMIN_USERS_EMAILS: z.string(),
 });
 
 /**

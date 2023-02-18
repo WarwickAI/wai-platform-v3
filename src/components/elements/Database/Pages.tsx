@@ -1,5 +1,8 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
-import PageElement from "../Page";
+import Link from "next/link";
+import { env } from "../../../env/client.mjs";
+import { trpc } from "../../../utils/trpc";
+import PageElement, { generateUUIDRoute } from "../Page";
 import { ElementWithAttsGroups } from "../utils";
 
 type DatabasePagesProps = {
@@ -32,3 +35,65 @@ const DatabasePages = ({ pages, handleAddRow, edit }: DatabasePagesProps) => {
 };
 
 export default DatabasePages;
+
+export const DatabasePagesCard = ({
+  pages,
+  handleAddRow,
+  edit,
+}: DatabasePagesProps) => {
+  return (
+    <div className="flex w-full flex-row flex-wrap gap-2">
+      {pages.map((page) => (
+        <PageCard key={page.id} page={page} />
+      ))}
+    </div>
+  );
+};
+
+const PageCard = ({ page }: { page: ElementWithAttsGroups }) => {
+  const coverAttribute = page.atts.find((a) => a.name === "Cover");
+  const { data: coverFile } = trpc.file.get.useQuery(
+    { id: (coverAttribute?.value as string) || "" },
+    {
+      enabled: !!coverAttribute?.value,
+    }
+  );
+
+  const titleAttribute = page.atts.find((a) => a.name === "Title");
+
+  return (
+    <Link
+      href={
+        page.route.match(
+          /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
+        )
+          ? "/" +
+            generateUUIDRoute(
+              page.route,
+              titleAttribute ? (titleAttribute.value as string) : undefined
+            )
+          : "/" + page.route
+      }
+    >
+      <div
+        className={`flex h-72 w-48 grow flex-col justify-end  overflow-clip rounded-xl hover:cursor-pointer ${
+          coverFile ? "bg-cover bg-center bg-no-repeat" : "bg-slate-10 border-2"
+        }`}
+        style={{
+          backgroundImage: coverFile
+            ? `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(https://${env.NEXT_PUBLIC_CDN_URL}/${coverFile.uuid})`
+            : "",
+        }}
+      >
+        {/* Put title at bottom */}
+        <p
+          className={`p-4 text-lg font-medium ${
+            coverFile ? "text-white" : "text-black"
+          }`}
+        >
+          {titleAttribute?.value as string}
+        </p>
+      </div>
+    </Link>
+  );
+};

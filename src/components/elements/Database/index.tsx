@@ -12,7 +12,7 @@ import {
   ElementAttributeDescription,
 } from "../utils";
 import DatabaseEvents from "./Events";
-import DatabasePages from "./Pages";
+import DatabasePages, { DatabasePagesCard } from "./Pages";
 import DatabaseTable from "./Table";
 
 export const DatabaseRequiredAttributes: ElementAttributeDescription[] = [
@@ -195,7 +195,7 @@ const DatabaseElement = ({
   return (
     <div>
       <div className="flex flex-row space-x-2">
-        {databaseTitle && (
+        {databaseTitle && edit && (
           <TextAttribute
             attribute={databaseTitle}
             edit={edit}
@@ -234,6 +234,13 @@ const DatabaseElement = ({
       )}
       {viewAs === "pages" && (
         <DatabasePages
+          pages={sortedChildren}
+          handleAddRow={handleAddRow}
+          edit={edit}
+        />
+      )}
+      {viewAs === "page_cards" && (
+        <DatabasePagesCard
           pages={sortedChildren}
           handleAddRow={handleAddRow}
           edit={edit}

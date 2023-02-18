@@ -5,7 +5,7 @@ import { AttributeProps } from "./utils";
 
 export const DatabaseViewTypeIcon = ViewColumnsIcon;
 
-export const ViewTypes = ["table", "events", "pages"] as const;
+export const ViewTypes = ["table", "events", "pages", "page_cards"] as const;
 
 export const DatabaseViewTypeAttributeSchema = z.enum(ViewTypes).default("table");
 
@@ -45,6 +45,7 @@ const DatabaseViewTypeAttribute = ({ attribute, edit }: AttributeProps) => {
         <option value="table">Table</option>
         <option value="events">Events</option>
         <option value="pages">Pages</option>
+        <option value="page_cards">Page Cards</option>
       </select>
     </div>
   );

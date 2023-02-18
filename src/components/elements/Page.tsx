@@ -325,7 +325,7 @@ const PageElement = ({ element, page }: ElementProps) => {
 
 export default PageElement;
 
-const generateUUIDRoute = (uuid: string, title?: string) => {
+export const generateUUIDRoute = (uuid: string, title?: string) => {
   return (
     (title ? title.replaceAll("-", "_").replaceAll(" ", "_") : "No_Title") +
     "-" +

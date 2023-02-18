@@ -23,6 +23,7 @@ export const EventRequiredAttributes: ElementAttributeDescription[] = [
   { name: "End Date", type: "Date" },
   { name: "Location", type: "Text" },
   { name: "Attendees", type: "Users", optional: true },
+  { name: "Interested", type: "Users", optional: true },
 ];
 
 const EventElement = ({ element, edit, page }: ElementProps) => {

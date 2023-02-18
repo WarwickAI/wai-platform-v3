@@ -37,6 +37,12 @@ const AdminPanel = () => {
                   <p className="text-sm text-gray-500">Manage membership</p>
                 </div>
               </Link>
+              <Link href="/admin/elements">
+                <div className="flex cursor-pointer flex-col items-center justify-center space-y-1 rounded-lg bg-gray-100 px-4 py-2 hover:bg-gray-200">
+                  <p className="text-lg font-bold">Elements</p>
+                  <p className="text-sm text-gray-500">Manage elements</p>
+                </div>
+              </Link>
             </div>
           </div>
         </div>

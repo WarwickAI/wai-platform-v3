@@ -215,6 +215,7 @@ const DatabaseElement = ({
       {!viewAs ||
         (viewAs === "table" && (
           <DatabaseTable
+            database={element}
             columns={columns || []}
             edit={edit}
             elements={sortedChildren}

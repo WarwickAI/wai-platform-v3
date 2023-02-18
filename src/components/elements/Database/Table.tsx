@@ -1,15 +1,16 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { useMemo, useState } from "react";
 import { z } from "zod";
+import { trpc } from "../../../utils/trpc";
 import attributes from "../../attributes";
 import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
 import { ColumnHeader } from "../../attributes/Columns/ColumnHeader";
-import DateAttribute from "../../attributes/Date";
-import MarkdownAttribute from "../../attributes/Markdown";
-import TextAttribute from "../../attributes/Text";
-import UsersAttribute from "../../attributes/Users";
+import Modify from "../../modify";
+import Permissions from "../../permissions";
 import { ElementWithAttsGroups } from "../utils";
 
 type DatabaseTableProps = {
+  database: ElementWithAttsGroups;
   columns: z.infer<typeof ColumnAttributeSchema>;
   elements: ElementWithAttsGroups[];
   edit: boolean;
@@ -23,6 +24,7 @@ type DatabaseTableProps = {
 };
 
 const DatabaseTable = ({
+  database,
   columns,
   elements,
   edit,
@@ -71,29 +73,13 @@ const DatabaseTable = ({
         </thead>
         <tbody>
           {elements.map((element) => (
-            <tr key={element.id}>
-              {element.atts
-                .sort(
-                  (a, b) =>
-                    columns.findIndex((c) => a.name === c.name) -
-                    columns.findIndex((c) => b.name === c.name)
-                )
-                .map((att) => {
-                  const AttributeEdit = attributes[att.type]?.element;
-
-                  if (!AttributeEdit) return null;
-
-                  return (
-                    <td
-                      key={element.id + att.name}
-                      className="border-r border-r-gray-300"
-                    >
-                      <AttributeEdit attribute={att} edit={edit} />
-                    </td>
-                  );
-                })}
-              <td></td>
-            </tr>
+            <DatabaseTableRow
+              key={element.id}
+              database={database}
+              element={element}
+              columns={columns}
+              editParent={edit}
+            />
           ))}
           {edit && (
             <tr>
@@ -113,3 +99,78 @@ const DatabaseTable = ({
 };
 
 export default DatabaseTable;
+
+type DatabaseTableRowProps = {
+  database: ElementWithAttsGroups;
+  element: ElementWithAttsGroups;
+  columns: z.infer<typeof ColumnAttributeSchema>;
+  editParent: boolean;
+};
+
+const DatabaseTableRow = ({
+  database,
+  element,
+  columns,
+  editParent,
+}: DatabaseTableRowProps) => {
+  const userData = trpc.user.getMe.useQuery();
+  const user = userData.data;
+
+  const [hovered, setHovered] = useState(false);
+
+  const edit = useMemo(() => {
+    if (!element || !user) return false;
+
+    // Check it the user is an admin
+    if (user.groups.find((g) => g.name === "Admin")) return true;
+
+    // Check if the all group is in the edit groups
+    if (element.editGroups.find((group) => group.name === "All")) return true;
+
+    return user.groups.some((g) =>
+      element.editGroups.find((eg) => eg.id === g.id)
+    );
+  }, [element, user]);
+
+  // Should the element be shown as hovered
+  const showHovered = hovered && editParent;
+  const showPerms = hovered && edit;
+
+  return (
+    <tr
+      key={element.id}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {element.atts
+        .sort(
+          (a, b) =>
+            columns.findIndex((c) => a.name === c.name) -
+            columns.findIndex((c) => b.name === c.name)
+        )
+        .map((att) => {
+          const AttributeEdit = attributes[att.type]?.element;
+
+          if (!AttributeEdit) return null;
+
+          return (
+            <td
+              key={element.id + att.name}
+              className="border-r border-r-gray-300"
+            >
+              <AttributeEdit attribute={att} edit={edit} />
+            </td>
+          );
+        })}
+      {/* This is the adding column cell */}
+      <td>
+        <div className="flex flex-row space-x-1">
+          {showPerms && element && (
+            <Permissions element={element} parent={database} />
+          )}
+          {showHovered && <Modify parent={database} element={element} />}
+        </div>
+      </td>
+    </tr>
+  );
+};

@@ -98,15 +98,17 @@ export const GroupsEdit = ({
               )}
             </GroupBadge>
           ))}
-        {edit && (
-          <div className="relative w-full">
-            <div className="flex w-full flex-row space-x-2">
-              <p className="text-base">{name}</p>
+        <div className="relative w-full">
+          <div className="flex w-full flex-row space-x-2">
+            <p className="text-base">{name}</p>
+            {edit && (
               <Combobox.Input
                 className="input input-sm"
                 onChange={(event) => setQuery(event.target.value)}
               />
-            </div>
+            )}
+          </div>
+          {edit && (
             <Combobox.Options className="absolute right-0 z-10 flex w-full flex-col space-y-0 rounded-md border-2 bg-white p-2">
               {filteredGroups.map((g) => (
                 <Combobox.Option key={g.id} value={g}>
@@ -127,8 +129,8 @@ export const GroupsEdit = ({
                 </Combobox.Option>
               ))}
             </Combobox.Options>
-          </div>
-        )}
+          )}
+        </div>
       </Combobox>
     </div>
   );

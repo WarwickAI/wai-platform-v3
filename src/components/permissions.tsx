@@ -1,6 +1,7 @@
 import { Popover } from "@headlessui/react";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { Element, Group } from "@prisma/client";
+import { useMemo } from "react";
 import { trpc } from "../utils/trpc";
 import { GroupsEdit } from "./attributes/Groups";
 
@@ -22,6 +23,9 @@ type PermissionsProps = {
 const Permissions = ({ element, parent }: PermissionsProps) => {
   const utils = trpc.useContext();
 
+  const userData = trpc.user.getMe.useQuery();
+  const user = userData.data;
+
   const modifyPerms = trpc.element.modifyPerms.useMutation({
     onSuccess: () => {
       utils.element.getAll.invalidate();
@@ -33,6 +37,18 @@ const Permissions = ({ element, parent }: PermissionsProps) => {
         });
     },
   });
+
+  // Check if the user has master perms on this element
+  const canModifyPerms = useMemo(() => {
+    if (!user) return false;
+
+    // Check if user has Admin group
+    if (user.groups.findIndex((g) => g.name === "Admin") !== -1) return true;
+
+    return element.masterGroups.some(
+      (g) => user.groups.findIndex((ug) => ug.id === g.id) !== -1
+    );
+  }, [user, element]);
 
   const handleInheritFromParent = () => {
     if (!parent) return;
@@ -73,7 +89,7 @@ const Permissions = ({ element, parent }: PermissionsProps) => {
             />
           </Popover.Button>
           <Popover.Panel className="absolute top-8 left-0 z-10 flex flex-col space-y-1 divide-y-2 rounded-md border-2 bg-white p-2 text-center">
-            {parent && (
+            {parent && canModifyPerms && (
               <button
                 className="rounded-full bg-primary text-sm text-white"
                 onClick={handleInheritFromParent}
@@ -86,24 +102,28 @@ const Permissions = ({ element, parent }: PermissionsProps) => {
               groups={element.masterGroups}
               element={element}
               parent={parent}
+              canModifyPerms={canModifyPerms}
             />
             <PermissionSelect
               permissionName="edit"
               groups={element.editGroups}
               element={element}
               parent={parent}
+              canModifyPerms={canModifyPerms}
             />
             <PermissionSelect
               permissionName="interact"
               groups={element.interactGroups}
               element={element}
               parent={parent}
+              canModifyPerms={canModifyPerms}
             />
             <PermissionSelect
               permissionName="view"
               groups={element.viewGroups}
               element={element}
               parent={parent}
+              canModifyPerms={canModifyPerms}
             />
           </Popover.Panel>
         </>
@@ -119,6 +139,7 @@ type PermissionSelectProps = {
   groups: Group[];
   element: Element;
   parent?: Element;
+  canModifyPerms?: boolean;
 };
 
 const PermissionSelect = ({
@@ -126,6 +147,7 @@ const PermissionSelect = ({
   groups,
   element,
   parent,
+  canModifyPerms,
 }: PermissionSelectProps) => {
   const utils = trpc.useContext();
   const updatePerms = trpc.element.modifyPerms.useMutation();
@@ -160,7 +182,7 @@ const PermissionSelect = ({
     <GroupsEdit
       groupIds={groups.map((g) => g.id)}
       onChange={handlePermChange}
-      edit={true}
+      edit={!!canModifyPerms}
       name={permissionName.charAt(0).toUpperCase() + permissionName.slice(1)}
     />
   );

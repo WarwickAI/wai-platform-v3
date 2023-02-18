@@ -14,6 +14,7 @@ import {
   SurveyQuestion,
 } from "../attributes/SurveyQuestion";
 import attributes from "../attributes";
+import STVAttribute from "../attributes/STV";
 
 export const SurveyResponseRequiredAttributes: ElementAttributeDescription[] =
   [];
@@ -152,7 +153,8 @@ const EditQuestionResponse = ({
         {i + 1}: {question.text}
       </p>
       {reqsDBRef && refDB.data ? (
-        <EditElement
+        // At the moment, only STV supports refDB
+        <STVAttribute
           attribute={questionAttribute}
           edit={!!edit}
           database={refDB.data}

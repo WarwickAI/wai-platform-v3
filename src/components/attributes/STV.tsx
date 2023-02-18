@@ -102,6 +102,19 @@ export const STVAttribute = ({ attribute, edit, database }: STVProps) => {
     handleValueUpdate(newValue);
   };
 
+  const handleRemove = (id: string) => {
+    const curValue = attribute.value as string[];
+
+    const index = curValue.findIndex((q) => q === id);
+
+    // If index exists, remove it
+    if (index !== -1) {
+      const newValue = [...curValue];
+      newValue.splice(index, 1);
+      handleValueUpdate(newValue);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       {database.children
@@ -125,7 +138,7 @@ export const STVAttribute = ({ attribute, edit, database }: STVProps) => {
               <button onClick={() => handleMoveDown(child.id)}>
                 <ChevronDownIcon className="h-6 w-6" />
               </button>
-              <button onClick={() => {}}>
+              <button onClick={() => handleRemove(child.id)}>
                 <TrashIcon className="h-6 w-6 text-warning" />
               </button>
             </div>

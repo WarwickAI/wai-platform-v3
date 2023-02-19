@@ -91,7 +91,7 @@ const PageCard = ({ page }: { page: ElementWithAttsGroups }) => {
         }`}
         style={{
           backgroundImage: coverFile
-            ? `linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(https://${env.NEXT_PUBLIC_CDN_URL}/${coverFile.uuid})`
+            ? `linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url(https://${env.NEXT_PUBLIC_CDN_URL}/${coverFile.uuid})`
             : "",
         }}
       >

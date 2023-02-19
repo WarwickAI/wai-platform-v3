@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
 import { AttributeProps } from "./utils";
-import { File as FileEntity } from "@prisma/client";
 import { trpc } from "../../utils/trpc";
 import CryptoJS from "crypto-js";
 import { z } from "zod";
+import { TrashIcon } from "@heroicons/react/24/solid";
 
 export const IMAGE_MIME_TYPES = [
   "image/gif",
@@ -188,6 +188,13 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
             </p>
           )}
         </div>
+        <button
+          onClick={() => {
+            editAttribute.mutate({ id: attribute.id, value: "" });
+          }}
+        >
+          <TrashIcon className="h-6 w-6 text-secondary" />
+        </button>
       </div>
     );
   } else {

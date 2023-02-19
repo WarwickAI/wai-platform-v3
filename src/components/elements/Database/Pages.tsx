@@ -13,7 +13,7 @@ type DatabasePagesProps = {
 
 const DatabasePages = ({ pages, handleAddRow, edit }: DatabasePagesProps) => {
   return (
-    <div className="flex flex-row flex-wrap space-x-2">
+    <div className="flex flex-row flex-wrap gap-2">
       {pages.map((page) => (
         <PageElement
           key={page.id}

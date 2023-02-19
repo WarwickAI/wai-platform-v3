@@ -227,7 +227,7 @@ const PageElement = ({ element, page }: ElementProps) => {
                   />
                 )}
                 <div className="absolute -left-12 mt-4 flex flex-col items-center justify-end space-x-1 space-y-0 pr-2 text-neutral transition-opacity lg:-left-24 lg:mt-0 lg:flex-row lg:pr-5">
-                  {element && (
+                  {edit && element && (
                     <div
                       className="tooltip hidden lg:block"
                       data-tip={

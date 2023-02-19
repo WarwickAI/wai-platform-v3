@@ -82,7 +82,7 @@ const MarkdownAttribute = ({
   }, []);
 
   return (
-    <div>
+    <div className="w-full">
       {edit && editMode ? (
         <div className="relative">
           <SimpleMDEReact
@@ -100,9 +100,13 @@ const MarkdownAttribute = ({
           </div>
         </div>
       ) : (
-        <article className="prose" onClick={() => setEditMode(true)}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {!edit || value.length > 0 ? value : placeholder ? placeholder : "*Edit markdown...*"}
+        <article className="prose w-full max-w-none" onClick={() => setEditMode(true)}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} className="w-full">
+            {!edit || value.length > 0
+              ? value
+              : placeholder
+              ? placeholder
+              : "*Edit markdown...*"}
           </ReactMarkdown>
         </article>
       )}

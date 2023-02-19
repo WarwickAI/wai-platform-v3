@@ -2,6 +2,8 @@ import {
   Bars3Icon,
   BuildingLibraryIcon,
   HomeIcon,
+  ShoppingBagIcon,
+  StarIcon,
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
@@ -15,6 +17,8 @@ import { CustomIcon } from "../utils";
 
 const Links: { name: string; route: string; icon: CustomIcon }[] = [
   { name: "Home", route: "/", icon: HomeIcon },
+  { name: "Election", route: "/election", icon: StarIcon },
+  { name: "Merch", route: "/merch", icon: ShoppingBagIcon },
 ];
 
 const NavBar = () => {

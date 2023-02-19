@@ -179,7 +179,14 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
               : ""}
           </button>
           {fileEntity.data ? (
-            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm">
+            <p className="flex flex-row space-x-1 overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm">
+              <button
+                onClick={() => {
+                  editAttribute.mutate({ id: attribute.id, value: "" });
+                }}
+              >
+                <TrashIcon className="h-6 w-6 text-secondary" />
+              </button>
               Uploaded: {fileEntity.data?.fileName}
             </p>
           ) : (
@@ -188,13 +195,6 @@ const ImageAttribute = ({ attribute, edit }: AttributeProps) => {
             </p>
           )}
         </div>
-        <button
-          onClick={() => {
-            editAttribute.mutate({ id: attribute.id, value: "" });
-          }}
-        >
-          <TrashIcon className="h-6 w-6 text-secondary" />
-        </button>
       </div>
     );
   } else {

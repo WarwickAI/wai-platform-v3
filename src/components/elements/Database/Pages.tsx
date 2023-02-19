@@ -49,7 +49,7 @@ export const DatabasePagesCard = ({
       {edit && (
         <button
           onClick={handleAddRow}
-          className="flex h-72 w-48 grow flex-col items-center justify-center overflow-clip rounded-xl border-2 bg-slate-100 hover:cursor-pointer"
+          className="flex h-72 w-48 max-w-[24rem] grow flex-col items-center justify-center overflow-clip rounded-xl border-2 bg-slate-100 hover:cursor-pointer"
         >
           <PlusIcon className="h-6 w-6 text-neutral" />
         </button>
@@ -84,7 +84,7 @@ const PageCard = ({ page }: { page: ElementWithAttsGroups }) => {
       }
     >
       <div
-        className={`flex h-72 w-48 grow flex-col justify-end  overflow-clip rounded-xl hover:cursor-pointer ${
+        className={`flex h-72 min-w-[12rem] max-w-[24rem] grow flex-col justify-end  overflow-clip rounded-xl hover:cursor-pointer ${
           coverFile
             ? "bg-cover bg-center bg-no-repeat"
             : "border-2 bg-slate-100"

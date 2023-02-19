@@ -40,6 +40,7 @@ export const PageRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
   { name: "Icon", type: "Image", optional: true },
   { name: "Cover", type: "Image", optional: true },
+  { name: "Card", type: "Image", optional: true },
 ];
 
 const PageElement = ({ element, page }: ElementProps) => {

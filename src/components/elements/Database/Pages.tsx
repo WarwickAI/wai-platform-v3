@@ -46,16 +46,24 @@ export const DatabasePagesCard = ({
       {pages.map((page) => (
         <PageCard key={page.id} page={page} />
       ))}
+      {edit && (
+        <button
+          onClick={handleAddRow}
+          className="flex h-72 w-48 grow flex-col items-center justify-center overflow-clip rounded-xl border-2 bg-slate-100 hover:cursor-pointer"
+        >
+          <PlusIcon className="h-6 w-6 text-neutral" />
+        </button>
+      )}
     </div>
   );
 };
 
 const PageCard = ({ page }: { page: ElementWithAttsGroups }) => {
-  const coverAttribute = page.atts.find((a) => a.name === "Cover");
+  const cardAttribute = page.atts.find((a) => a.name === "Card");
   const { data: coverFile } = trpc.file.get.useQuery(
-    { id: (coverAttribute?.value as string) || "" },
+    { id: (cardAttribute?.value as string) || "" },
     {
-      enabled: !!coverAttribute?.value,
+      enabled: !!cardAttribute?.value,
     }
   );
 
@@ -77,7 +85,9 @@ const PageCard = ({ page }: { page: ElementWithAttsGroups }) => {
     >
       <div
         className={`flex h-72 w-48 grow flex-col justify-end  overflow-clip rounded-xl hover:cursor-pointer ${
-          coverFile ? "bg-cover bg-center bg-no-repeat" : "bg-slate-10 border-2"
+          coverFile
+            ? "bg-cover bg-center bg-no-repeat"
+            : "border-2 bg-slate-100"
         }`}
         style={{
           backgroundImage: coverFile

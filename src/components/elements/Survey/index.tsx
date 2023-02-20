@@ -1,4 +1,12 @@
 import { Popover, RadioGroup } from "@headlessui/react";
+import {
+  QuestionMarkCircleIcon,
+  Cog6ToothIcon,
+} from "@heroicons/react/24/solid";
+import {
+  QuestionMarkCircleIcon as QuestionMarkCircleOutlineIcon,
+  Cog6ToothIcon as Cog6ToothOutlineIcon,
+} from "@heroicons/react/24/outline";
 import { AttributeType } from "@prisma/client";
 import { signIn } from "next-auth/react";
 import { useMemo, useState } from "react";
@@ -184,7 +192,16 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
             <Popover className="relative">
               {({ open }) => (
                 <>
-                  <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
+                  <Popover.Button
+                    className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
+                      open ? "outline-2" : "outline-none"
+                    }`}
+                  >
+                    {open ? (
+                      <QuestionMarkCircleIcon className="w-5" />
+                    ) : (
+                      <QuestionMarkCircleOutlineIcon className="w-5" />
+                    )}
                     <span className="text-sm">Questions</span>
                   </Popover.Button>
                   <Popover.Panel className="absolute top-8 left-0 z-10 flex w-96 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">
@@ -201,7 +218,16 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
           <Popover className="relative">
             {({ open }) => (
               <>
-                <Popover.Button className="flex flex-row items-center space-x-2 rounded-lg bg-primary px-2 py-1 font-semibold text-primary-content hover:bg-primary-focus">
+                <Popover.Button
+                  className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
+                    open ? "outline-2" : "outline-none"
+                  }`}
+                >
+                  {open ? (
+                    <Cog6ToothIcon className="w-5" />
+                  ) : (
+                    <Cog6ToothOutlineIcon className="w-5" />
+                  )}
                   <span className="text-sm">Settings</span>
                 </Popover.Button>
                 <Popover.Panel className="absolute top-8 left-0 z-10 flex w-80 flex-col space-y-1 rounded-md border-2 bg-white p-2 text-center">

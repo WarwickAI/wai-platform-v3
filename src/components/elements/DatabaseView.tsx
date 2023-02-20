@@ -46,7 +46,7 @@ const DatabaseViewElement = ({ element, edit }: ElementProps) => {
   return (
     <div>
       {edit && (
-        <div className="spacing-x-2 flex flex-row justify-start">
+        <div className="flex flex-row flex-wrap justify-start gap-2">
           <DatabaseSelectPopover attribute={database} />
           <DatabaseViewTypeSelectPopover attribute={viewType} />
           <DatabaseSortPopover attribute={sort} />
@@ -72,14 +72,14 @@ const DatabaseSelectPopover = ({ attribute }: { attribute?: Attribute }) => {
       {({ open }) => (
         <>
           <Popover.Button
-            className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+            className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
               open ? "outline-2" : "outline-none"
             }`}
           >
             {open ? (
-              <CircleStackIcon className="w-6" />
+              <CircleStackIcon className="w-5" />
             ) : (
-              <CircleStackOutlineIcon className="w-6" />
+              <CircleStackOutlineIcon className="w-5" />
             )}
             <span className="text-sm">Database</span>
           </Popover.Button>
@@ -108,14 +108,14 @@ const DatabaseViewTypeSelectPopover = ({
       {({ open }) => (
         <>
           <Popover.Button
-            className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+            className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
               open ? "outline-2" : "outline-none"
             }`}
           >
             {open ? (
-              <ViewColumnsIcon className="w-6" />
+              <ViewColumnsIcon className="w-5" />
             ) : (
-              <ViewColumnsOutlineIcon className="w-6" />
+              <ViewColumnsOutlineIcon className="w-5" />
             )}
             <span className="text-sm">View Type</span>
           </Popover.Button>
@@ -140,14 +140,14 @@ const DatabaseSortPopover = ({ attribute }: { attribute?: Attribute }) => {
       {({ open }) => (
         <>
           <Popover.Button
-            className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+            className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
               open ? "outline-2" : "outline-none"
             }`}
           >
             {open ? (
-              <Bars3BottomRightIcon className="w-6" />
+              <Bars3BottomRightIcon className="w-5" />
             ) : (
-              <Bars3BottomRightOutlineIcon className="w-6" />
+              <Bars3BottomRightOutlineIcon className="w-5" />
             )}
             <span className="text-sm">Sort</span>
           </Popover.Button>

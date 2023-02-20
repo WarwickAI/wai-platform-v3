@@ -111,14 +111,14 @@ const AttendeesPopover = ({ element, edit }: ElementProps) => {
       {({ open }) => (
         <>
           <Popover.Button
-            className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+            className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
               open ? "outline-2" : "outline-none"
             }`}
           >
             {open ? (
-              <TicketIcon className="w-6" />
+              <TicketIcon className="w-5" />
             ) : (
-              <TicketOutlineIcon className="w-6" />
+              <TicketOutlineIcon className="w-5" />
             )}
             <span className="text-sm">Attendees</span>
           </Popover.Button>
@@ -143,14 +143,14 @@ const EventQRPopover = ({ element }: ElementProps) => {
       {({ open }) => (
         <>
           <Popover.Button
-            className={`flex flex-row items-center space-x-2 rounded-lg px-2 py-1 font-semibold hover:bg-slate-200 ${
+            className={`flex flex-row items-center space-x-1 rounded-lg bg-secondary px-2 py-1 font-semibold text-secondary-content hover:bg-secondary-focus ${
               open ? "outline-2" : "outline-none"
             }`}
           >
             {open ? (
-              <QrCodeIcon className="w-6" />
+              <QrCodeIcon className="w-5" />
             ) : (
-              <QrCodeOutlineIcon className="w-6" />
+              <QrCodeOutlineIcon className="w-5" />
             )}
             <span className="text-sm">QR Code</span>
           </Popover.Button>

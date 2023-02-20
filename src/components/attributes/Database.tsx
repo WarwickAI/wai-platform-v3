@@ -113,9 +113,6 @@ const DatabaseAttribute = ({ attribute, edit }: AttributeProps) => {
             </option>
           ))}
       </select>
-      <button onClick={handleDelete}>
-        <TrashIcon className="h-6 w-6 text-neutral" />
-      </button>
       <button onClick={handleCreate}>
         <PlusIcon className="h-6 w-6 text-neutral" />
       </button>

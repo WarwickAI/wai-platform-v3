@@ -18,6 +18,7 @@ import { CustomIcon } from "../utils";
 const Links: { name: string; route: string; icon: CustomIcon }[] = [
   { name: "Home", route: "/", icon: HomeIcon },
   { name: "Election", route: "/election", icon: StarIcon },
+  { name: "Education", route: "/education", icon: BuildingLibraryIcon },
   { name: "Merch", route: "/merch", icon: ShoppingBagIcon },
 ];
 

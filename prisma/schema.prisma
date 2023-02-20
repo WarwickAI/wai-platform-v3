@@ -114,6 +114,7 @@ enum AttributeType {
   Image
   ElementType
   STV
+  DatabaseFilter
 }
 
 model Element {

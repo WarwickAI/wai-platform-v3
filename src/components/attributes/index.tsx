@@ -5,6 +5,7 @@ import {
   CircleStackIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
+  FunnelIcon,
   InboxStackIcon,
   PaperClipIcon,
   PhotoIcon,
@@ -26,9 +27,9 @@ import NumberAttribute, { NumberAttributeSchema } from "./Number";
 import TextAttribute, { TextAttributeSchema } from "./Text";
 import DatabaseAttribute, { DatabaseAttributeSchema } from "./Database";
 import { AttributeProps } from "./utils";
-import DatabaseSortAttribute, {
-  DatabaseSortAttributeSchema,
-} from "./DatabaseSort";
+import DatabaseFilterAttribute, {
+  DatabaseFilterAttributeSchema,
+} from "./DatabaseFilter";
 import DatabaseViewTypeAttribute, {
   DatabaseViewTypeAttributeSchema,
 } from "./DatabaseViewType";
@@ -43,6 +44,9 @@ import ElementTypeAttribute, {
   ElementTypeAttributeSchema,
 } from "./ElementType";
 import STVAttribute, { STVAttributeSchema } from "./STV";
+import DatabaseSortAttribute, {
+  DatabaseSortAttributeSchema,
+} from "./DatabaseSort";
 
 const attributes: {
   [key in AttributeType]?: {
@@ -180,6 +184,14 @@ const attributes: {
     icon: StarIcon,
     valueSchema: STVAttributeSchema,
     element: STVAttribute,
+    showInPicker: false,
+  },
+  [AttributeType.DatabaseFilter]: {
+    name: "Database Filter",
+    description: "Filters for a database",
+    icon: FunnelIcon,
+    valueSchema: DatabaseFilterAttributeSchema,
+    element: DatabaseFilterAttribute,
     showInPicker: false,
   },
 };

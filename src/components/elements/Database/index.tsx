@@ -3,6 +3,7 @@ import { z } from "zod";
 import { trpc } from "../../../utils/trpc";
 import attributes from "../../attributes";
 import { ColumnAttributeSchema, ColumnSchema } from "../../attributes/Columns";
+import { DatabaseFilterType } from "../../attributes/DatabaseFilter";
 import { DatabaseSortType } from "../../attributes/DatabaseSort";
 import TextAttribute from "../../attributes/Text";
 import Permissions from "../../permissions";
@@ -25,7 +26,12 @@ const DatabaseElement = ({
   edit,
   viewAs,
   sorts,
-}: ElementProps & { viewAs?: string; sorts?: DatabaseSortType }) => {
+  filters,
+}: ElementProps & {
+  viewAs?: string;
+  sorts?: DatabaseSortType;
+  filters?: DatabaseFilterType;
+}) => {
   const utils = trpc.useContext();
 
   const addElement = trpc.element.create.useMutation();
@@ -158,39 +164,64 @@ const DatabaseElement = ({
 
     if (!sorts) return children;
 
-    const sorted = children.sort((a, b) => {
-      let i = 0;
-      while (true) {
-        const sort = sorts[i];
-        if (!sort) return 0;
+    const sorted = children
+      .sort((a, b) => {
+        let i = 0;
+        while (true) {
+          const sort = sorts[i];
+          if (!sort) return 0;
 
-        const aAtt = a.atts.find((att) => att.name === sort.columnName);
-        const bAtt = b.atts.find((att) => att.name === sort.columnName);
+          const aAtt = a.atts.find((att) => att.name === sort.columnName);
+          const bAtt = b.atts.find((att) => att.name === sort.columnName);
 
-        if (!aAtt || !bAtt) return 0;
-        if (!aAtt) return -1;
-        if (!bAtt) return 1;
+          if (!aAtt || !bAtt) return 0;
+          if (!aAtt) return -1;
+          if (!bAtt) return 1;
 
-        if (aAtt.value !== bAtt.value) {
-          return sort.direction === "asc"
-            ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              aAtt.value! > bAtt.value!
+          if (aAtt.value !== bAtt.value) {
+            return sort.direction === "asc"
+              ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                aAtt.value! > bAtt.value!
+                ? 1
+                : -1
+              : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              aAtt.value! < bAtt.value!
               ? 1
-              : -1
-            : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            aAtt.value! < bAtt.value!
-            ? 1
-            : -1;
-        }
+              : -1;
+          }
 
-        // Will only get to here if the values are the same
-        // So we need to check the next sort
-        i += 1;
-      }
-    });
+          // Will only get to here if the values are the same
+          // So we need to check the next sort
+          i += 1;
+        }
+      })
+      .filter((e) => {
+        if (!filters) return true;
+
+        return filters.every((f) => {
+          const att = e.atts.find((att) => att.name === f.columnName);
+          if (!att) return false;
+
+          if (f.operator === "eq") {
+            return att.value === f.value;
+          } else if (f.operator === "neq") {
+            return att.value !== f.value;
+          } else if (f.operator === "gt") {
+            return att.value && att.value > f.value;
+          } else if (f.operator === "gte") {
+            return att.value && att.value >= f.value;
+          } else if (f.operator === "lt") {
+            return att.value && att.value < f.value;
+          } else if (f.operator === "lte") {
+            return att.value && att.value <= f.value;
+          } else {
+            return false;
+          }
+        });
+      });
 
     return sorted;
-  }, [element.children, sorts]);
+  }, [element.children, sorts, filters]);
 
   return (
     <div>

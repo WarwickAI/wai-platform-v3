@@ -77,10 +77,14 @@ export const elementRouter = router({
   queryAll: publicProcedure
     .input(z.object({ type: z.nativeEnum(ElementType) }))
     .query(async ({ ctx, input }) => {
-      const elements = await ctx.prisma.element.findMany({
-        where: {
-          type: input.type,
-        },
+      const reqAtts = elements[input.type as ElementType]?.requiredAtts;
+
+      // Filter out ones that have optional true
+      const requiredAtts = reqAtts?.filter((a) => !a.optional);
+
+      // Get all elements that have at least all the required attributes
+      // ToDo Make more efficient!!!
+      const queriedElements = await ctx.prisma.element.findMany({
         include: {
           atts: true,
           ...groupsInclude,
@@ -95,9 +99,16 @@ export const elementRouter = router({
         },
       });
 
+      // Filter out ones that don't have all the required attributes
+      const matchingAtts = queriedElements.filter((e) => {
+        return requiredAtts?.every((att) => {
+          return e.atts.some((a) => a.name === att.name && a.type === att.type);
+        });
+      });
+
       // Filter only elements user has permission to view
       const filtered = await asyncFilter(
-        elements,
+        matchingAtts,
         (e: ElementWithAttsGroups) => {
           return defaultPermsCheck(ctx, e, "ElementView");
         }

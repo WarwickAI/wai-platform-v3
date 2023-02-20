@@ -49,12 +49,9 @@ const CollectionElement = ({ element, edit }: ElementProps) => {
         </div>
       )}
       <div className="flex flex-row flex-wrap space-x-2">
-        {queriedElements.map(
-          (element: ElementWithAttsGroupsChildren) =>
-            element.type === ElementType.Event && (
-              <EventElement element={element} edit={edit} />
-            )
-        )}
+        {queriedElements.map((element: ElementWithAttsGroupsChildren) => (
+          <EventElement key={element.id} element={element} edit={edit} />
+        ))}
       </div>
     </div>
   );

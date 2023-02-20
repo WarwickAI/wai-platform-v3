@@ -3,14 +3,14 @@ import {
   ChevronUpIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import { ElementType } from "@prisma/client";
+import { Attribute, ElementType } from "@prisma/client";
+import { InstantRunoff } from "votes";
 import { z } from "zod";
 import { trpc } from "../../utils/trpc";
 import elements from "../elements";
 import { ElementWithAttsGroupsChildren } from "../elements/utils";
 import { getValidElementTypes } from "../utils";
 import { ColumnAttributeSchema } from "./Columns";
-import DatabaseAttribute from "./Database";
 import { AttributeProps } from "./utils";
 
 export const STVAttributeSchema = z.array(z.string()).default([]);
@@ -149,3 +149,61 @@ export const STVAttribute = ({ attribute, edit, database }: STVProps) => {
 };
 
 export default STVAttribute;
+
+// Given a list of STV results, allow the user to choose the number of seats to allocate
+// and show the results (with counts of votes and seats allocated)
+export const STVResults = ({
+  stvAttributes,
+  dbRef,
+}: {
+  stvAttributes: Attribute[];
+  dbRef: string;
+}) => {
+  // Get the database
+  const { data: database } = trpc.element.get.useQuery(dbRef);
+
+  if (!database) return <div>Database not found</div>;
+
+  // Get the candidates (titles and IDs of the database children)
+  const candidates = database.children.map((child) => {
+    return {
+      id: child.id,
+      name: child.atts.find((att) => att.name === "Title")?.value as string,
+    };
+  });
+
+  // Parse the STV attributes
+  const results = stvAttributes.map((att) => {
+    const parsed = STVAttributeSchema.parse(att.value);
+    return parsed;
+  });
+
+  // Create the STV object
+  const stvResults = new InstantRunoff({
+    candidates: candidates.map((c) => c.id),
+    ballots: results.map((r) => {
+      return {
+        weight: 1,
+        ranking: r.map((id) => [id]),
+      };
+    }),
+  });
+
+  return (
+    <div>
+      <p>STV Results</p>
+      <ul>
+        {stvResults.ranking().map((rank, i) => (
+          <li key={i}>
+            {rank.map((candidate) => (
+              <span key={i + " " + candidate}>
+                {candidates.find(({ id, name }) => id === candidate)?.name ||
+                  "Unknown"}
+              </span>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};

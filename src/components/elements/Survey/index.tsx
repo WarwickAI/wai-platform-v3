@@ -29,6 +29,7 @@ import {
   ElementAttributeDescription,
 } from "../utils";
 import SurveyResponseTable from "./Table";
+import QuestionResponses from "./QuestionResponse";
 
 export const SurveyRequiredAttributes: ElementAttributeDescription[] = [
   { name: "Title", type: "Text" },
@@ -341,6 +342,20 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
           {viewMode === "responses" && questionsAttribute && (
             <div className="flex flex-col space-y-2">
               <SurveyResponseTable
+                surveyQuestions={
+                  questionsAttribute.value as z.infer<
+                    typeof SurveyQuestionsAttributeSchema
+                  >
+                }
+                anonymous={anonymousAttribute?.value as boolean}
+                elements={surveyElement.children}
+              />
+            </div>
+          )}
+          {/* View by question */}
+          {viewMode === "questions" && questionsAttribute && (
+            <div className="flex flex-col space-y-2">
+              <QuestionResponses
                 surveyQuestions={
                   questionsAttribute.value as z.infer<
                     typeof SurveyQuestionsAttributeSchema

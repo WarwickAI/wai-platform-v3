@@ -14,13 +14,11 @@ const DatabaseEvents = ({
   edit,
 }: DatabaseEventsProps) => {
   return (
-    <div className="flex flex-row flex-wrap space-x-2">
+    <div className="flex flex-row flex-wrap gap-2">
       {events.map((event) => (
-        <EventElement
-          key={event.id}
-          element={{ ...event, children: [] }}
-          edit={edit}
-        />
+        <div key={event.id} className="rounded-xl border-2 p-2">
+          <EventElement element={{ ...event, children: [] }} edit={edit} />
+        </div>
       ))}
       {edit && (
         <button

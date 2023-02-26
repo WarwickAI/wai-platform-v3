@@ -70,7 +70,7 @@ const UserAttribute = ({ attribute }: AttributeProps) => {
                   src={
                     "https://www.gravatar.com/avatar/" +
                     MD5(user.email || "") +
-                    "?s=120"
+                    "?s=120&d=identicon"
                   }
                   alt={"Profile picture of " + user?.email}
                 />

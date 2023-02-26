@@ -87,7 +87,7 @@ const Item = ({ element, parent, blur, editParent }: ItemProps) => {
               src={
                 "https://www.gravatar.com/avatar/" +
                 MD5(element?.user.email || "") +
-                "?s=24"
+                "?s=24&d=identicon"
               }
             />
           </div>

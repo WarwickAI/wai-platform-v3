@@ -49,15 +49,12 @@ const UserAttribute = ({ attribute }: AttributeProps) => {
     editAttribute.mutate({ id: attribute.id, value: user.id });
   };
 
-  console.log(query);
-  console.log(filteredUsers);
-
   return (
     <Popover className="relative w-full">
       {({ open }) => (
         <>
           <Popover.Button
-            className={`flex flex-row w-full items-center justify-center space-x-1 rounded-lg px-2 py-1 font-semibold ${
+            className={`flex w-full flex-row items-center justify-center space-x-1 rounded-lg px-2 py-1 font-semibold ${
               open ? "outline-2" : "outline-none"
             }`}
           >

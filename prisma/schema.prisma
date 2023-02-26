@@ -94,6 +94,7 @@ enum ElementType {
   SurveyResponse
   Image
   Collection
+  User
 }
 
 enum AttributeType {

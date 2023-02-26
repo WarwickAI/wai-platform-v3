@@ -8,10 +8,12 @@ import {
   PhotoIcon,
   PresentationChartBarIcon,
   TableCellsIcon,
+  UserIcon,
 } from "@heroicons/react/24/solid";
 import { ElementType } from "@prisma/client";
 import TextElement, { TextRequiredAttributes } from "./Text";
 import PageElement, { PageRequiredAttributes } from "./Page";
+import UserElement, { UserRequiredAttributes } from "./User";
 import {
   ElementProps,
   ElementAttributeDescription,
@@ -148,6 +150,14 @@ const elements: {
     icon: ListBulletIcon,
     element: CollectionElement,
     requiredAtts: CollectionRequiredAttributes,
+    showInPicker: true,
+  },
+  [ElementType.User]: {
+    name: "User",
+    description: "Shows a user.",
+    icon: UserIcon,
+    element: UserElement,
+    requiredAtts: UserRequiredAttributes,
     showInPicker: true,
   },
 };

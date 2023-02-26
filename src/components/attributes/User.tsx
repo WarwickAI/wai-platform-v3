@@ -24,7 +24,10 @@ const UserAttribute = ({ attribute }: AttributeProps) => {
     if (!query) return allUsers;
 
     return allUsers?.filter((u) => {
-      return u.email?.toLowerCase().includes(query.toLowerCase());
+      return (
+        u.email?.toLowerCase().includes(query.toLowerCase()) ||
+        u.name?.toLowerCase().includes(query.toLowerCase())
+      );
     });
   }, [query, allUsers]);
 
@@ -41,7 +44,7 @@ const UserAttribute = ({ attribute }: AttributeProps) => {
   });
 
   const handleEdit = (newValue: string) => {
-    // Find the user with the id
+    // Find the user with the email
     const user = allUsers?.find((u) => u.email === newValue);
 
     if (!user) return;
@@ -61,17 +64,17 @@ const UserAttribute = ({ attribute }: AttributeProps) => {
             {user ? (
               <div className="flex flex-row items-center space-x-2">
                 <Image
-                  width={100}
-                  height={100}
+                  width={60}
+                  height={60}
                   className={"rounded-full"}
                   src={
                     "https://www.gravatar.com/avatar/" +
                     MD5(user.email || "") +
-                    "?s=125"
+                    "?s=120"
                   }
                   alt={"Profile picture of " + user?.email}
                 />
-                {/* <p>{user?.name}</p> currently don't have the name :( */}
+                <p className="text-base">{user?.name}</p>
               </div>
             ) : (
               <p>select user</p>
@@ -88,7 +91,7 @@ const UserAttribute = ({ attribute }: AttributeProps) => {
                 {filteredUsers?.map((u) => (
                   <Combobox.Option key={u.email} value={u.email}>
                     <div className="flex flex-row items-center space-x-2">
-                      <p>{u?.email}</p>
+                      <p>{u?.name}</p>
                     </div>
                   </Combobox.Option>
                 ))}

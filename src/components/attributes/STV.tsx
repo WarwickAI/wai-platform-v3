@@ -125,9 +125,12 @@ export const STVAttribute = ({ attribute, edit, database }: STVProps) => {
         )
         .map((child) => {
           return (
-            <div key={child.id} className="flex flex-row space-x-1">
-              <p>
-                {order.findIndex((c) => c === child.id) + 1 || "not sorted"}
+            <div
+              key={child.id}
+              className="mt-2 flex flex-row items-center space-x-1"
+            >
+              <p className="font-sembold w-8 text-3xl">
+                {order.findIndex((c) => c === child.id) + 1 || ""}
               </p>
               {Element && (
                 <Element element={{ ...child, children: [] }} edit={edit} />
@@ -162,13 +165,21 @@ export const STVResults = ({
   // Get the database
   const { data: database } = trpc.element.get.useQuery(dbRef);
 
+  // Get all users
+  const { data: users } = trpc.user.getAll.useQuery();
+
   if (!database) return <div>Database not found</div>;
 
   // Get the candidates (titles and IDs of the database children)
   const candidates = database.children.map((child) => {
+    const userId = child.atts.find((att) => att.name === "User")?.value;
+
+    if (!userId) return { id: child.id, name: "Unknown" };
+
+    const user = users?.find((u) => u.id === userId);
     return {
       id: child.id,
-      name: child.atts.find((att) => att.name === "Title")?.value as string,
+      name: user?.name || "Unknown",
     };
   });
 

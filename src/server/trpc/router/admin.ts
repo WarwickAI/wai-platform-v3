@@ -180,4 +180,29 @@ export const adminRouter = router({
         }
       }
     }),
+  addRONUser: adminProcedure.mutation(async ({ ctx }) => {
+    // Check the user doesn't already exist
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        email: "RON@RON",
+      },
+    });
+
+    if (user) {
+      throw new Error("User already exists");
+    }
+
+    // Create the user
+    await ctx.prisma.user.create({
+      data: {
+        email: "RON@RON",
+        name: "RON (Re-open Nominations)",
+        groups: {
+          connect: {
+            name: "Member",
+          },
+        },
+      },
+    });
+  }),
 });

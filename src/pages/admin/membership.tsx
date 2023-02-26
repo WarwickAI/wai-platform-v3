@@ -13,6 +13,8 @@ const MembershipPanel = () => {
     },
   });
 
+  const addRONMember = trpc.admin.addRONUser.useMutation();
+
   return (
     <>
       <Head>
@@ -34,6 +36,12 @@ const MembershipPanel = () => {
               className="mt-4 rounded-lg bg-secondary px-4 py-2 text-white hover:cursor-pointer hover:bg-secondary-focus"
             >
               Update membership from SU API
+            </button>
+            <button
+              onClick={() => addRONMember.mutate()}
+              className="mt-4 rounded-lg bg-secondary px-4 py-2 text-white hover:cursor-pointer hover:bg-secondary-focus"
+            >
+              Add RON member
             </button>
             <DetailedMembershpPopup />
           </div>

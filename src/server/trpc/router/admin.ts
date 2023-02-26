@@ -76,6 +76,7 @@ export const adminRouter = router({
         },
         data: {
           UniID: member.id,
+          name: `${member.firstName} ${member.lastName}`,
         },
       });
 

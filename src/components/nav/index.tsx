@@ -81,11 +81,11 @@ const NavBar = () => {
               <li key={link.name}>
                 <Link href={link.route}>
                   <div
-                    className={`-ml-2 flex flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white ${
+                    className={`-ml-2 text-gray-700 flex flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white ${
                       router.asPath === link.route && "bg-white"
                     }`}
                   >
-                    <Icon className="h-8 w-8 text-black" />
+                    <Icon className="h-8 w-8" />
                     <p>{link.name}</p>
                   </div>
                 </Link>
@@ -99,13 +99,13 @@ const NavBar = () => {
             className="mb-5 -ml-2 flex w-36 flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white"
             onClick={() => (user?.data ? signOut() : signIn())}
           >
-            <UserIcon className=" h-8 w-8 p-2 text-black" />
+            <UserIcon className=" h-8 w-8 p-2 text-gray-700" />
             <p>{user?.data ? "Logout" : "Login"}</p>
           </div>
           {isAdmin && (
             <Link href="/admin">
               <div className="mb-5 -ml-2 flex w-36 flex-row items-center space-x-4 py-2 px-4 transition-colors ease-in-out hover:cursor-pointer hover:bg-white">
-                <BuildingLibraryIcon className=" h-8 w-8 p-2 text-black" />
+                <BuildingLibraryIcon className=" h-8 w-8 p-2 text-gray-700" />
                 <p>Admin</p>
               </div>
             </Link>

@@ -292,6 +292,11 @@ const SurveyElement = ({ element, edit }: ElementProps) => {
             No longer recieving responses
           </p>
         )}
+        {!interact && (
+          <p className="text-sm font-semibold text-warning">
+            You do not have permission to respond
+          </p>
+        )}
       </div>
 
       {/* Results are shown below */}

@@ -200,6 +200,18 @@ export const STVResults = ({
     }),
   });
 
+  const preferenceCounts: { [key: string]: number[] } = {};
+
+  candidates.forEach((c) => {
+    preferenceCounts[c.id] = [0, 0, 0, 0, 0, 0];
+  });
+
+  results.forEach((r) => {
+    r.forEach((id, i) => {
+      preferenceCounts[id]![i]++;
+    });
+  });
+
   return (
     <div>
       <p>STV Results</p>
@@ -215,6 +227,17 @@ export const STVResults = ({
           </li>
         ))}
       </ul>
+      <p>Raw Results</p>
+      {Object.keys(preferenceCounts).map((id) => {
+        return (
+          <div key={id}>
+            <p>
+              {candidates.find((c) => c.id === id)?.name || "Unknown"}:{" "}
+              {preferenceCounts[id]!.join(", ")}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 };
